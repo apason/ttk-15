@@ -1,0 +1,15 @@
+; this is a comment
+
+LOAD R1,=1  ;this is also a comment
+OUT R1,=CRT
+IN R1,=11
+OUT R1,=CRT
+IN R1,=12
+OUT R1,=CRT
+LOAD R2,=2
+OUT R2,=12
+IN R1,=12
+OUT R1,=CRT
+OUT R2,=12
+IN R1,=12
+OUT R1,=CRT
