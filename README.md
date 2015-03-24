@@ -2,9 +2,10 @@
 ttk-15 on ttk-91 klooni pienillä muutoksilla
 
 # työn alla #
-*lataaja -> lataaja + makefile + testaus
-*testit kaikille konekäskyille
-*refaktorointi -> järkevä hakemistorakenne
+ * lataaja -> lataaja + makefile + testaus
+ * testit kaikille konekäskyille
+ * refaktorointi -> järkevä hakemistorakenne
 
 # tulevia #
-*n ydintä
+ * bitshiftit kuntoon
+ * n ydintä
