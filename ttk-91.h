@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define MYTYPE int32_t
-#define FUNCTION(function) void function(machine *m,uint8_t rj,uint8_t mod,uint8_t ri,uint16_t mem)
+#define FUNCTION(function) void function(machine *m, uint8_t rj, uint8_t mod, uint8_t ri, uint16_t mem)
 
 //hardcoded symbols
 #define CRT    0x0
@@ -51,7 +51,8 @@ typedef struct MACHINE {
 
 } machine;
 
-typedef void(*instructionptr)(machine*,uint8_t,uint8_t,uint8_t,uint16_t);
+//prototype for machine instruction
+typedef void(*instructionptr)(machine*, uint8_t, uint8_t, uint8_t, uint16_t);
 
 //global variables
 instructionptr instructions[255];
@@ -63,13 +64,12 @@ extern machine *newMachine(long memsize);
 extern void startMachine(machine *m);
 
 //mmu.c
-extern void mmuGetData(mm_unit *mmu,MYTYPE *mem,MYTYPE x);
-extern void mmuSetData(mm_unit *mmu,MYTYPE *mem,MYTYPE addr,MYTYPE data);
-extern void mmuCheckAddress(mm_unit *mmu,MYTYPE x);
+extern void mmuGetData(mm_unit *mmu, MYTYPE *mem, MYTYPE x);
+extern void mmuSetData(mm_unit *mmu, MYTYPE *mem, MYTYPE addr, MYTYPE data);
 
 //cu.c
-extern MYTYPE calculateSecondOperand(machine *m,uint8_t mode,uint8_t ri,int16_t addr);
-extern MYTYPE calculatePointer(machine *m,uint8_t mode,uint8_t ri,int16_t addr);
+extern MYTYPE calculateSecondOperand(machine *m, uint8_t mode, uint8_t ri, int16_t addr);
+extern MYTYPE calculatePointer(machine *m, uint8_t mode, uint8_t ri, int16_t addr);
 
 //helpers.c
 extern void initializeGlobals(void);

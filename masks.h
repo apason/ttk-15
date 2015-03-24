@@ -1,3 +1,8 @@
+/*
+ * defines mask value for all used 
+ * bits in state register
+ */
+
 #ifndef masks
 #define masks
 

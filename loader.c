@@ -6,37 +6,39 @@
 
 #define BUFSIZE 32
 
+//loads old ttk-91 "binary" file to memory
 int loadFile(MYTYPE *mem, char *file){
   FILE *fp;
-  int cstart,cend,dstart,dend,i;
+  // c stands for "code" and d for "data"
+  int cstart, cend, dstart, dend, i;
   char buffer[BUFSIZE];
 
-  if((fp=fopen(file,"r"))==NULL){
+  if( (fp = fopen(file,"r")) == NULL){
     printf("ERROR: cannot open binary file %s\n", file);
     exit(-1);
   }
   
   do{
-    fgets(buffer,BUFSIZE,fp);
-    printf("%s",buffer);
-  }while(sscanf(buffer,"%d %d",&cstart,&cend)!=2);
-  printf("cstart: %d\ncend: %d\n",cstart,cend);
+    fgets(buffer, BUFSIZE, fp);
+    printf("%s", buffer);
+  }while(sscanf(buffer,"%d %d", &cstart, &cend) != 2);
+  printf("cstart: %d\ncend: %d\n", cstart, cend);
 
 
-  for(i=cstart;i<=cend;i++){
-    fgets(buffer,BUFSIZE,fp);
-    sscanf(buffer,"%d",mem+i);
+  for(i = cstart; i <= cend; i++){
+    fgets(buffer, BUFSIZE, fp);
+    sscanf(buffer, "%d", mem +i);
   }
-  
+ 
   do{
-    fgets(buffer,BUFSIZE,fp);
-    printf("%s",buffer);
-  }while(sscanf(buffer,"%d %d",&dstart,&dend)!=2);
-  printf("dstart: %d\ndend: %d\n",dstart,dend);
+    fgets(buffer, BUFSIZE, fp);
+    printf("%s", buffer);
+  }while(sscanf(buffer, "%d %d", &dstart, &dend) != 2);
+  printf("dstart: %d\ndend: %d\n", dstart, dend);
 
-  for(i=dstart;i<=dend;i++){
-    fgets(buffer,BUFSIZE,fp);
-    sscanf(buffer,"%d",mem+i);
+  for(i = dstart; i <= dend; i++){
+    fgets(buffer, BUFSIZE, fp);
+    sscanf(buffer, "%d", mem +i);
   }
   
   fclose(fp);

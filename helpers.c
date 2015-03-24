@@ -4,58 +4,61 @@
 #include "ttk-91.h"
 #include "instructions.h"
 
+//initializes all global variables excluded machine itself
 void initializeGlobals(void){
   int i;
   // mytype length in bytes
-  mtl=sizeof(MYTYPE)*8; 
+  mtl = sizeof(MYTYPE) * 8; 
 
-  for(i=0;i<255;i++) instructions[i]=NULL;
+  for(i = 0; i < 255; i++) instructions[i] = NULL;
 
-  instructions[NOP]=nop;
-  instructions[STORE]=store;
-  instructions[LOAD]=load;
-  instructions[IN]=in;
-  instructions[OUT]=out;
-  instructions[ADD]=add;
-  instructions[SUB]=sub;
-  instructions[MUL]=mul;
-  instructions[DIV]=divv;
-  instructions[MOD]=mod;
-  instructions[AND]=and;
-  instructions[OR]=or;
-  instructions[XOR]=xor;
-  instructions[SHL]=shl;
-  instructions[SHR]=shr;
-  instructions[NOT]=not;
-  instructions[SHRA]=shra;
-  instructions[COMP]=comp;
-  instructions[JUMP]=jump;
-  instructions[JNEG]=jneg;
-  instructions[JZER]=jzer;
-  instructions[JPOS]=jpos;
-  instructions[JNNEG]=jnneg;
-  instructions[JNZER]=jnzer;
-  instructions[JNPOS]=jnpos;
-  instructions[JLES]=jles;
-  instructions[JEQU]=jequ;
-  instructions[JGRE]=jgre;
-  instructions[JNLES]=jnles;
-  instructions[JNEQU]=jnequ;
-  instructions[JNGRE]=jngre;
-  instructions[CALL]=call;
-  instructions[EXIT]=exitt;
-  instructions[PUSH]=push;
-  instructions[POP]=pop;
-  instructions[PUSHR]=pushr;
-  instructions[POPR]=popr;
-  instructions[SVC]=svc;
+  instructions[NOP]   = nop;
+  instructions[STORE] = store;
+  instructions[LOAD]  = load;
+  instructions[IN]    = in;
+  instructions[OUT]   = out;
+  instructions[ADD]   = add;
+  instructions[SUB]   = sub;
+  instructions[MUL]   = mul;
+  instructions[DIV]   = divv;
+  instructions[MOD]   = mod;
+  instructions[AND]   = and;
+  instructions[OR]    = or;
+  instructions[XOR]   = xor;
+  instructions[SHL]   = shl;
+  instructions[SHR]   = shr;
+  instructions[NOT]   = not;
+  instructions[SHRA]  = shra;
+  instructions[COMP]  = comp;
+  instructions[JUMP]  = jump;
+  instructions[JNEG]  = jneg;
+  instructions[JZER]  = jzer;
+  instructions[JPOS]  = jpos;
+  instructions[JNNEG] = jnneg;
+  instructions[JNZER] = jnzer;
+  instructions[JNPOS] = jnpos;
+  instructions[JLES]  = jles;
+  instructions[JEQU]  = jequ;
+  instructions[JGRE]  = jgre;
+  instructions[JNLES] = jnles;
+  instructions[JNEQU] = jnequ;
+  instructions[JNGRE] = jngre;
+  instructions[CALL]  = call;
+  instructions[EXIT]  = exitt;    //exit to not to be conflict with std function
+  instructions[PUSH]  = push;
+  instructions[POP]   = pop;
+  instructions[PUSHR] = pushr;
+  instructions[POPR]  = popr;
+  instructions[SVC]   = svc;
 }
 
+//for fatal errors
 void error(const char *msg){
-  printf("ERROR: %s",msg);
+  fprintf(stderr, "ERROR: %s", msg);
   exit(-1);
 }
 
+//mainly for debugging. prints state of machine and first memoryslots
 void printState(machine *m){
   int i;
   
