@@ -1,5 +1,7 @@
 #include <stdio.h>
-#include "ttk-91.h"
+
+//project header
+#include <ttk-91.h>
 
 int main(int argc,char *argv[]){
   machine *m = newMachine(65536 /*64k system*/);

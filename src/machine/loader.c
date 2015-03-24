@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "ttk-91.h"
+//project header
+#include <ttk-91.h>
 
 #define BUFSIZE 32
 

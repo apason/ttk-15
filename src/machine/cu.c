@@ -1,4 +1,5 @@
-#include "ttk-91.h"
+//project header
+#include <ttk-91.h>
 
 //calculates second operand in instruction (result of addr field and mode field)
 MYTYPE calculateSecondOperand(machine *m, uint8_t mode, uint8_t ri, int16_t addr){

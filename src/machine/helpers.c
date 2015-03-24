@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "ttk-91.h"
-#include "instructions.h"
+//project headers
+#include <ttk-91.h>
+#include <instructions.h>
 
 //initializes all global variables excluded machine itself
 void initializeGlobals(void){

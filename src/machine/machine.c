@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "ttk-91.h"
-#include "masks.h"
+//project headers
+#include <ttk-91.h>
+#include <masks.h>
 
 static void getInstruction(machine *m);
 static void increasePC(machine *m);

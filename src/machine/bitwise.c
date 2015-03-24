@@ -1,4 +1,5 @@
-#include "ttk-91.h"
+//project header
+#include <ttk-91.h>
 
 //lengths of bit fields
 #define OPCODE_L  8

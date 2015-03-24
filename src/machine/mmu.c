@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "ttk-91.h"
+
+//project header
+#include <ttk-91.h>
 
 static void mmuCheckAddress(mm_unit *mmu, MYTYPE x);
 

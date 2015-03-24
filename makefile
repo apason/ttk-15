@@ -1,17 +1,15 @@
-CC= 	gcc
-STD=	_GNU_SOURCE_
-OBJS=	main.o bitwise.o cu.o helpers.o instructions.o machine.o mmu.o loader.c
+MACHINE=  ./src/machine
+COMPILER= ./src/compiler
 
 .c.o:
-	$(CC) -c -Wall $(CFLAGS) -D$(STD) $<
+	$(CC) $(CFLAGS) -I src/include $<
 
-all:	ttk-15
+all:	machine
 
-ttk-15:	$(OBJS)
-	$(CC) $(OBJS) -o ttk-15
-
+machine:	
+	$(MAKE) -C $(MACHINE) all
 clean:
-	rm -f *.o
+	$(MAKE) -C $(MACHINE) clean
 
 clobber:	clean
-	rm -f ttk-15
+	$(MAKE) -C $(MACHINE) clobber

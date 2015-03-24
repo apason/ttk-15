@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "ttk-91.h"
-#include "masks.h"
+//project headers
+#include <ttk-91.h>
+#include <masks.h>
 
 FUNCTION(nop){
   ;
