@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 
+int countLines(FILE*);
 
 int main (int argc, char* argv[]) {
 
@@ -23,14 +25,17 @@ int main (int argc, char* argv[]) {
 		}
 		input[i] = (char*) malloc(256 * sizeof(char*));
 		int ch = fgetc(fh), count = 0;
-		while (ch == ' ' || ch == '\t') ch = fgetc(fh);
+		while (ch == ' ' || ch == '\t') ch = fgetc(fh);
 		if (ch == ';') {
 			while (fgetc(fh) != '\n');
 			ch = fgetc(fh);
-			while (ch == ' ' || ch == '\t') ch = fgetc(fh);
+			while (ch == ' ' || ch == '\t') ch = fgetc(fh);
 		}
 		while (ch != '\n') {
-			if (ch == ';') continue;
+			if (ch == ';') {
+				while (fgetc(fh) != '\n');
+				continue;
+			}
 			*input[count++] = ch;
 		}
 		*input[count] = 0;
@@ -50,7 +55,7 @@ int countLines (FILE* fh) {
 	int ch = 0;	
 	while (!feof(fh)) {
 		ch = fgetc(fh);
-		while (ch == ' ' || ch == '\t') ch = fgetc(fh);
+		while (ch == ' ' || ch == '\t') ch = fgetc(fh);
 		if (ch == ';') continue;
 		while (ch != '\n') fgetc(fh);
 		++lines;
