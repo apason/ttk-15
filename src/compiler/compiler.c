@@ -5,7 +5,7 @@
 int countLines(FILE*);
 
 int main (int argc, char* argv[]) {
-
+	int i;
 	if (argc < 2) return -1;
 
 	// we take the first argument to be name of a .ttk91 file
@@ -22,7 +22,7 @@ int main (int argc, char* argv[]) {
 	
 	// reserve space and read the code lines from the file
 	char** input = (char**) malloc(lines*sizeof(char*));
-	for (int i = 0; i < lines; ++i) {
+	for (i = 0; i < lines; ++i) {
 		if (feof(fh)) {
 			printf("Error reading the source file!\n");
 			return -1;
@@ -58,7 +58,7 @@ int main (int argc, char* argv[]) {
 	fclose(fh);
 
 	// free space for the file array
-	for (int i = 0; i < lines; ++i) {
+	for (i = 0; i < lines; ++i) {
 		free(input[i]);
 	}
 	free(input);
