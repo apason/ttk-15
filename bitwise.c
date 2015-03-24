@@ -7,7 +7,7 @@
 #define MODE_L    2
 
 /* 
- * mtl stands for MyType Length. Its nuber of bytes in MYTYPE 
+ * mtl stands for MyType Length. Its number of bytes in MYTYPE 
  * and is used in bitshifts. e.g. to read bits in position [15,16]
  * it is needed to shift bits 16 times to right: x >> (mtl - 16)
  *

@@ -44,7 +44,7 @@ void initializeGlobals(void){
   instructions[JNEQU] = jnequ;
   instructions[JNGRE] = jngre;
   instructions[CALL]  = call;
-  instructions[EXIT]  = exitt;    //exit to not to be conflict with std function
+  instructions[EXIT]  = exitt;    //exitt to not to be conflict with std function
   instructions[PUSH]  = push;
   instructions[POP]   = pop;
   instructions[PUSHR] = pushr;
