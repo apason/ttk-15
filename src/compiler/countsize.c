@@ -36,19 +36,26 @@ int countSize(char **code, int length, label_list* label_node){
 	 size++;
       else if(!strncmp(word, "ds", MAX)) {
 	size += atoi(val);
+	// remember the size
 	label_node->size = atoi(val);
 	}
       else if(strncm(word, "equ", MAX)) {
+	// now address/label is inserted into label
 	label_node->address = atoi(val);
 	label_node->size = -1;
 	;//error
 	}
+	// set label name
 	label_node->label = label;
+	// reserve space for next label
 	label_node->next = (label_list*) malloc(sizeof(label_list));
 	label_node = label_node->next;
 	label_node->size = 0;
     }
   }
+  free(label_node->next);
+  label_node->next = NULL;
+  return size;
 }
 
 static int isInstruction(char *word){
