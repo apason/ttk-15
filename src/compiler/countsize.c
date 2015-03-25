@@ -14,11 +14,10 @@ typedef struct label_list {
 static int isInstruction(char *word);
 
 int countSize(char **code, int length, label_list* label_node){
-  if (label_node != NULL) {
-    fprintf(stderr, "label_node should be null\n");
+  if (label_node == NULL) {
+    fprintf(stderr, "label_node should not be null\n");
     return -1;
   }
-  label_node = (label_list*)malloc(sizeof(label_list));
   label_node->size = 0;
   int i;
   int size=0;
@@ -32,8 +31,12 @@ int countSize(char **code, int length, label_list* label_node){
 	;//error
       if(!isInstruction(label) && isInstruction(word))
 	size++;
-      if(!strncmp(word, "dc", MAX))
+      if(!strncmp(word, "dc", MAX)) {
 	 size++;
+	 label_node->size = 1;
+	// store the value to be inserted in the address member
+	 label_node->address = atoi(val);
+	}
       else if(!strncmp(word, "ds", MAX)) {
 	size += atoi(val);
 	// remember the size
