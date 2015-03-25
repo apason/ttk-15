@@ -1,5 +1,7 @@
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #define MAX 128
 
 typedef struct label_list {
@@ -8,6 +10,8 @@ typedef struct label_list {
 	int address;
 	int size;
 } label_list;
+
+static int isInstruction(char *word);
 
 int countSize(char **code, int length, label_list* label_node){
   if (label_node != NULL) {
@@ -45,5 +49,20 @@ int countSize(char **code, int length, label_list* label_node){
 	label_node->size = 0;
     }
   }
+}
+
+static int isInstruction(char *word){
+  int i;
+  char instructions[38][6] = {"nop", "store", "load", "in", "out",\
+                              "add", "sub", "mul", "div", "mod",\
+                              "and", "or", "xor", "shl", "shr", "not", "shra",\
+                              "comp", "jump", "jneg", "jzer", "jpos", "jnneg", "jnzer", "jnpos",\
+                              "jles", "jequ", "jgre", "jnles", "jnequ", "jngre",\
+                              "call", "exit", "push", "pop", "pushr", "popr", "svc"};
+  for(i = 0; i < 38; i++)
+    if(strncmp(instructions[i], word, MAX))
+      return 1;
+  return 0;
+
 }
 
