@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 int countLines(FILE*);
 
 int main (int argc, char* argv[]) {
@@ -13,8 +12,13 @@ int main (int argc, char* argv[]) {
 
 	printf("file is : %s\n",filename);
 
-	// open file and count the lines but not comments
+	// open file
 	FILE* fh = fopen(filename,"r");
+	if (fh == NULL) {
+		fprintf(stderr, "Error opening file: %s\n",filename);
+		return -1;
+	}
+	// count lines, but not comments
 	int lines = countLines(fh);
 	printf("lines = %d\n",lines);
 	if (lines == -1) return -1;
@@ -24,7 +28,7 @@ int main (int argc, char* argv[]) {
 	char** input = (char**) malloc(lines*sizeof(char*));
 	for (i = 0; i < lines; ++i) {
 		if (feof(fh)) {
-			printf("Error reading the source file!\n");
+			fprintf(stderr, "Error reading the source file!\n");
 			return -1;
 		}
 		int ch = fgetc(fh);
