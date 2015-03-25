@@ -1,5 +1,7 @@
 ; this is a comment
 
+x dc 4
+
 LOAD R1,=1  ;this is also a comment
 OUT R1,=CRT
 IN R1,=11

@@ -21,10 +21,7 @@ int loadFile(MYTYPE *mem, char *file){
   
   do{
     fgets(buffer, BUFSIZE, fp);
-    printf("%s", buffer);
   }while(sscanf(buffer,"%d %d", &cstart, &cend) != 2);
-  printf("cstart: %d\ncend: %d\n", cstart, cend);
-
 
   for(i = cstart; i <= cend; i++){
     fgets(buffer, BUFSIZE, fp);
@@ -33,9 +30,7 @@ int loadFile(MYTYPE *mem, char *file){
  
   do{
     fgets(buffer, BUFSIZE, fp);
-    printf("%s", buffer);
   }while(sscanf(buffer, "%d %d", &dstart, &dend) != 2);
-  printf("dstart: %d\ndend: %d\n", dstart, dend);
 
   for(i = dstart; i <= dend; i++){
     fgets(buffer, BUFSIZE, fp);
