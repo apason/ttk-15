@@ -1,4 +1,6 @@
+#include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <compiler.h>
@@ -6,7 +8,7 @@
 int countLines(FILE*);
 int nextLine(FILE*);
 char** readCode(FILE*, int);
-uint32_t convertIntoBytes(char* word, char* val, label_list* symbols);
+void writeInstruction(char*,char*,label_list*, FILE*);
 
 // this is a function to be used outside this file
 int readCodeFile(code_file* file) {
@@ -35,49 +37,56 @@ int readCodeFile(code_file* file) {
 
 // this is also a function to be used outside of this file
 int writeCodeFile(code_file* file) {
-	label_list* symbols = file->symbolList;
-	// reserve space for the module
-	uint32_t* array = (uint32_t*)malloc(sizeof(uint32_t) * file->moduleSize);
-	label_list* temp = symbols;
-	// set memory spaces reserved with dc to their correct value
-	while (temp->next != NULL) {
-		if (temp->size == 1) {
-			if (temp->address >= file->moduleSize) {
-				fprintf(stderr, "Invalid address on symbol: %s\n",temp->label);
-				return -1;
-			}
-			array[temp->address] = temp->value;
-		}
-		temp = temp->next;
+	// TODO: dynamic name for the object file
+	FILE* fh = fopen("testi.o15","wb");
+	if (fh == NULL) {
+		fprintf(stderr, "Error opening file!!!!!\n");
+		return -1;
 	}
-	int i, command = 0;
+	// write header to the object file
+	uint32_t dataSegmentAddress = file->codeSize*5 + 8;
+	uint32_t symbolTableAddress =  dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
+	fwrite(&symbolTableAddress,sizeof(uint32_t),1,fh);
+	fwrite(&dataSegmentAddress, sizeof(uint32_t),1,fh);
+	// start writing data
+	int i, cInstructions = 0;
 	char word[MAX], label[MAX], val[MAX];
 	for (i = 0; i < file->lines; ++i) {
 		sscanf(file->array[i], "%s %s", word, val);
 		if (isInstruction(word)) {
-			uint32_t bytes = convertIntoBytes(word,val, file->symbolList);
-			((uint32_t*)array)[command++] = bytes;
+			writeInstruction(word,val,file->symbolList, fh);
+			++cInstructions;
 		}
 		if (sscanf(file->array[i], "%s %s %s", label, word, val) != 3)
 		;//error
 		if (!isInstruction(label) && isInstruction(word)) {
-			uint32_t bytes = convertIntoBytes(word,val,file->symbolList);
-			((uint32_t*)array)[command++] = bytes;
+			writeInstruction(word,val,file->symbolList, fh);
+			++cInstructions;
 		}
 
 	}
-	// TODO: actually write the array to a file
 
-	// print the array
-	printf("Binary:\n");
-	for (i = 0; i < file->moduleSize; ++i) {
-		printf("%04x ", array[i]);
-		if (((i + 1) % 4) == 0) printf("\n");
+	label_list* symbols = file->symbolList;
+	while (symbols!=NULL) {
+		if (symbols->size == 1) {
+			fwrite(&(symbols->value),sizeof(symbols->value),1,fh);
+		} else if (symbols->size > 1) {
+			for (i = 0; i < symbols->size; ++i) {
+				uint32_t nul = 0;
+				fwrite(&nul, 1, sizeof(uint32_t),fh);
+			}
+		}
+		symbols = symbols->next;	
 	}
-	printf("\n");
-
-	// free array
-	free(array);
+	symbols = file->symbolList;
+	while (symbols != NULL) {
+		if (symbols->size >= 0) {
+			fwrite(symbols->label,sizeof(char),32,fh);
+			fwrite(&(symbols->address),sizeof(symbols->address),1,fh);
+		}
+		symbols = symbols->next;
+	}
+	fclose(fh);
 	return 0;
 }
 
@@ -151,8 +160,96 @@ char** readCode(FILE* fh, int lines) {
 	}
 	return input;
 }
-uint32_t convertIntoBytes(char* word, char* val, label_list* symbols) {
-	// do nothing
+void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
+	// DO NOTHING
+	static const char opcodes[38][8] = {\
+		"nop\0\0\0\0",\
+		"store\0\x1",\
+		"load\0\0\0\x2",\
+		"in\0\0\0\0\x3",\
+		"out\0\0\0\x4",\
+		"add\0\0\0\x11",\
+		"sub\0\0\0\x12",\
+		"mul\0\0\0\x13",\
+		"div\0\0\0\x14",\
+		"mod\0\0\0\x15",\
+		"and\0\0\0\x16",\
+		"or\0\0\0\0\x17",\
+		"xor\0\0\0\x18",\
+		"shl\0\0\0\x19",\
+		"shr\0\0\0\x1A",\
+		"not\0\0\0\x1B",\
+		"shra\0\0\x1C",\
+		"comp\0\0\x1F",\
+		"jump\0\0\x20",\
+		"jneg\0\0\x21",\
+		"jzer\0\0\x22",\
+		"jpos\0\0\x23",\
+		"jnneg\0\x24",\
+		"jnpos\0\x25",\
+		"jles\0\0\x27",\
+		"jequ\0\0\x28",\
+		"jgre\0\0\x29",\
+		"jnles\0\x2A",\
+		"jnequ\0\x2B",\
+		"jngre\0\x2C",\
+		"call\0\0\x31",\
+		"exit\0\0\x32",\
+		"push\0\0\x33",\
+		"pop\0\0\0\x34",\
+		"pushr\0\x35",\
+		"popr\0\0\x36",\
+		"svc\0\0\0\x70" };
+	uint32_t instruction = 0;
+	int i;
+	printf("%d\n",opcodes[1][6]);
+	for (i = 0; i < 38; ++i) {
+		if (strncmp(opcodes[i],word,strlen(word)) == 0) {
+			instruction |= (opcodes[i][6] << 24);
+			break;
+		}
+	}
+	char* argument = strchr(val, ',');
+	*argument++ = '\0';
 
-	return 0;
+	if (tolower(val[0]) == 'r' && isdigit(val[1]) && val[2] == 0) {
+		int reg = atoi(val + 1);
+		if (reg > 7); //error
+		instruction |= (reg << 21);
+	} else if (tolower(val[1]) == 'p' && val[2] == 0) {
+		if (tolower(val[0] == 's'))
+			instruction |= 6 << 21;
+		else if (tolower(val[0] == 'f'))
+			instruction |= 7 << 21;
+		else
+		;//error
+	} else
+	;//error
+	
+	// make the argument lowercase
+	char* p = argument;
+	for (; *p; ++p) *p = tolower(*p);
+	// see if the label we have here matches our records
+	label_list* temp = symbols;
+	while(temp != NULL) {
+		if (!strncmp(temp->label,argument,strlen(argument))) {
+			instruction |= temp->address;
+			break;
+		}
+		// TODO: add foreign labels to list as external
+		temp = temp->next;
+	}
+	uint8_t firstByte;
+	if (temp->address < 0) {
+		firstByte = 2;
+	} else if (temp->size > 0) {
+		firstByte = 1;
+	} else {
+		firstByte = 0;
+	}
+	// write a byte indicating whether the address is hardcoded, local or external to the module
+	fwrite(&firstByte,sizeof(firstByte),1,fh);
+	// write the compiled instruction
+	fwrite(&instruction,sizeof(instruction),1,fh);
 }
+

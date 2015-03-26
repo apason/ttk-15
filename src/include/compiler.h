@@ -1,6 +1,7 @@
 #ifndef COMPILER
 #define COMPILER
 #define MAX 128
+#include <stdint.h>
 // single linked list for the symbol table
 typedef struct label_list {
 	struct label_list* next;
@@ -16,7 +17,8 @@ typedef struct {
 	int lines;
 	char** array;
 	struct label_list* symbolList;
-	int moduleSize;
+	uint32_t moduleSize;
+	uint32_t codeSize;
 } code_file;
 // reads the code file into the array in the struct and puts lenght in lines member
 int readCodeFile(code_file*);

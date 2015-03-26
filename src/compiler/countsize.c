@@ -2,10 +2,8 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <compiler.h>
-
-
-
 
 int countSize(code_file* file){
   file->symbolList = (label_list*)malloc(sizeof(label_list));
@@ -41,7 +39,6 @@ int countSize(code_file* file){
       else if(!strncmp(word, "ds", MAX)) {
 	// remember the size
 	label_node->size = atoi(val);
-	label_node->address = 0;
 	}
       else if(!strncmp(word, "equ", MAX)) {
 	// now address/label is inserted into label
@@ -63,20 +60,27 @@ int countSize(code_file* file){
       label_node->label[0] = '\0';
     }
   }
+  label_node = first;
+  file->codeSize = size;
   // calculate addresses add the variables to the end of code
-  while(first->label[0]) {
+  while(label_node->label[0]) {
 	// the dc case
-	if (first->size == 1) {
-		first->address = size++;
+	if (label_node->size == 1) {
+		label_node->address = size++;
 	// the ds case
-	} else if (first->size > 1) {
-		first->address = size;
-		size += first->size;
-		first->size = 0;
+	} else if (label_node->size > 1) {
+		label_node->address = size;
+		size += label_node->size;
 	}
-	first = first->next;
+	label_node = label_node->next;
   }
   file->moduleSize = size;
+  while (first->next->label[0] != '\0') {
+	first = first->next;
+  }
+  free(first->next);
+  first->next = NULL;
+  
   return 0;
 }
 
