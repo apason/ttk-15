@@ -9,11 +9,14 @@ int main (int argc, char* argv[]) {
 	// we take the first argument to be name of a .ttk91 file
 	code_file codeFile;
 	codeFile.name = argv[1];
+
 	// read the codeFile
 	if (readCodeFile(&codeFile) < 0) return -1;
 
 	// calculate code size and create the symbol table
 	countSize(&codeFile);
+
+	// print module size
 	printf("module size = %d\n",codeFile.moduleSize);
 
 	// write the code file
