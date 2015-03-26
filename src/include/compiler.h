@@ -24,4 +24,6 @@ int readCodeFile(code_file*);
 int countSize(code_file*);
 // writes the binary file
 int writeCodeFile(code_file*);
+
+int isInstruction(char *word);
 #endif 

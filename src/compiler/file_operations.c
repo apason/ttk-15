@@ -1,10 +1,12 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <compiler.h>
 
 int countLines(FILE*);
 int nextLine(FILE*);
 char** readCode(FILE*, int);
+uint32_t convertIntoBytes(char* word, char* val, label_list* symbols);
 
 // this is a function to be used outside this file
 int readCodeFile(code_file* file) {
@@ -48,7 +50,31 @@ int writeCodeFile(code_file* file) {
 		}
 		temp = temp->next;
 	}
-	// TODO: write the code file and replace every label with the address found in the symbol table
+	int i, command = 0;
+	char word[MAX], label[MAX], val[MAX];
+	for (i = 0; i < file->lines; ++i) {
+		sscanf(file->array[i], "%s %s", word, val);
+		if (isInstruction(word)) {
+			uint32_t bytes = convertIntoBytes(word,val, file->symbolList);
+			((uint32_t*)array)[command++] = bytes;
+		}
+		if (sscanf(file->array[i], "%s %s %s", label, word, val) != 3)
+		;//error
+		if (!isInstruction(label) && isInstruction(word)) {
+			uint32_t bytes = convertIntoBytes(word,val,file->symbolList);
+			((uint32_t*)array)[command++] = bytes;
+		}
+
+	}
+	// TODO: actually write the array to a file
+
+	// print the array
+	for (i = 0; i < file->moduleSize; ++i) {
+		printf("%x ", array[i]);
+		if (((i + 1) % 4) == 0) printf("\n");
+	}
+	printf("\n");
+
 	// free array
 	free(array);
 	return 0;
@@ -123,4 +149,9 @@ char** readCode(FILE* fh, int lines) {
 	
 	}
 	return input;
+}
+uint32_t convertIntoBytes(char* word, char* val, label_list* symbols) {
+	// do nothing
+
+	return 0;
 }

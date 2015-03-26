@@ -6,7 +6,6 @@
 
 
 
-static int isInstruction(char *word);
 
 int countSize(code_file* file){
   file->symbolList = (label_list*)malloc(sizeof(label_list));
@@ -77,7 +76,7 @@ int countSize(code_file* file){
   return 0;
 }
 
-static int isInstruction(char *word){
+int isInstruction(char *word){
   char *p = word;
   // make word lowercase
   for (; *p; ++p) *p = tolower(*p);
