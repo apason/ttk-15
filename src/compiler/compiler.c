@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "compiler.h"
+#include <file_operations.h>
+#include <countsize.h>
 
 int main (int argc, char* argv[]) {
 	int i;
@@ -14,6 +15,7 @@ int main (int argc, char* argv[]) {
 
 	// make a new label list
 	label_list* first = (label_list*) malloc(sizeof(label_list));
+	// calculate module size and create the symbol table
 	int moduleSize = countSize(codeFile.array,codeFile.lines,first);
 	printf("module size = %d\n",moduleSize);
 

@@ -1,15 +1,10 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <countsize.h>
 
 #define MAX 128
 
-typedef struct label_list {
-	struct label_list* next;
-	char label[MAX];
-	int address;
-	int size;
-} label_list;
 
 static int isInstruction(char *word);
 

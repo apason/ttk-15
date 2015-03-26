@@ -1,8 +1,3 @@
-typedef struct {
-	char* name;
-	int lines;
-	char** array;
-} code_file;
 typedef struct label_list {
 	struct label_list* next;
 	char label[128];
@@ -10,5 +5,3 @@ typedef struct label_list {
 	int size;
 } label_list;
 int countSize(char**, int, label_list*);
-int countLines(FILE*);
-char** readCode(FILE*,int);
