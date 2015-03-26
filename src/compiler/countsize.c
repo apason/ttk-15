@@ -1,4 +1,5 @@
 #include <string.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <countsize.h>
@@ -9,10 +10,6 @@
 static int isInstruction(char *word);
 
 int countSize(char **code, int length, label_list* label_node){
-  if (label_node == NULL) {
-    fprintf(stderr, "label_node should not be null\n");
-    return -1;
-  }
   label_node->size = 0;
   label_node->label[0] = '\0';
   label_node->next = NULL;
