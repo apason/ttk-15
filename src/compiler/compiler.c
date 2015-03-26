@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <file_operations.h>
-#include <countsize.h>
+#include <compiler.h>
 
 int main (int argc, char* argv[]) {
 	int i;
@@ -13,24 +12,25 @@ int main (int argc, char* argv[]) {
 	// read the codeFile
 	if (readCodeFile(&codeFile) < 0) return -1;
 
-	// make a new label list
-	label_list* first = (label_list*) malloc(sizeof(label_list));
-	// calculate module size and create the symbol table
-	int moduleSize = countSize(codeFile.array,codeFile.lines,first);
-	printf("module size = %d\n",moduleSize);
+	// calculate code size and create the symbol table
+	countSize(&codeFile);
+	printf("module size = %d\n",codeFile.moduleSize);
+
+	// write the code file
+	writeCodeFile(&codeFile);
 
 	// print the symbol table
 	printf("Symbols:\n");
-	label_list* temp = first;
+	label_list* temp = codeFile.symbolList;
 	while (temp != NULL) {
-		printf("%s : %0x : %d\n",temp->label, temp->address, temp->size);
+		printf("%s : %0x : %d : %d\n",temp->label, temp->address, temp->size, temp->value);
 		temp = temp->next;
 	}
 
 	// free the space of the label_list
-	while (first != NULL) {
-		label_list* temp = first;
-		first = first->next;
+	while (codeFile.symbolList != NULL) {
+		label_list* temp = codeFile.symbolList;
+		codeFile.symbolList = codeFile.symbolList->next;
 		free(temp);
 	}
 

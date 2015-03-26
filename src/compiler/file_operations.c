@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <file_operations.h>
+#include <compiler.h>
 
 int countLines(FILE*);
 int nextLine(FILE*);
@@ -28,6 +28,29 @@ int readCodeFile(code_file* file) {
 	file->array = readCode(fh, file->lines);
 
 	fclose(fh);
+	return 0;
+}
+
+// this is also a function to be used outside of this file
+int writeCodeFile(code_file* file) {
+	label_list* symbols = file->symbolList;
+	// reserve space for the module
+	char* array = (char*)malloc(sizeof(char) * file->moduleSize);
+	label_list* temp = symbols;
+	// set memory spaces reserved with dc to their correct value
+	while (temp->next != NULL) {
+		if (temp->size == 1) {
+			if (temp->address >= file->moduleSize) {
+				fprintf(stderr, "Invalid address on symbol: %s\n",temp->label);
+				return -1;
+			}
+			array[temp->address] = temp->value;
+		}
+		temp = temp->next;
+	}
+	// TODO: write the code file and replace every label with the address found in the symbol table
+	// free array
+	free(array);
 	return 0;
 }
 
@@ -85,7 +108,7 @@ char** readCode(FILE* fh, int lines) {
 			while (ch == ' ' || ch == '\t') ch = fgetc(fh);
 		}
 		// reserve space for the next line
-		input[i] = (char*) malloc(256 * sizeof(char));
+		input[i] = (char*) malloc(MAX * sizeof(char));
 		int count = 0;
 		while (ch != EOF && ch != '\n') {
 			if (ch == ';') {

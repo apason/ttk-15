@@ -2,46 +2,53 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <countsize.h>
+#include <compiler.h>
 
-#define MAX 128
 
 
 static int isInstruction(char *word);
 
-int countSize(char **code, int length, label_list* label_node){
+int countSize(code_file* file){
+  file->symbolList = (label_list*)malloc(sizeof(label_list));
+  label_list* label_node = file->symbolList;
+  char **code = file->array;
+  label_list* first = label_node;
   label_node->size = 0;
   label_node->label[0] = '\0';
   label_node->next = NULL;
+  label_node->value = 0;
   int i;
   int size=0;
   char word[MAX], label[MAX], val[MAX];
-  for(i = 0; i < length; i++){
+  for(i = 0; i < file->lines; i++){
     sscanf(code[i], "%s %s", word, val);
     if(isInstruction(word))
-      size++;
+      size += 4;
     else{
       if(sscanf(code[i], "%s %s %s", label, word, val) != 3)
 	;//error
-      if(!isInstruction(label) && isInstruction(word))
-	size++;
+      if(!isInstruction(label) && isInstruction(word)) {
+	label_node->address = size;
+	size += 4;
+	}
       if(!strncmp(word, "dc", MAX)) {
-	 size++;
 	 label_node->size = 1;
-	// store the value to be inserted in the address member
-	 label_node->address = atoi(val);
+	// store the value to be inserted later
+	 label_node->value = atoi(val);
 	}
       else if(!strncmp(word, "ds", MAX)) {
-	size += atoi(val);
 	// remember the size
 	label_node->size = atoi(val);
+	label_node->address = 0;
 	}
       else if(!strncmp(word, "equ", MAX)) {
 	// now address/label is inserted into label
 	label_node->address = atoi(val);
 	label_node->size = -1;
-	;//error
 	}
+      else
+	;//error
+
 	// set label name
 	strncpy(label_node->label, label, MAX);
 	// reserve space for next label
@@ -50,9 +57,24 @@ int countSize(char **code, int length, label_list* label_node){
 	label_node->size = 0;
 	label_node->next = NULL;
 	label_node->label[0] = '\0';
+  	label_node->value = 0;
     }
   }
-  return size;
+  // calculate addresses add the variables to the end of code
+  while(first->label[0]) {
+	// the dc case
+	if (first->size == 1) {
+		first->address = size++;
+	// the ds case
+	} else if (first->size > 1) {
+		first->address = size;
+		size += first->size;
+		first->size = 0;
+	}
+	first = first->next;
+  }
+  file->moduleSize = size;
+  return 0;
 }
 
 static int isInstruction(char *word){
