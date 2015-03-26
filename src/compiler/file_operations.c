@@ -69,9 +69,10 @@ int writeCodeFile(code_file* file) {
 	// TODO: actually write the array to a file
 
 	// print the array
+	printf("Binary:\n");
 	for (i = 0; i < file->moduleSize; ++i) {
-		printf("%x ", array[i]);
-		if (((i + 1) % 4) == 0) printf("\n");
+		printf("%02x ", array[i]);
+		if (((i + 1) % 16) == 0) printf("\n");
 	}
 	printf("\n");
 

@@ -15,7 +15,6 @@ int countSize(code_file* file){
   label_node->size = 0;
   label_node->label[0] = '\0';
   label_node->next = NULL;
-  label_node->value = 0;
   int i;
   int size=0;
   char word[MAX], label[MAX], val[MAX];
@@ -56,7 +55,6 @@ int countSize(code_file* file){
 	label_node->size = 0;
 	label_node->next = NULL;
 	label_node->label[0] = '\0';
-  	label_node->value = 0;
     }
   }
   // calculate addresses add the variables to the end of code
