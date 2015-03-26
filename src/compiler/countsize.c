@@ -6,7 +6,7 @@
 
 typedef struct label_list {
 	struct label_list* next;
-	char[MAX] label;
+	char label[MAX];
 	int address;
 	int size;
 } label_list;
@@ -19,10 +19,12 @@ int countSize(char **code, int length, label_list* label_node){
     return -1;
   }
   label_node->size = 0;
+  label_node->label[0] = '\0';
+  label_node->next = NULL;
   int i;
   int size=0;
   char word[MAX], label[MAX], val[MAX];
-  for(i = 0; i < length, i++){
+  for(i = 0; i < length; i++){
     sscanf(code[i], "%s %s", word, val);
     if(isInstruction(word))
       size++;
@@ -42,26 +44,29 @@ int countSize(char **code, int length, label_list* label_node){
 	// remember the size
 	label_node->size = atoi(val);
 	}
-      else if(strncm(word, "equ", MAX)) {
+      else if(!strncmp(word, "equ", MAX)) {
 	// now address/label is inserted into label
 	label_node->address = atoi(val);
 	label_node->size = -1;
 	;//error
 	}
 	// set label name
-	label_node->label = label;
+	strncpy(label_node->label, label, MAX);
 	// reserve space for next label
 	label_node->next = (label_list*) malloc(sizeof(label_list));
 	label_node = label_node->next;
 	label_node->size = 0;
+	label_node->next = NULL;
+	label_node->label[0] = '\0';
     }
   }
-  free(label_node->next);
-  label_node->next = NULL;
   return size;
 }
 
 static int isInstruction(char *word){
+  char *p = word;
+  // make word lowercase
+  for (; *p; ++p) *p = tolower(*p);
   int i;
   char instructions[38][6] = {"nop", "store", "load", "in", "out",\
                               "add", "sub", "mul", "div", "mod",\
@@ -70,7 +75,7 @@ static int isInstruction(char *word){
                               "jles", "jequ", "jgre", "jnles", "jnequ", "jngre",\
                               "call", "exit", "push", "pop", "pushr", "popr", "svc"};
   for(i = 0; i < 38; i++)
-    if(strncmp(instructions[i], word, MAX))
+    if(!strncmp(instructions[i], word, MAX))
       return 1;
   return 0;
 
