@@ -1,11 +1,5 @@
-#ifndef COMPILER
-#define COMPILER
-
-typedef struct {
-	char* name;
-	int lines;
-	char** array;
-} code_file;
+#ifndef COMPILER_COUNT_SIZE
+#define COMPILER_COUNT_SIZE
 
 typedef struct label_list {
 	struct label_list* next;
@@ -15,7 +9,4 @@ typedef struct label_list {
 } label_list;
 
 int countSize(char**, int, label_list*);
-int countLines(FILE*);
-char** readCode(FILE*,int);
-
 #endif 
