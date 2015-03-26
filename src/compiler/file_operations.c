@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "compiler.h"
+#include <file_operations.h>
 
 int countLines(FILE*);
-int nextLines(FILE*);
+int nextLine(FILE*);
 char** readCode(FILE*, int);
 
+// this is a function to be used outside this file
 int readCodeFile(code_file* file) {
 	FILE* fh = fopen(file->name,"r");
 	if (fh == NULL) {
@@ -33,7 +34,6 @@ int readCodeFile(code_file* file) {
 int countLines (FILE* fh) {
 	if (fh == NULL) return -1;
 	int lines = 0;
-	int ch = 0;	
 	while (!feof(fh)) {
 		lines += nextLine(fh);
 	}
@@ -43,7 +43,7 @@ int countLines (FILE* fh) {
 int nextLine(FILE* fh) {
 	int ch = fgetc(fh);
 	// Strip whitespaces and tabs from beginning
-	while (ch != EOF && ch == ' ' || ch == '\t') ch = fgetc(fh);
+	while (ch != EOF && (ch == ' ' || ch == '\t')) ch = fgetc(fh);
 	// If this line is a comment, let's skip it
 	if (ch == ';') {
 		while ((ch = fgetc(fh)) != EOF && ch != '\n');
