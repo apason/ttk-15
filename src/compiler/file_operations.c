@@ -37,7 +37,7 @@ int readCodeFile(code_file* file) {
 int writeCodeFile(code_file* file) {
 	label_list* symbols = file->symbolList;
 	// reserve space for the module
-	char* array = (char*)malloc(sizeof(char) * file->moduleSize);
+	uint32_t* array = (uint32_t*)malloc(sizeof(uint32_t) * file->moduleSize);
 	label_list* temp = symbols;
 	// set memory spaces reserved with dc to their correct value
 	while (temp->next != NULL) {
@@ -71,8 +71,8 @@ int writeCodeFile(code_file* file) {
 	// print the array
 	printf("Binary:\n");
 	for (i = 0; i < file->moduleSize; ++i) {
-		printf("%02x ", array[i]);
-		if (((i + 1) % 16) == 0) printf("\n");
+		printf("%04x ", array[i]);
+		if (((i + 1) % 4) == 0) printf("\n");
 	}
 	printf("\n");
 

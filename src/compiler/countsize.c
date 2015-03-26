@@ -21,14 +21,12 @@ int countSize(code_file* file){
   for(i = 0; i < file->lines; i++){
     sscanf(code[i], "%s %s", word, val);
     if(isInstruction(word))
-      size += 4;
+      ++size;
     else{
       if(sscanf(code[i], "%s %s %s", label, word, val) != 3)
 	;//error
-      if(!isInstruction(label) && isInstruction(word)) {
-	label_node->address = size;
-	size += 4;
-	}
+      if(!isInstruction(label) && isInstruction(word))
+	label_node->address = size++;
       if(!strncmp(word, "dc", MAX)) {
 	 label_node->size = 1;
 	// store the value to be inserted later
