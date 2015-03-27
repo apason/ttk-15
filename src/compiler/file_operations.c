@@ -128,7 +128,7 @@ char** readCode(FILE* fh, int lines) {
 	for (i = 0; i < lines; ++i) {
 		if (feof(fh)) {
 			fprintf(stderr, "Error reading the source file!\n");
-			return -1;
+			return NULL;
 		}
 		int ch = fgetc(fh);
 		// skip whitespaces
