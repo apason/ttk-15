@@ -9,7 +9,7 @@
 static void getInstruction(machine *m);
 static void increasePC(machine *m);
 static void execInstruction(machine *m);
-static void handleInterrupts(machine *m);
+//static void handleInterrupts(machine *m);
 
 machine *newMachine(long memsize){
   machine       *m = (machine*)malloc(sizeof(machine));
@@ -54,9 +54,11 @@ static void increasePC(machine *m){
   m->cu->pc++;
 }
 
+/*
 static void handleInterrupts(machine *m){
   if(m->cu->sr&IMASK) ;                                   //interrupt detected
 }
+*/
 
 static void execInstruction(machine *m){
   void(*instruction)(machine*, uint8_t, uint8_t, uint8_t, uint16_t);

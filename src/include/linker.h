@@ -1,10 +1,10 @@
 #ifndef LINKER
 #define LINKER
 
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 typedef struct LLIST{
   struct LLIST *next;
