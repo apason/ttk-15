@@ -56,16 +56,17 @@ int writeCodeFile(code_file* file) {
 		if (isInstruction(word)) {
 			writeInstruction(word,val,file->symbolList, fh);
 			++cInstructions;
+			continue;
 		}
 		if (sscanf(file->array[i], "%s %s %s", label, word, val) != 3)
-		;//error
+			fprintf(stderr,"Error reading line: %d\n",cInstructions);//error
 		if (!isInstruction(label) && isInstruction(word)) {
 			writeInstruction(word,val,file->symbolList, fh);
 			++cInstructions;
 		}
 
 	}
-
+	printf("Starting to write the symbol list\n");
 	label_list* symbols = file->symbolList;
 	while (symbols!=NULL) {
 		if (symbols->size == 1) {
@@ -160,12 +161,38 @@ char** readCode(FILE* fh, int lines) {
 	}
 	return input;
 }
+
+int getRegister(char* val, int errors) {
+
+	int reg = 0;
+	if (tolower(val[0]) == 'r' && isdigit(val[1]) && val[2] == 0) {
+		reg = atoi(val + 1);
+		if (reg > 7) {
+			if (errors) fprintf(stderr, "Invalid register r%d\n",reg);
+			return -1;
+		}
+	} else if (tolower(val[1]) == 'p' && val[2] == 0) {
+		if (tolower(val[0] == 's'))
+			reg = 6;
+		else if (tolower(val[0] == 'f'))
+			reg = 7;
+		else {
+			if (errors) fprintf(stderr, "First operand must be a register, found: %s\n",val);
+			return -1;
+		}
+	} else {
+		if (errors) fprintf(stderr, "First operand must be a register, found: %s\n",val);
+		return -1;
+	}
+	return reg;
+}
+
+
 void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
-	// DO NOTHING
 	static const char opcodes[38][8] = {\
 		"nop\0\0\0\0",\
 		"store\0\x1",\
-		"load\0\0\0\x2",\
+		"load\0\0\x2",\
 		"in\0\0\0\0\x3",\
 		"out\0\0\0\x4",\
 		"add\0\0\0\x11",\
@@ -202,47 +229,88 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 		"svc\0\0\0\x70" };
 	uint32_t instruction = 0;
 	int i;
-	printf("%d\n",opcodes[1][6]);
 	for (i = 0; i < 38; ++i) {
-		if (strncmp(opcodes[i],word,strlen(word)) == 0) {
+		if (strncmp(opcodes[i],word,strlen(opcodes[i])) == 0) {
 			instruction |= (opcodes[i][6] << 24);
 			break;
 		}
+		if (i == 37) {
+			fprintf(stderr,"Unknown opcode: %s\n",word);
+			return;
+		}
 	}
 	char* argument = strchr(val, ',');
-	*argument++ = '\0';
+	if (argument != NULL && strlen(argument) > 1)
+		*argument++ = '\0';
+	else {
+		fprintf(stderr, "Invalid arguments\n");
+		return ;
+	}
+		
 
-	if (tolower(val[0]) == 'r' && isdigit(val[1]) && val[2] == 0) {
-		int reg = atoi(val + 1);
-		if (reg > 7); //error
-		instruction |= (reg << 21);
-	} else if (tolower(val[1]) == 'p' && val[2] == 0) {
-		if (tolower(val[0] == 's'))
-			instruction |= 6 << 21;
-		else if (tolower(val[0] == 'f'))
-			instruction |= 7 << 21;
-		else
-		;//error
-	} else
-	;//error
-	
+	// figure out which indexind mode to use
+	uint32_t mode = 1;
+	if (argument[0] == '=') {
+		if (argument[1] == '\0') {
+			fprintf(stderr, "Invalid argument: %s\n", argument);
+			return;
+		}
+		mode = 0;
+		++argument;
+	} else if (argument[0] == '@') {
+		if (argument[1] == '\0') {
+			fprintf(stderr, "Invalid argument: %s\n", argument);
+			return;
+		}
+		mode = 2;
+		++argument;
+	}
+
+	// set the indexing mode
+	instruction |= mode << 19;
+
+	// set Register
+	int reg = getRegister(val, 1);
+	if (reg < 0) return;
+	instruction |= reg << 21;
+
 	// make the argument lowercase
-	char* p = argument;
-	for (; *p; ++p) *p = tolower(*p);
+	{ char* p = argument;
+	for (; *p; ++p) *p = tolower(*p); }
+
 	// see if the label we have here matches our records
 	label_list* temp = symbols;
-	while(temp != NULL) {
-		if (!strncmp(temp->label,argument,strlen(argument))) {
-			instruction |= temp->address;
-			break;
+
+	if ((reg = getRegister(argument, 0)) > 0) {
+		instruction |= reg;
+		temp = NULL;
+	// if argument is kbd, set address is 1
+	} else if (!strncmp("kbd",argument,strlen(argument))) {
+		instruction |= 1;
+		temp = NULL;
+	} else if (isdigit(argument[0])) {
+		instruction |= atoi(argument);
+		temp = NULL;
+	} else if (strncmp("crt",argument,strlen(argument))) {
+		while(temp != NULL) {
+			if (!strncmp(temp->label,argument,strlen(argument))) {
+				instruction |= temp->address;
+				break;
+			}
+			// TODO: add foreign labels to list as external
+			temp = temp->next;
 		}
-		// TODO: add foreign labels to list as external
-		temp = temp->next;
+		if (temp == NULL) {
+			fprintf(stderr, "No definition of label: %s found!\n",argument);
+			fclose(fh);
+			return;
+		}
 	}
+
 	uint8_t firstByte;
-	if (temp->address < 0) {
+	if (temp != NULL && temp->address < 0) {
 		firstByte = 2;
-	} else if (temp->size > 0) {
+	} else if (temp != NULL && temp->size > 0) {
 		firstByte = 1;
 	} else {
 		firstByte = 0;
