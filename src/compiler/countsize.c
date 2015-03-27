@@ -2,29 +2,33 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <compiler.h>
-
-
-
 
 int countSize(code_file* file){
   file->symbolList = (label_list*)malloc(sizeof(label_list));
   label_list* label_node = file->symbolList;
   char **code = file->array;
   label_list* first = label_node;
-  label_node->size = 0;
-  label_node->label[0] = '\0';
-  label_node->next = NULL;
+
   int i;
   int size=0;
   char word[MAX], label[MAX], val[MAX];
+
+  label_node->size = 0;
+  label_node->label[0] = '\0';
+  label_node->next = NULL;
+
   for(i = 0; i < file->lines; i++){
     sscanf(code[i], "%s %s", word, val);
     if(isInstruction(word))
       ++size;
     else{
-      if(sscanf(code[i], "%s %s %s", label, word, val) != 3)
-	;//error
+      if(sscanf(code[i], "%s %s %s", label, word, val) != 3){
+	printf("invalid start of expression: %s\n", label);
+	exit(-1);
+      }
+	
       if(!isInstruction(label) && isInstruction(word))
 	label_node->address = size++;
       if(!strncmp(word, "dc", MAX)) {
@@ -41,17 +45,19 @@ int countSize(code_file* file){
 	label_node->address = atoi(val);
 	label_node->size = -1;
 	}
-  //    else
-//	;//error
+      else{
+	printf("ERROR: invalid instruction %s\n", word);
+	exit(-1);
+      }
 
-	// set label name
-	strncpy(label_node->label, label, MAX);
-	// reserve space for next label
-	label_node->next = (label_list*) malloc(sizeof(label_list));
-	label_node = label_node->next;
-	label_node->size = 0;
-	label_node->next = NULL;
-	label_node->label[0] = '\0';
+      // set label name
+      strncpy(label_node->label, label, MAX);
+      // reserve space for next label
+      label_node->next = (label_list*) malloc(sizeof(label_list));
+      label_node = label_node->next;
+      label_node->size = 0;
+      label_node->next = NULL;
+      label_node->label[0] = '\0';
     }
   }
   label_node = first;

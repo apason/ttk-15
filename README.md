@@ -7,8 +7,10 @@ kääntämiä tiedostoja machinen loader moduulilla ja vertaa data-aluetta compi
  * testit kaikille konekäskyille
 
 # tulevia #
+ * formaatti voi kusta: r1,        =x
  * muistin vapautus!
  * bitshiftit kuntoon
+ * ylivuoto yms bitit kuntoon
  * riippuvuuksien lisääminen makefileen jotta headerien päivitys aiheuttaa uudelleenkäännöksen
  * pienin osoitettava muistiyksikkö keskusmuistissa MYTYPE:stä yhteen bittiin
  * n ydintä
