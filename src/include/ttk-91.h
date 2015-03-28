@@ -85,6 +85,7 @@ extern uint8_t extractRi(MYTYPE x);
 
 //loader.c
 extern int loadFile(MYTYPE *mem, char *file);
+extern int loadFile91(MYTYPE *mem, char *file);
 
 //instructions.c
 extern FUNCTION(nop);

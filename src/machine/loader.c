@@ -7,8 +7,24 @@
 
 #define BUFSIZE 32
 
-//loads old ttk-91 "binary" file to memory
 int loadFile(MYTYPE *mem, char *file){
+  FILE *fp;
+  MYTYPE word;
+  int i;
+
+  if(!(fp = fopen(file,"rb"))){
+    printf("ERROR: cannot open binary fil %s\n", file);
+    exit(-1);
+  }
+
+  for(i = 0; !feof(fp); i++)
+    fread(&word, sizeof(MYTYPE), 1, fp);
+    
+  return i;
+}
+
+//loads old ttk-91 "binary" file to memory
+int loadFile91(MYTYPE *mem, char *file){
   FILE *fp;
   // c stands for "code" and d for "data"
   int cstart, cend, dstart, dend, i;

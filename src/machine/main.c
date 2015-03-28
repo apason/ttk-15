@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 //project header
 #include <ttk-91.h>
@@ -8,7 +9,14 @@ int main(int argc,char *argv[]){
 
   initializeGlobals();
   m->cu->pc = 0;
-  m->regs[6] = (MYTYPE)loadFile(m->mem, argv[1]);
+
+  if(argc >= 3){
+    if(!strncmp(argv[1], "-91", 3))
+       m->regs[6] = (MYTYPE)loadFile91(m->mem, argv[2]);
+  }
+  else
+    m->regs[6] = (MYTYPE)loadFile(m->mem, argv[1]);
+       
   m->regs[7] = m->regs[6];
   
   startMachine(m);

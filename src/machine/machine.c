@@ -82,8 +82,8 @@ static void execInstruction(machine *m){
     fprintf(stderr, "ERROR: incorrect operation code: %X\n", opc);
     exit(-1);
   }
-  //printState(m);
-  //getchar();
+  printState(m);
+  getchar();
   
   instruction(m, rj, mode, ri, addr);
   
