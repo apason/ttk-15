@@ -14,14 +14,16 @@ int main(int argc, char **argv){
   FILE *output;
   int i, mainnbr;
 
+printf("Creating modules\n");
   //create module structs for each module
   createModules(argc -1, argv +1, modules);
 
+printf("Finding main...\n");
   //determine which module contains main
   mainnbr = findMain(modules, argc -1);
   
  
-  if((output = fopen("a.out.b15", "bw")) == NULL){
+  if((output = fopen("a.out.b15", "wb")) == NULL){
     printf("ERROR: cannot open result file\n");
     exit(-1);
   }

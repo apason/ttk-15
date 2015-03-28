@@ -1,5 +1,2 @@
 aaaa dc 2048
 main STORE R1,aaaa  ;this is also a comment
-load r2,r1
-load r1,=aaaa
-store r2,@r1

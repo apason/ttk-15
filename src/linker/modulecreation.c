@@ -42,8 +42,8 @@ static module *readModule(FILE *fp){
   fseek(fp, 0, SEEK_SET);
 
   //read code and data starts
-  fread(&mod->data_start, 4, 1, fp);
   fread(&mod->symbol_start, 4, 1, fp);
+  fread(&mod->data_start, 4, 1, fp);
 
   fseek(fp, 0, SEEK_SET);
   
