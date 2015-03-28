@@ -29,7 +29,7 @@ void link(FILE *fp, module **modules, int mi, int n ){
 
   //copy data segment to executable
   for(i = 0; i < (mod->symbol_start - mod->data_start); i++)
-    fwrite(mod->data, sizeof(int8_t), 1, fp);
+    fwrite(mod->data +mod->data_start +i, sizeof(int8_t), 1, fp);
 }
 
 //gets label "value" from modules own table
