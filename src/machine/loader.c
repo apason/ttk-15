@@ -9,7 +9,6 @@
 
 int loadFile(MYTYPE *mem, char *file){
   FILE *fp;
-  MYTYPE word;
   int i;
 
   if(!(fp = fopen(file,"rb"))){
@@ -18,7 +17,8 @@ int loadFile(MYTYPE *mem, char *file){
   }
 
   for(i = 0; !feof(fp); i++)
-    fread(&word, sizeof(MYTYPE), 1, fp);
+    fread(mem +i, sizeof(MYTYPE), 1, fp);
+    
     
   return i;
 }

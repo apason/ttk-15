@@ -13,33 +13,43 @@ static void printSymbols(llist *l);
 
 int main(int argc, char **argv){
   module **modules = (module**)malloc(sizeof(module*) * (argc -1));
+  module *tmp;
   FILE *output;
   int i, mainnbr;
 
-printf("Creating modules\n");
+  printf("Creating modules\n");
   //create module structs for each module
   createModules(argc -1, argv +1, modules);
 
-printf("Finding main...\n");
+  printf("Finding main...\n");
   //determine which module contains main
   mainnbr = findMain(modules, argc -1);
+
+  //swap main to first position
+  if(mainnbr != 0){
+    tmp = modules[0];
+    modules[0] = modules[mainnbr];
+    modules[mainnbr] = tmp;
+  }
   
- 
-  if((output = fopen("a.out.b15", "wb")) == NULL){
+  //main module
+  modules[0]->address_constant = 0;
+
+  for(i = 1; i < argc -1; i++)
+    modules[i]->address_constant = modules[i -1]->linked_size + modules[i -1]->address_constant;
+
+  if(!(output = fopen("a.out.b15", "wb"))){
     printf("ERROR: cannot open result file\n");
     exit(-1);
   }
 
   printModule(modules[0]);
 
-  //link main containing module to first one
-  link(output, modules, mainnbr, argc -1);
-
-  //means "module already linked"
-  modules[mainnbr]->data = NULL; //free memory first!
+  //link main containing module first
+  link(output, modules, 0, argc -1);
 
   //link others
-  for(i = 0; i < argc -1; i++)
+  for(i = 1; i < argc -1; i++)
     link(output, modules, i, argc -1);
 
   fclose(output);

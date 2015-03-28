@@ -31,19 +31,23 @@ void createModules(int n, char **argv, module **modules){
 //initializes one module
 static module *readModule(FILE *fp){
   module *mod = (module*)malloc(sizeof(module));
-  int i;
+  int i, data_size, code_size;
 
   //determine size
   fseek(fp, 0, SEEK_END);
   mod->size = ftell(fp);
 
   mod->data = (int8_t*)malloc(mod->size);
-
   fseek(fp, 0, SEEK_SET);
 
   //read code and data starts
   fread(&mod->symbol_start, 4, 1, fp);
   fread(&mod->data_start, 4, 1, fp);
+
+  //calculate linked size 
+  code_size = 4 * (mod->data_start - 8) / 5;
+  data_size = mod->symbol_start - mod->data_start;
+  mod->linked_size = code_size + data_size;
 
   fseek(fp, 0, SEEK_SET);
   

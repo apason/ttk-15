@@ -13,8 +13,9 @@ typedef struct LLIST{
 } llist;
 
 typedef struct MODULE {
+  int address_constant;
   int size;
-  // int code_start; 8 by definition
+  int linked_size;
   int data_start;
   int symbol_start;
   llist *symbols;
