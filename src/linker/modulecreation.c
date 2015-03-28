@@ -78,7 +78,7 @@ static void readSymbols(module *mod){
   symbol = mod->symbols;
 
   for(i = 0; i < size; i++){
-    strncpy(symbol->label, mod->data +mod->symbol_start +(i * 36) , 32);
+    strncpy(symbol->label, (char *)mod->data +mod->symbol_start +(i * 36) , 32);
     symbol->value = mod->data[mod->symbol_start +(i * 36) +32]; //type?
     if(i < size -1){
       symbol->next = (llist*)malloc(sizeof(llist));
