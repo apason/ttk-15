@@ -31,7 +31,7 @@ int countSize(code_file* file){
 	
       if(!isInstruction(label) && isInstruction(word))
 	label_node->address = size++;
-      if(!strncmp(word, "dc", MAX)) {
+      else if(!strncmp(word, "dc", MAX)) {
 	 label_node->size = 1;
 	// store the value to be inserted later
 	 label_node->value = atoi(val);
