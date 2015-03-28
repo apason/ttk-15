@@ -288,6 +288,9 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 	} else if (!strncmp("kbd",argument,strlen(argument))) {
 		instruction |= 1;
 		temp = NULL;
+	} else if (!strncmp("halt",argument,strlen(argument))) {
+		instruction |= 0xB;
+		temp = NULL;
 	} else if (isdigit(argument[0])) {
 		instruction |= atoi(argument);
 		temp = NULL;
