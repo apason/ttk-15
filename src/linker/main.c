@@ -8,6 +8,8 @@
 
 static int findMain(module **modules, int n);
 static int containsMain(module *mod);
+static void printModule(module *mod);
+static void printSymbols(llist *l);
 
 int main(int argc, char **argv){
   module **modules = (module**)malloc(sizeof(module*) * (argc -1));
@@ -21,10 +23,12 @@ int main(int argc, char **argv){
   mainnbr = findMain(modules, argc -1);
   
  
-  if((output = fopen("a.out.b15", "bw")) == NULL){
+  if((output = fopen("a.out.b15", "wb")) == NULL){
     printf("ERROR: cannot open result file\n");
     exit(-1);
   }
+
+  printModule(modules[0]);
 
   //link main containing module to first one
   link(output, modules, mainnbr, argc -1);
@@ -58,4 +62,18 @@ static int containsMain(module *mod){
       return 1;
   return 0;
     
+}
+static void printModule(module *mod){
+
+  printf("size: %d\tdstart: %d\tsstart %d\n", mod->size, mod->data_start, mod->symbol_start);
+  if(!mod->symbols)
+    printf("symbol list = NULL\n");
+  else
+    printSymbols(mod->symbols);
+
+}
+
+static void printSymbols(llist *l){
+  for(;l;l=l->next)
+    printf("%s\t%d\n",l->label,l->value);
 }
