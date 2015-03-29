@@ -303,13 +303,13 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 		instruction |= atoi(argument);
 		temp = NULL;
 	} else if (strncmp("crt",argument,strlen(argument))) {
-		uint16_t index = 0xffff;
+		uint16_t index = 0x1;
 		while(temp != NULL) {
 			if (!strncmp(temp->label,argument,strlen(argument))) {
 				instruction |= temp->address;
 				break;
 			}
-			if (temp->address < 0) --index;
+			if (temp->address < 0) ++index;
 			temp = temp->next;
 		}
 		if (temp == NULL) {
@@ -321,7 +321,7 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 			strncpy(temp->next->label,argument,strlen(argument));
 			temp->next->label[strlen(argument)] = '\0';
 			temp->next->size = 0;
-			temp->next->address = index;
+			temp->next->address = -1*(int32_t)index;
 			instruction |= index;
 		}
 	}
