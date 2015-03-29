@@ -273,11 +273,31 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 		++argument;
 	}
 
+	// figure if there is a need for indexing register
+	char* bracket = argument;
+	while (*bracket && *bracket != '(') ++bracket;
+	int reg = 0;
+	// found braces
+	if (*bracket) {
+		*bracket++ = '\0';
+		char* p = bracket;
+		while (*p && *p != ')') ++p;
+		if (*p) {
+			*p = '\0';
+			reg = getRegister(bracket,1);
+			if (reg == -1) return;
+		} else {
+			fprintf(stderr, "Missing closed braces!\n");
+			return;
+		}
+		instruction |= reg << 16;
+	}
+
 	// set the indexing mode
 	instruction |= mode << 19;
 	
 	// set Register
-	int reg = 0;
+	reg = 0;
 	if (argument > val) {
 		reg = getRegister(val, 1);
 		if (reg < 0) return;
