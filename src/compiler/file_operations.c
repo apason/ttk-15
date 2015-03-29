@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <compiler.h>
+#include <ttk-91.h>
 
 int countLines(FILE*);
 int nextLine(FILE*);
@@ -44,10 +45,10 @@ int writeCodeFile(code_file* file) {
 		return -1;
 	}
 	// write header to the object file
-	uint32_t dataSegmentAddress = file->codeSize*5 + 8;
-	uint32_t symbolTableAddress =  dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
-	fwrite(&symbolTableAddress,sizeof(uint32_t),1,fh);
-	fwrite(&dataSegmentAddress, sizeof(uint32_t),1,fh);
+	MYTYPE dataSegmentAddress = file->codeSize*5 + 8;
+	MYTYPE symbolTableAddress =  dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
+	fwrite(&symbolTableAddress,sizeof(MYTYPE),1,fh);
+	fwrite(&dataSegmentAddress, sizeof(MYTYPE),1,fh);
 	// start writing data
 	int i, cInstructions = 0;
 	char word[MAX], label[MAX], val[MAX] = "\0";
@@ -328,7 +329,7 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 			temp->label[strlen(argument)] = '\0';
 			temp->size = 0;
 			temp->address = index;
-			instruction |= index;
+			instruction |= (index & 0xffff);
 		}
 	}
 
