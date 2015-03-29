@@ -2,7 +2,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <compiler.h>
 
 int countSize(code_file* file){
@@ -63,7 +62,7 @@ int countSize(code_file* file){
   label_node = first;
   file->codeSize = size;
   // calculate addresses add the variables to the end of code
-  while(label_node->label[0]) {
+  while(label_node->next != NULL) {
 	// the dc case
 	if (label_node->size == 1) {
 		label_node->address = size++;
@@ -75,7 +74,7 @@ int countSize(code_file* file){
 	label_node = label_node->next;
   }
   file->moduleSize = size;
-  while (first->next->label[0] != '\0') {
+  while (first->next != NULL && first->next->next != NULL) {
 	first = first->next;
   }
   free(first->next);

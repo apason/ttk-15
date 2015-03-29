@@ -37,8 +37,8 @@ int readCodeFile(code_file* file) {
 
 // this is also a function to be used outside of this file
 int writeCodeFile(code_file* file) {
-	// TODO: dynamic name for the object file
-	FILE* fh = fopen("testi.o15","wb");
+	printf("Opening output file: %s\n",file->out_name);
+	FILE* fh = fopen(file->out_name,"wb");
 	if (fh == NULL) {
 		fprintf(stderr, "Error opening file!!!!!\n");
 		return -1;
@@ -303,7 +303,7 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 		instruction |= atoi(argument);
 		temp = NULL;
 	} else if (strncmp("crt",argument,strlen(argument))) {
-		int index = -1;
+		uint16_t index = 0xffff;
 		while(temp != NULL) {
 			if (!strncmp(temp->label,argument,strlen(argument))) {
 				instruction |= temp->address;
@@ -314,13 +314,15 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 		}
 		if (temp == NULL) {
 			// Didn't find label so added to the list of external symbols
-			int16_t address = index;
 			temp = symbols;
 			while (temp->next != NULL) temp = temp->next;
 			temp->next = (label_list*)malloc(sizeof(label_list));
+			temp->next->next = NULL;
 			strncpy(temp->next->label,argument,strlen(argument));
+			temp->next->label[strlen(argument)] = '\0';
+			temp->next->size = 0;
 			temp->next->address = index;
-			instruction |= address;
+			instruction |= index;
 		}
 	}
 
