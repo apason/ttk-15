@@ -305,6 +305,7 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 	} else if (strncmp("crt",argument,strlen(argument))) {
 		uint16_t index = 0x1;
 		while(temp != NULL) {
+			// when label is found it's address is replaced in the instruction
 			if (!strncmp(temp->label,argument,strlen(argument))) {
 				instruction |= temp->address;
 				break;
