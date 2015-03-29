@@ -50,7 +50,7 @@ int writeCodeFile(code_file* file) {
 	fwrite(&dataSegmentAddress, sizeof(uint32_t),1,fh);
 	// start writing data
 	int i, cInstructions = 0;
-	char word[MAX], label[MAX], val[MAX];
+	char word[MAX], label[MAX], val[MAX] = "\0";
 	for (i = 0; i < file->lines; ++i) {
 		sscanf(file->array[i], "%s %s", word, val);
 		if (isInstruction(word)) {
@@ -229,6 +229,12 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 		"svc\0\0\0\x70" };
 	uint32_t instruction = 0;
 	int i;
+	// nop is just zeros
+	if (!strncmp(word,"nop",3)) {
+		fwrite(&instruction,sizeof(uint8_t),1,fh);
+		fwrite(&instruction,sizeof(instruction),1,fh);
+		return;
+	}
 	for (i = 0; i < 38; ++i) {
 		if (strncmp(opcodes[i],word,strlen(opcodes[i])) == 0) {
 			instruction |= (opcodes[i][6] << 24);
@@ -243,8 +249,7 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 	if (argument != NULL && strlen(argument) > 1)
 		*argument++ = '\0';
 	else {
-		fprintf(stderr, "Invalid arguments\n");
-		return ;
+		argument = val;
 	}
 		
 
@@ -268,10 +273,13 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 
 	// set the indexing mode
 	instruction |= mode << 19;
-
+	
 	// set Register
-	int reg = getRegister(val, 1);
-	if (reg < 0) return;
+	int reg = 0;
+	if (argument > val) {
+		reg = getRegister(val, 1);
+		if (reg < 0) return;
+	}
 	instruction |= reg << 21;
 
 	// make the argument lowercase
@@ -295,18 +303,24 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 		instruction |= atoi(argument);
 		temp = NULL;
 	} else if (strncmp("crt",argument,strlen(argument))) {
+		int index = -1;
 		while(temp != NULL) {
 			if (!strncmp(temp->label,argument,strlen(argument))) {
 				instruction |= temp->address;
 				break;
 			}
-			// TODO: add foreign labels to list as external
+			if (temp->address < 0) --index;
 			temp = temp->next;
 		}
 		if (temp == NULL) {
-			fprintf(stderr, "No definition of label: %s found!\n",argument);
-			fclose(fh);
-			return;
+			// Didn't find label so added to the list of external symbols
+			int16_t address = index;
+			temp = symbols;
+			while (temp->next != NULL) temp = temp->next;
+			temp->next = (label_list*)malloc(sizeof(label_list));
+			strncpy(temp->next->label,argument,strlen(argument));
+			temp->next->address = index;
+			instruction |= address;
 		}
 	}
 

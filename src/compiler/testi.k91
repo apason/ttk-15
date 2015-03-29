@@ -1,2 +1,8 @@
 aaaa dc 2048
 main STORE R1,aaaa  ;this is also a comment
+push sp,external_label
+nop
+nop
+nop
+jump end
+list ds 10
