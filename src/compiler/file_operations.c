@@ -74,8 +74,8 @@ int writeCodeFile(code_file* file) {
 			fwrite(&(symbols->value),sizeof(symbols->value),1,fh);
 		} else if (symbols->size > 1) {
 			for (i = 0; i < symbols->size; ++i) {
-				uint32_t nul = 0;
-				fwrite(&nul, 1, sizeof(uint32_t),fh);
+				MYTYPE nul = 0;
+				fwrite(&nul, 1, sizeof(MYTYPE),fh);
 			}
 		}
 		symbols = symbols->next;	

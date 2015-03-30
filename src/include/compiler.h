@@ -8,7 +8,7 @@ typedef struct label_list {
 	struct label_list* next;
 	char label[MAX];
 	int16_t address;
-	int size;
+	MYTYPE size;
 	// used only with the dc keyword
 	int value;
 } label_list;
