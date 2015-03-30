@@ -73,7 +73,6 @@ extern MYTYPE calculatePointer(machine *m, uint8_t mode, uint8_t ri, int16_t add
 
 //helpers.c
 extern void initializeGlobals(void);
-extern void error(const char* msg);
 extern void printState(machine *m);
 
 //bitwise.c

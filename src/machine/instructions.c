@@ -25,16 +25,20 @@ FUNCTION(in){
     scanf("%d", &tmp);
     m->regs[rj] = tmp;
   }
-  else
-    error("in instruction IN: reference to unknown device\n");
+  else{
+    fprintf(stderr, "ERROR: in instruction IN: reference to unknown device\n");
+    exit(-1);
+  }
 }
 
 //simulation
 FUNCTION(out){
   if(m->cu->tr2 == CRT)
     printf("%d\t", m->regs[rj]);
-  else
-    error("in instruction OUT: reference to unknown device\n");
+  else{
+    fprintf(stderr, "in instruction OUT: reference to unknown device\n");
+    exit(-1);
+  }
 }
 
 FUNCTION(add){
@@ -82,9 +86,13 @@ FUNCTION(shl){
   m->regs[rj] = m->alu->out;
 }
 
-//in progress..
 FUNCTION(shr){
-  ;
+  MYTYPE mask = 0xFFFFFFFF;
+
+  m->regs[rj] >>= m->cu->tr2;
+  mask <<= (mtl -m->cu->tr2);
+
+  m->regs[rj] &= (~mask);
 }
 
 FUNCTION(not){
@@ -92,9 +100,18 @@ FUNCTION(not){
   m->regs[rj] = m->alu->out;
 }
 
-//in progress..
 FUNCTION(shra){
-  ;
+  int sign;
+  MYTYPE mask = 0xFFFFFFFF;
+
+  if(rj < 0) sign = 1;
+  else       sign = 0;
+    
+  m->regs[rj] >>= m->cu->tr2;
+  mask <<= (mtl -m->cu->tr2);
+
+  if(sign) m->regs[rj] |= mask;
+  else     m->regs[rj] &= (~mask);
 }
 
 FUNCTION(comp){
@@ -108,10 +125,6 @@ FUNCTION(comp){
   else
     m->cu->sr |= EMASK;
 }
-
-/*  ?? should it be possible to jump with ??
- *  ?? indexed of referenced operand      ??
- */
 
 FUNCTION(jump){
   m->cu->pc = mem;

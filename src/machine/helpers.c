@@ -8,6 +8,7 @@
 //initializes all global variables excluded machine itself
 void initializeGlobals(void){
   int i;
+
   // mytype length in bytes
   mtl = sizeof(MYTYPE) * 8; 
 
@@ -51,12 +52,6 @@ void initializeGlobals(void){
   instructions[PUSHR] = pushr;
   instructions[POPR]  = popr;
   instructions[SVC]   = svc;
-}
-
-//for fatal errors
-void error(const char *msg){
-  fprintf(stderr, "ERROR: %s", msg);
-  exit(-1);
 }
 
 //mainly for debugging. prints state of machine and first memoryslots

@@ -19,7 +19,7 @@ typedef struct LLIST{
 } llist;
 
 typedef struct MODULE {
-  int16_t address_constant;
+  int16_t address_constant;  //size in bytes!
   int size;
   int linked_size;
   int data_start;

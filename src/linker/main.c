@@ -93,7 +93,7 @@ static int containsMain(module *mod){
 
 /*
 static void printModule(module *mod){
-  printf("size: %d\tdstart: %d\tsstart %d\n", mod->size, mod->data_start, mod->symbol_start);
+  printf("nsize: %d\tdstart: %d\tsstart %d\n", mod->size, mod->data_start, mod->symbol_start);
   if(!mod->symbols)
     printf("symbol list = NULL\n");
   else
@@ -102,7 +102,7 @@ static void printModule(module *mod){
 }
 
 static void printSymbols(llist *l){
-  for(;l;l=l->next)
+  for(;l;l = l->next)
     printf("%s\t%d\n",l->label,l->value);
 }
 */

@@ -5,7 +5,8 @@
 #include <ttk-15.h>
 
 int main(int argc,char *argv[]){
-  machine *m = newMachine(65536 /*64k system*/);
+  
+  machine *m = newMachine(65536);
 
   initializeGlobals();
   m->cu->pc = 0;

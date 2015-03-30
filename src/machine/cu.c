@@ -29,6 +29,7 @@ MYTYPE calculatePointer(machine *m, uint8_t mode ,uint8_t ri ,int16_t addr){
   
   addr += (m->regs[ri]);               //handle indexed data
 
+
   /* fetch data from pointer if needed (if would
    * be better here cause mode -1 is at most 1  */
   for(i = 0; i < mode - 1; i++){
