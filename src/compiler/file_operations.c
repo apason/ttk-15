@@ -175,30 +175,6 @@ char** readCode(FILE* fh, int lines) {
 	return input;
 }
 
-int getRegister(char* val, int errors) {
-
-	int reg = 0;
-	if (tolower(val[0]) == 'r' && isdigit(val[1]) && val[2] == 0) {
-		reg = atoi(val + 1);
-		if (reg > 7) {
-			if (errors) fprintf(stderr, "Invalid register r%d\n",reg);
-			return -1;
-		}
-	} else if (tolower(val[1]) == 'p' && val[2] == 0) {
-		if (tolower(val[0] == 's'))
-			reg = 6;
-		else if (tolower(val[0] == 'f'))
-			reg = 7;
-		else {
-			if (errors) fprintf(stderr, "First operand must be a register, found: %s\n",val);
-			return -1;
-		}
-	} else {
-		if (errors) fprintf(stderr, "First operand must be a register, found: %s\n",val);
-		return -1;
-	}
-	return reg;
-}
 
 
 void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
@@ -255,7 +231,7 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 			if ((reg = getRegister(val, 1)) < 0)
 				return;
 		}
-		if (( temp = getRegister(argument, 0) >= 0))
+		if (( temp = getRegister(argument, 0)) >= 0)
 			if (nargs == 2) {
 				ireg = temp;
 				if (mode == 1)
@@ -391,17 +367,42 @@ int getIndexingMode(char* argument) {
 		return 1;
 }
 
+int getRegister(char* val, int errors) {
+
+	int reg = 0;
+	if (tolower(val[0]) == 'r' && isdigit(val[1]) && val[2] == 0) {
+		reg = atoi(val + 1);
+		if (reg > 7) {
+			if (errors) fprintf(stderr, "Invalid register r%d\n",reg);
+			return -1;
+		}
+	} else if (tolower(val[1]) == 'p' && val[2] == 0) {
+		if (tolower(val[0] == 's'))
+			reg = 6;
+		else if (tolower(val[0] == 'f'))
+			reg = 7;
+		else {
+			if (errors) fprintf(stderr, "First operand must be a register, found: %s\n",val);
+			return -1;
+		}
+	} else {
+		if (errors) fprintf(stderr, "First operand must be a register, found: %s\n",val);
+		return -1;
+	}
+	return reg;
+}
+
 int getIndexRegister(char* argument) {
 
 	// figure if there is a need for indexing register
 	char* bracket = argument;
-	while (*bracket && *bracket != '(') ++bracket;
-	if (*bracket) {
+	while (*bracket && (*bracket != '(')) ++bracket;
+	if (*bracket == '(') {
 		// found braces, inside must be a register
 		*bracket++ = '\0';
 		char* p = bracket;
 		while (*p && *p != ')') ++p;
-		if (*p) {
+		if (*p == ')') {
 			*p = '\0';
 			return getRegister(bracket,1);
 		} else {
