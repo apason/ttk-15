@@ -47,7 +47,7 @@ static module *readModule(FILE *fp, char *filename){
   fread(&mod->data_start, 4, 1, fp);
 
   //calculate linked size 
-  code_size = 4 * (mod->data_start - CODESTART) / 5;
+  code_size = 4 * (mod->data_start - CODESTART) / CODESIZE;
   data_size = mod->symbol_start - mod->data_start;
   mod->linked_size = code_size + data_size;
 
@@ -79,8 +79,10 @@ static void readSymbols(module *mod){
   int size = (mod->size - mod->symbol_start) / SYMBOLSIZE;
   int i;
 
-  mod->symbols = (llist *)malloc(sizeof(llist));
+  mod->symbols = (llist *)malloc(sizeof(llist));  
   symbol = mod->symbols;
+  *(symbol->label +LABELLENGTH) = '\0';           //initialize
+  symbol->next = NULL;                            //initialize
 
   for(i = 0; i < size; i++){
     
@@ -90,31 +92,12 @@ static void readSymbols(module *mod){
 				  +(i * SYMBOLSIZE) +LABELLENGTH));
 
     if(i < size -1){
-      
       symbol->next = (llist *)malloc(sizeof(llist));
       symbol = symbol->next;
       symbol->next = NULL;
-      
     }    
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

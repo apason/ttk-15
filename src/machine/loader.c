@@ -12,7 +12,7 @@ int loadFile(MYTYPE *mem, char *file){
   int i;
 
   if(!(fp = fopen(file,"rb"))){
-    printf("ERROR: cannot open binary fil %s\n", file);
+    fprintf(stderr, "ERROR: cannot open binary fil %s\n", file);
     exit(-1);
   }
 
@@ -31,7 +31,7 @@ int loadFile91(MYTYPE *mem, char *file){
   char buffer[BUFSIZE];
 
   if( (fp = fopen(file,"r")) == NULL){
-    printf("ERROR: cannot open binary file %s\n", file);
+    fprintf(stderr, "ERROR: cannot open binary file %s\n", file);
     exit(-1);
   }
   

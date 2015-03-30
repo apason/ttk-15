@@ -21,7 +21,7 @@ void link(FILE *fp, module **modules, int mi, int n ){
   printf("%s\n", modules[mi]->filename);
 
   codesize = (mod->data_start - CODESTART) / CODESIZE;
-  datasize = (mod->symbol_start -mod->data_start);
+  datasize = (mod->symbol_start -mod->data_start) / sizeof(MYTYPE);
 
   //copy code segment to executable
   for(i = 0; i < codesize; i++){
@@ -47,6 +47,7 @@ void link(FILE *fp, module **modules, int mi, int n ){
 	buf -= value;
 	label_address_constant = findLabelAddressConstant(modules, n, label);
 
+
 	if(label_address_constant < 0){
 	  fprintf(stderr, "Undefined label %s. Aborting!\n", label);
 	  exit(-1);
@@ -68,9 +69,9 @@ void link(FILE *fp, module **modules, int mi, int n ){
     }
   }
 
-  //copy data segment to executable
+  //copy data segment to executable ERROR endianess fucked up
   for(i = 0; i < datasize; i++)
-    fwrite(mod->data +mod->data_start +i, sizeof(int8_t), 1, fp);
+    fwrite(mod->data +mod->data_start +i, sizeof(MYTYPE), 1, fp);
 
   freeRedundant(mod);
 }
@@ -82,8 +83,8 @@ static int findLabelAddressConstant(module **modules, int n, char *label){
   
   for(i = 0; i < n; i++)
     for(s = modules[i]->symbols; s; s = s->next)
-      if(!strncmp(s->label, label, 32))
-	return modules[i]->address_constant;
+      if(!strncmp(s->label, label, LABELLENGTH) && s->value > 0)
+	return modules[i]->address_constant / sizeof(MYTYPE);
   
   return -1; 
 }
@@ -91,6 +92,8 @@ static int findLabelAddressConstant(module **modules, int n, char *label){
 //gets label name from modules own table
 static char *getLabelName(llist *s, uint32_t instruction){
   int16_t label;
+
+  if(!s) printf("llist is null\n");
 
   label = (int16_t) instruction;
 
