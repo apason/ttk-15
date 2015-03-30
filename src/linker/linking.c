@@ -113,7 +113,9 @@ static int16_t findLabelValue(module **modules, int n, char *label){
     printf("label name null! aborting..\n");
     exit(-1);
   }
-    
+
+  printf("modules: %d\n", n);
+  
   for(i = 0; i < n; i++)
     for(s = modules[i]->symbols; s; s = s->next)
       if(!strncmp(s->label, label, LABELLENGTH) && s->value >= 0)
