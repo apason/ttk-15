@@ -49,7 +49,7 @@ int countSize(code_file* file){
 	printf("ERROR: invalid instruction %s\n", word);
 	exit(-1);
       }
-
+      memset(label_node->label, 0, LABELLENGTH);
       // set label name
       strncpy(label_node->label, label, LABELLENGTH);
       // reserve space for next label

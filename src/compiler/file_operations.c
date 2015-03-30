@@ -60,8 +60,9 @@ int writeCodeFile(code_file* file) {
 	fwrite(&dataSegmentAddress, sizeof(MYTYPE),1,fh);
 	// start writing data
 	int i, cInstructions = 0;
-	char word[MAX], label[MAX], val[MAX] = "\0";
+	char word[MAX], label[LABELLENGTH], val[MAX];
 	for (i = 0; i < file->lines; ++i) {
+		val[0] = '\0';
 		sscanf(file->array[i], "%s %s", word, val);
 		if (isInstruction(word)) {
 			writeInstruction(word,val,file->symbolList, fh);
@@ -219,7 +220,7 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 
 	// find number of arguments
 	char* argument = NULL;
-	if (val != NULL) {
+	if (val[0]) {
 		// make the arguments lowercase
 		{
 			char* p = val;
@@ -271,7 +272,7 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 	instruction |= (reg << 21);
 	instruction |= (mode << 19);
 	instruction |= (ireg << 16);
-	instruction |= (int16_t)addr;
+	instruction |= (addr & 0xffff);
 
 	// write 1, if address is a label, 0, if not
 	fwrite(&firstByte,sizeof(firstByte),1,fh);
@@ -440,8 +441,9 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte) {
 			temp->next = (label_list*)malloc(sizeof(label_list));
 			temp = temp->next;
 			temp->next = NULL;
-			strncpy(temp->label,argument,strlen(argument));
-			temp->label[strlen(argument)] = '\0';
+			// zero the label char array
+			memset(temp->label,0,sizeof(temp->label));
+			strncpy(temp->label,argument,LABELLENGTH);
 			temp->size = 0;
 			temp->address = (int16_t)index;
 			addr = index;
