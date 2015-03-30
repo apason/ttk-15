@@ -27,6 +27,7 @@ typedef struct MODULE {
   llist *symbols;
   char **codes;
   char *data;
+  char *filename;
 } module;
 
 extern void link(FILE *fp, module **modules, int mi, int n );

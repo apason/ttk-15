@@ -6,44 +6,70 @@
 
 #define LABEL 1
 
-static char *getLabelName(llist *s, uint32_t label);
-static int findLabelValue(module **modules, int n, char *label);
+static char *getLabelName(llist *s, uint32_t instruction);
+static int16_t findLabelValue(module **modules, int n, char *label);
 static int findLabelAddressConstant(module **modules, int n, char *label); 
 
 void link(FILE *fp, module **modules, int mi, int n ){
   int i;
-  uint32_t size, buf;
-  int16_t value;
+  uint32_t codesize, datasize, buf;
+  int16_t value, label_address_constant;
   char *label;
   module *mod     = modules[mi];
 
-  size = (mod->data_start - CODESTART) / CODESIZE;
+  //filename to module struct and say module name instead of index number?
+  printf("%s\n", modules[mi]->filename);
+
+  codesize = (mod->data_start - CODESTART) / CODESIZE;
+  datasize = (mod->symbol_start -mod->data_start);
 
   //copy code segment to executable
-  for(i = 0; i < size; i++){
-    
+  for(i = 0; i < codesize; i++){
+
+    //contains next instruction
     memcpy(&buf, mod->codes[i] +1, sizeof(buf));
     
+    //in this case  there is label in instruction
     if(*(mod->codes[i]) == 1){
 
       label = getLabelName(mod->symbols, buf);
-      value = findLabelValue(modules, n, label);
+      value = (int16_t) buf;
+
+      if(!label){
+	fprintf(stderr, "ERROR: Incorrect symbol table: nameless label with");
+	fprintf(stderr, " value %d. Aborting!\n", value);
+	exit(-1);
+      }
 
       //external label
-      if(value > 0)
-	buf += findLabelAddressConstant(modules, n, label) + value;
-      //internal label
-      else
-	buf += mod->address_constant;
+      if(value < 0){
+	
+	buf -= value;
+	label_address_constant = findLabelAddressConstant(modules, n, label);
+
+	if(label_address_constant < 0){
+	  fprintf(stderr, "Undefined label %s. Aborting!\n", label);
+	  exit(-1);
+	}
+
+	buf += label_address_constant +findLabelValue(modules, n, label);
+      }
+      
+      else buf += mod->address_constant;
       
     }
     
     fwrite(&buf, sizeof(buf), 1, fp);
     
+    if(ferror(fp)){
+      fprintf(stderr, "Cant write to destination file.\n aborting!\n");
+      fclose(fp);
+      exit(-1);
+    }
   }
 
   //copy data segment to executable
-  for(i = 0; i < (mod->symbol_start - mod->data_start); i++)
+  for(i = 0; i < datasize; i++)
     fwrite(mod->data +mod->data_start +i, sizeof(int8_t), 1, fp);
 
   freeRedundant(mod);
@@ -53,28 +79,42 @@ void link(FILE *fp, module **modules, int mi, int n ){
 static int findLabelAddressConstant(module **modules, int n, char *label){
   int i;
   llist *s;
+  
   for(i = 0; i < n; i++)
     for(s = modules[i]->symbols; s; s = s->next)
       if(!strncmp(s->label, label, 32))
 	return modules[i]->address_constant;
-  return -1; //fatal error
+  
+  return -1; 
 }
 
 //gets label name from modules own table
-static char *getLabelName(llist *s, uint32_t label){
+static char *getLabelName(llist *s, uint32_t instruction){
+  int16_t label;
+
+  label = (int16_t) instruction;
+
   for(; s; s = s->next)
     if(s->value == label)
       return s->label;
+  
   return NULL;
 }
 
 //get labels real value from arbitrary module
-static int findLabelValue(module **modules, int n, char *label){
+static int16_t findLabelValue(module **modules, int n, char *label){
   int i;
   llist *s;
+
+  if(!label){
+    printf("label name null! aborting..\n");
+    exit(-1);
+  }
+    
   for(i = 0; i < n; i++)
     for(s = modules[i]->symbols; s; s = s->next)
-      if(!strncmp(s->label, label, 32))
+      if(!strncmp(s->label, label, LABELLENGTH) && s->value >= 0)
 	return s->value;
-  return 0xFFFF; //to be change
+  
+  return -1;
 }
