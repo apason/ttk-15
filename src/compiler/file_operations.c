@@ -60,9 +60,8 @@ int writeCodeFile(code_file* file) {
 	fwrite(&dataSegmentAddress, sizeof(MYTYPE),1,fh);
 	// start writing data
 	int i, cInstructions = 0;
-	char word[MAX], label[MAX], val[MAX];
+	char word[MAX], label[MAX], val[MAX] = "\0";
 	for (i = 0; i < file->lines; ++i) {
-		val[0] =  '\0';
 		sscanf(file->array[i], "%s %s", word, val);
 		if (isInstruction(word)) {
 			writeInstruction(word,val,file->symbolList, fh);
@@ -220,7 +219,7 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 
 	// find number of arguments
 	char* argument = NULL;
-	if (val[0] = '\0') {
+	if (val != NULL) {
 		// make the arguments lowercase
 		{
 			char* p = val;
