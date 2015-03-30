@@ -271,7 +271,7 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 	instruction |= (reg << 21);
 	instruction |= (mode << 19);
 	instruction |= (ireg << 16);
-	instruction |= (int16_t)addr;
+	instruction |= (addr & 0xffff);
 
 	// write 1, if address is a label, 0, if not
 	fwrite(&firstByte,sizeof(firstByte),1,fh);
