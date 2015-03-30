@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <compiler.h>
-#include <ttk-91.h>
 
 int countLines(FILE*);
 int nextLine(FILE*);
