@@ -3,16 +3,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <compiler.h>
+#include <linker.h>
 
 int countSize(code_file* file){
   file->symbolList = (label_list*)malloc(sizeof(label_list));
+  if (file->symbolList == NULL) return -1;
   label_list* label_node = file->symbolList;
   char **code = file->array;
-  label_list* first = label_node;
 
   int i;
   int size=0;
-  char word[MAX], label[MAX], val[MAX];
+  char word[MAX], label[LABELLENGTH], val[MAX];
 
   label_node->size = 0;
   label_node->label[0] = '\0';
@@ -50,7 +51,7 @@ int countSize(code_file* file){
       }
 
       // set label name
-      strncpy(label_node->label, label, MAX);
+      strncpy(label_node->label, label, LABELLENGTH);
       // reserve space for next label
       label_node->next = (label_list*) malloc(sizeof(label_list));
       label_node = label_node->next;
@@ -59,7 +60,7 @@ int countSize(code_file* file){
       label_node->label[0] = '\0';
     }
   }
-  label_node = first;
+  label_node = file->symbolList;
   file->codeSize = size;
   // calculate addresses add the variables to the end of code
   while(label_node->next != NULL) {
@@ -73,12 +74,14 @@ int countSize(code_file* file){
 	}
 	label_node = label_node->next;
   }
-  file->moduleSize = size;
-  while (first->next != NULL && first->next->next != NULL) {
-	first = first->next;
+  label_node = file->symbolList;
+  while(label_node->next && label_node->next->next) {
+	label_node = label_node->next;
   }
-  free(first->next);
-  first->next = NULL;
+  free(label_node->next);
+  label_node->next = NULL;
+
+  file->moduleSize = size;
   
   return 0;
 }
@@ -95,7 +98,7 @@ int isInstruction(char *word){
                               "jles", "jequ", "jgre", "jnles", "jnequ", "jngre",\
                               "call", "exit", "push", "pop", "pushr", "popr", "svc"};
   for(i = 0; i < 38; i++)
-    if(!strncmp(instructions[i], word, MAX))
+    if(!strncmp(instructions[i], word, LABELLENGTH))
       return 1;
   return 0;
 

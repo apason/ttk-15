@@ -4,11 +4,21 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <compiler.h>
+#include <ttk-15.h>
 
 int countLines(FILE*);
 int nextLine(FILE*);
 char** readCode(FILE*, int);
-void writeInstruction(char*,char*,label_list*, FILE*);
+void writeInstruction(char* instr,char* val,label_list* symbols, FILE*);
+void freeSymbols(code_file*);
+void freeCodeArray(code_file*);
+
+int getHardcodedSymbolValue(char* argument);
+int getOpCode(char* operation);
+int getRegister(char* argument, int errors);
+int getIndexingMode(char* argument);
+int getIndexRegister(char* argument);
+int getAddress(char* argument, label_list* symbols, uint8_t* firstByte);
 
 // this is a function to be used outside this file
 int readCodeFile(code_file* file) {
@@ -191,6 +201,128 @@ int getRegister(char* val, int errors) {
 
 
 void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
+
+	uint8_t firstByte = 0;
+	uint32_t instruction = 0;
+
+	int opCode = 0;
+	int reg = 0;
+	int mode = 0;
+	int ireg = 0;
+	int addr = 0;
+
+	int nargs = 0;
+
+	// find out the operation code
+	opCode = getOpCode(word);
+	if (opCode == -1) return;
+
+	// find number of arguments
+	char* argument = NULL;
+	if (val != NULL) {
+		// make the arguments lowercase
+		{
+			char* p = val;
+			for (; *p; ++p) *p = tolower(*p);
+		}
+		// split val into two if there's a comma
+		argument = strchr(val, ',');
+		if (argument != NULL && strlen(argument) > 1) {
+			*argument++ = '\0';
+			nargs = 2;
+		} else {
+			nargs = 1;
+			argument = val;
+		}
+	} else
+		nargs = 0;
+
+	// if we have arguments for the instruction
+	if (nargs) {
+		int temp;
+		// get indexing mode
+		if ((temp = getIndexingMode(argument)) < 0)
+			return;
+		if (temp != 1)
+			++argument;
+		mode = temp;
+		// get index register
+		if ((ireg = getIndexRegister(argument)) < 0)
+			return;
+		// two arguments, first one has to be a register
+		if (nargs == 2) {
+			if ((reg = getRegister(val, 1)) < 0)
+				return;
+		}
+		if (( temp = getRegister(argument, 0) >= 0))
+			if (nargs == 2) {
+				ireg = temp;
+				if (mode == 1)
+					mode = 0;
+			} else
+				reg = temp;
+		else
+			addr = getAddress(argument, symbols, &firstByte);
+		
+	}
+
+	
+	instruction |= (opCode << 24);
+	instruction |= (reg << 21);
+	instruction |= (mode << 19);
+	instruction |= (ireg << 16);
+	instruction |= (int16_t)addr;
+
+	// write 1, if address is a label, 0, if not
+	fwrite(&firstByte,sizeof(firstByte),1,fh);
+	// write the compiled instruction
+	fwrite(&instruction,sizeof(instruction),1,fh);
+}
+
+void freeCodeFile(code_file* file) {
+	freeSymbols(file);
+	freeCodeArray(file);
+}
+
+void freeSymbols(code_file* file) {
+	while (file->symbolList != NULL) {
+		label_list* temp = file->symbolList;
+		file->symbolList = file->symbolList->next;
+		free(temp);
+	}
+}
+
+void freeCodeArray(code_file* file) {
+	int i;
+	for (i = 0; i < file->lines; ++i) {
+		free(file->array[i]);
+	}
+	free(file->array);
+}
+
+int getHardcodedSymbolValue(char* arg) {
+	if (!strncmp(arg, "crt", 4))
+		return 0x0;
+	else if (!strncmp(arg, "kbd", 4))
+		return 0x1;
+	else if (!strncmp(arg, "stdin", 6))
+		return 0x6;
+	else if (!strncmp(arg, "stdout", 7))
+		return 0x7;
+	else if (!strncmp(arg, "halt", 5))
+		return 0xB;
+	else if (!strncmp(arg, "read", 5))
+		return 0xC;
+	else if (!strncmp(arg, "write", 6))
+		return 0xD;
+	else if (!strncmp(arg, "time", 5))
+		return 0xE;
+	else if (!strncmp(arg, "date", 5))
+		return 0xF;
+	return -1;
+}
+
+int getOpCode(char* word) {
 	static const char opcodes[38][8] = {\
 		"nop\0\0\0\0",\
 		"store\0\x1",\
@@ -229,110 +361,72 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 		"pushr\0\x35",\
 		"popr\0\0\x36",\
 		"svc\0\0\0\x70" };
-	uint32_t instruction = 0;
 	int i;
-	// nop is just zeros
-	if (!strncmp(word,"nop",3)) {
-		fwrite(&instruction,sizeof(uint8_t),1,fh);
-		fwrite(&instruction,sizeof(instruction),1,fh);
-		return;
-	}
-	// find out the operation code
-	for (i = 1; i < 38; ++i) {
+	for (i = 0; i < 38; ++i) {
 		if (strncmp(opcodes[i],word,strlen(opcodes[i])) == 0) {
-			instruction |= (opcodes[i][6] << 24);
-			break;
-		}
-		if (i == 37) {
-			fprintf(stderr,"Unknown opcode: %s\n",word);
-			return;
+			return opcodes[i][6];
 		}
 	}
-	char* argument = strchr(val, ',');
-	if (argument != NULL && strlen(argument) > 1)
-		*argument++ = '\0';
-	else {
-		argument = val;
-	}
-		
+	fprintf(stderr,"Unknown opcode: %s\n",word);
+	return -1;
+}
 
-	// figure out which indexind mode to use
-	uint32_t mode = 1;
+
+int getIndexingMode(char* argument) {
 	if (argument[0] == '=') {
 		if (argument[1] == '\0') {
 			fprintf(stderr, "Invalid argument: %s\n", argument);
-			return;
+			return -1;
 		}
-		mode = 0;
-		++argument;
+		return 0;
 	} else if (argument[0] == '@') {
 		if (argument[1] == '\0') {
 			fprintf(stderr, "Invalid argument: %s\n", argument);
-			return;
+			return -1;
 		}
-		mode = 2;
-		++argument;
+		return 2;
 	}
+	else
+		return 1;
+}
+
+int getIndexRegister(char* argument) {
 
 	// figure if there is a need for indexing register
 	char* bracket = argument;
 	while (*bracket && *bracket != '(') ++bracket;
-	int reg = 0;
-	// found braces
 	if (*bracket) {
+		// found braces, inside must be a register
 		*bracket++ = '\0';
 		char* p = bracket;
 		while (*p && *p != ')') ++p;
 		if (*p) {
 			*p = '\0';
-			reg = getRegister(bracket,1);
-			if (reg == -1) return;
+			return getRegister(bracket,1);
 		} else {
 			fprintf(stderr, "Missing closed braces!\n");
-			return;
+			return -1;
 		}
-		instruction |= reg << 16;
 	}
+	return 0;
+}
 
-	// set the indexing mode
-	instruction |= mode << 19;
-	
-	// set Register
-	reg = 0;
-	if (argument > val) {
-		reg = getRegister(val, 1);
-		if (reg < 0) return;
-	}
-	instruction |= reg << 21;
-
-	// make the argument lowercase
-	{ char* p = argument;
-	for (; *p; ++p) *p = tolower(*p); }
-
-	// see if the label we have here matches our records
+int getAddress(char* argument, label_list* symbols, uint8_t *firstByte) {
 	label_list* temp = symbols;
-
-	if ((reg = getRegister(argument, 0)) > 0) {
-		instruction |= reg;
-		temp = NULL;
-	// if argument is kbd, set address is 1
-	} else if (!strncmp("kbd",argument,strlen(argument))) {
-		instruction |= 1;
-		temp = NULL;
-	} else if (!strncmp("halt",argument,strlen(argument))) {
-		instruction |= 0xB;
-		temp = NULL;
-	} else if (isdigit(argument[0])) {
-		instruction |= atoi(argument);
-		temp = NULL;
-	} else if (strncmp("crt",argument,strlen(argument))) {
+	int addr;
+	// is it a number?
+	if (isdigit(argument[0])) {
+		addr = atoi(argument);
+	// is it not a hardcoded symbol, but a label?
+	} else if ((addr = getHardcodedSymbolValue(argument)) < 0) {
+		*firstByte = 1;
 		int16_t index = -1;
 		while(temp != NULL) {
 			// when label is found it's address is replaced in the instruction
 			if (!strncmp(temp->label,argument,strlen(argument))) {
-				instruction |= temp->address;
+				addr = temp->address;
 				// make sure equ are not treated as labels
-				if (temp->size < 0) temp = NULL;
+				if (temp->size < 0) *firstByte = 0;
 				break;
 			}
 			// don't use the same index as the other external labels
@@ -349,23 +443,9 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 			strncpy(temp->label,argument,strlen(argument));
 			temp->label[strlen(argument)] = '\0';
 			temp->size = 0;
-			temp->address = index;
-			instruction |= (index & 0xffff);
+			temp->address = (int16_t)index;
+			addr = index;
 		}
 	}
-
-	// set info on whether there is a label or not in the address field of the instruction
-	uint8_t firstByte;
-	if (temp != NULL) {
-		// there is a label
-		firstByte = 1;
-	} else {
-		// no label
-		firstByte = 0;
-	}
-	// write a byte indicating whether the address is hardcoded, local or external to the module
-	fwrite(&firstByte,sizeof(firstByte),1,fh);
-	// write the compiled instruction
-	fwrite(&instruction,sizeof(instruction),1,fh);
+	return addr;
 }
-
