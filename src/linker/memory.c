@@ -7,8 +7,10 @@ static void freeSymbolList(llist *l);
 //free redundant data of module (codes and data already linked)
 void freeRedundant(module *mod){
   int i, size = (mod->data_start - CODESTART) / 5;
+  
   for(i = 0; i < size; i++)
     free(mod->codes[i]);
+  
   free(mod->codes);
   free(mod->data);
 }

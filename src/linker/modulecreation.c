@@ -4,7 +4,7 @@
 
 static void readSymbols(module *mod);
 static void readCode(module *mod);
-static module *readModule(FILE *fp);
+static module *readModule(FILE *fp, char *filename);
 
 //create all modules determined by argv
 void createModules(int n, char **argv, module **modules){
@@ -18,7 +18,7 @@ void createModules(int n, char **argv, module **modules){
       exit(-1);
     }
 
-    modules[i] = readModule(fp);
+    modules[i] = readModule(fp, argv[i]);
 
     fclose(fp);
 
@@ -29,9 +29,11 @@ void createModules(int n, char **argv, module **modules){
 }
 
 //initializes one module
-static module *readModule(FILE *fp){
+static module *readModule(FILE *fp, char *filename){
   module *mod = (module *)malloc(sizeof(module));
   int i, data_size, code_size;
+
+  mod->filename = filename;
 
   //determine size
   fseek(fp, 0, SEEK_END);
@@ -76,14 +78,16 @@ static void readSymbols(module *mod){
   llist *symbol;
   int size = (mod->size - mod->symbol_start) / SYMBOLSIZE;
   int i;
-  
+
   mod->symbols = (llist *)malloc(sizeof(llist));
   symbol = mod->symbols;
 
   for(i = 0; i < size; i++){
     
-    strncpy(symbol->label, (char *)mod->data +mod->symbol_start +(i * SYMBOLSIZE), sizeof(MYTYPE));
-    symbol->value = *((int16_t *)(mod->data +mod->symbol_start +(i * SYMBOLSIZE) +LABELLENGTH));
+    strncpy(symbol->label, (char *)mod->data \
+	    +mod->symbol_start +(i * SYMBOLSIZE), LABELLENGTH);
+    symbol->value = *((int16_t *)(mod->data +mod->symbol_start \
+				  +(i * SYMBOLSIZE) +LABELLENGTH));
 
     if(i < size -1){
       
@@ -91,8 +95,7 @@ static void readSymbols(module *mod){
       symbol = symbol->next;
       symbol->next = NULL;
       
-    }
-    
+    }    
   }
 }
 
