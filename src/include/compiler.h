@@ -1,8 +1,8 @@
 #ifndef COMPILER
 #define COMPILER
 #define MAX 128
-#define MYTYPE uint32_t
 #include <stdint.h>
+#include <ttk-15.h>
 // single linked list for the symbol table
 typedef struct label_list {
 	struct label_list* next;

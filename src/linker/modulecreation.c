@@ -1,6 +1,6 @@
-#include "linker.h"
+#include <linker.h>
 
-#define CODESIZE 5
+#define SYMBOLSIZE 34  //size of one symbol sub block in .o15 format
 
 static void readSymbols(module *mod);
 static void readCode(module *mod);
@@ -30,14 +30,14 @@ void createModules(int n, char **argv, module **modules){
 
 //initializes one module
 static module *readModule(FILE *fp){
-  module *mod = (module*)malloc(sizeof(module));
+  module *mod = (module *)malloc(sizeof(module));
   int i, data_size, code_size;
 
   //determine size
   fseek(fp, 0, SEEK_END);
   mod->size = ftell(fp);
 
-  mod->data = (int8_t*)malloc(mod->size);
+  mod->data = (char *)malloc(mod->size);
   fseek(fp, 0, SEEK_SET);
 
   //read code and data starts
@@ -45,7 +45,7 @@ static module *readModule(FILE *fp){
   fread(&mod->data_start, 4, 1, fp);
 
   //calculate linked size 
-  code_size = 4 * (mod->data_start - 8) / 5;
+  code_size = 4 * (mod->data_start - CODESTART) / 5;
   data_size = mod->symbol_start - mod->data_start;
   mod->linked_size = code_size + data_size;
 
@@ -56,38 +56,62 @@ static module *readModule(FILE *fp){
     fread(mod->data +i, 1, 1, fp);
   
   return mod;
-
 }
 
 //constructs code array in module 
 static void readCode(module *mod){
   int i;
-  int size = (mod->data_start -8 ); //code starts from byte 8 by definition
+  int size = (mod->data_start -CODESTART );
   
-  mod->codes = (char**)malloc(sizeof(char*) * size);
+  mod->codes = (char **)malloc(sizeof(char *) * size);
   
   for(i = 0; i < size / CODESIZE; i++){
-    mod->codes[i] = (char*)malloc(sizeof(char) * CODESIZE);
-    memcpy(mod->codes[i], mod->data +(i * CODESIZE) +8, CODESIZE);
+    mod->codes[i] = (char *)malloc(sizeof(char) * CODESIZE);
+    memcpy(mod->codes[i], mod->data +(i * CODESIZE) +CODESTART, CODESIZE);
   }
 }
 
 //constructs symbol list in module
 static void readSymbols(module *mod){
   llist *symbol;
-  int size = (mod->size - mod->symbol_start) / 36;
+  int size = (mod->size - mod->symbol_start) / SYMBOLSIZE;
   int i;
   
-  mod->symbols = (llist*)malloc(sizeof(llist));
+  mod->symbols = (llist *)malloc(sizeof(llist));
   symbol = mod->symbols;
 
   for(i = 0; i < size; i++){
-    strncpy(symbol->label, (char *)mod->data +mod->symbol_start +(i * 36) , 32);
-    symbol->value = mod->data[mod->symbol_start +(i * 36) +32]; //type?
+    
+    strncpy(symbol->label, (char *)mod->data +mod->symbol_start +(i * SYMBOLSIZE), sizeof(MYTYPE));
+    symbol->value = *((int16_t *)(mod->data +mod->symbol_start +(i * SYMBOLSIZE) +LABELLENGTH));
+
     if(i < size -1){
-      symbol->next = (llist*)malloc(sizeof(llist));
+      
+      symbol->next = (llist *)malloc(sizeof(llist));
       symbol = symbol->next;
       symbol->next = NULL;
+      
     }
+    
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
