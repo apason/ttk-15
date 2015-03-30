@@ -53,6 +53,9 @@ int main(int argc, char **argv){
     exit(-1);
   }
 
+  for(i = 0; i < argc -1; i++)
+    printModule(modules[i]);
+  
   printf("linking modules..\n");
   
   //link main containing module first
