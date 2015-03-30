@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <compiler.h>
 
+#include <ttk-15.h>
+
 int countLines(FILE*);
 int nextLine(FILE*);
 char** readCode(FILE*, int);
@@ -44,10 +46,10 @@ int writeCodeFile(code_file* file) {
 		return -1;
 	}
 	// write header to the object file
-	uint32_t dataSegmentAddress = file->codeSize*5 + 8;
-	uint32_t symbolTableAddress =  dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
-	fwrite(&symbolTableAddress,sizeof(uint32_t),1,fh);
-	fwrite(&dataSegmentAddress, sizeof(uint32_t),1,fh);
+	MYTYPE dataSegmentAddress = file->codeSize*5 + 8;
+	MYTYPE symbolTableAddress =  dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
+	fwrite(&symbolTableAddress,sizeof(MYTYPE),1,fh);
+	fwrite(&dataSegmentAddress, sizeof(MYTYPE),1,fh);
 	// start writing data
 	int i, cInstructions = 0;
 	char word[MAX], label[MAX], val[MAX] = "\0";
@@ -235,7 +237,8 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 		fwrite(&instruction,sizeof(instruction),1,fh);
 		return;
 	}
-	for (i = 0; i < 38; ++i) {
+	// find out the operation code
+	for (i = 1; i < 38; ++i) {
 		if (strncmp(opcodes[i],word,strlen(opcodes[i])) == 0) {
 			instruction |= (opcodes[i][6] << 24);
 			break;
@@ -271,11 +274,31 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 		++argument;
 	}
 
+	// figure if there is a need for indexing register
+	char* bracket = argument;
+	while (*bracket && *bracket != '(') ++bracket;
+	int reg = 0;
+	// found braces
+	if (*bracket) {
+		*bracket++ = '\0';
+		char* p = bracket;
+		while (*p && *p != ')') ++p;
+		if (*p) {
+			*p = '\0';
+			reg = getRegister(bracket,1);
+			if (reg == -1) return;
+		} else {
+			fprintf(stderr, "Missing closed braces!\n");
+			return;
+		}
+		instruction |= reg << 16;
+	}
+
 	// set the indexing mode
 	instruction |= mode << 19;
 	
 	// set Register
-	int reg = 0;
+	reg = 0;
 	if (argument > val) {
 		reg = getRegister(val, 1);
 		if (reg < 0) return;
@@ -303,14 +326,17 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 		instruction |= atoi(argument);
 		temp = NULL;
 	} else if (strncmp("crt",argument,strlen(argument))) {
-		uint16_t index = 0x1;
+		int16_t index = -1;
 		while(temp != NULL) {
 			// when label is found it's address is replaced in the instruction
 			if (!strncmp(temp->label,argument,strlen(argument))) {
 				instruction |= temp->address;
+				// make sure equ are not treated as labels
+				if (temp->size < 0) temp = NULL;
 				break;
 			}
-			if (temp->address < 0) ++index;
+			// don't use the same index as the other external labels
+			if (temp->address < 0) --index;
 			temp = temp->next;
 		}
 		if (temp == NULL) {
@@ -318,21 +344,23 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 			temp = symbols;
 			while (temp->next != NULL) temp = temp->next;
 			temp->next = (label_list*)malloc(sizeof(label_list));
-			temp->next->next = NULL;
-			strncpy(temp->next->label,argument,strlen(argument));
-			temp->next->label[strlen(argument)] = '\0';
-			temp->next->size = 0;
-			temp->next->address = -1*(int32_t)index;
-			instruction |= index;
+			temp = temp->next;
+			temp->next = NULL;
+			strncpy(temp->label,argument,strlen(argument));
+			temp->label[strlen(argument)] = '\0';
+			temp->size = 0;
+			temp->address = index;
+			instruction |= (index & 0xffff);
 		}
 	}
 
+	// set info on whether there is a label or not in the address field of the instruction
 	uint8_t firstByte;
-	if (temp != NULL && temp->address < 0) {
-		firstByte = 2;
-	} else if (temp != NULL && temp->size > 0) {
+	if (temp != NULL) {
+		// there is a label
 		firstByte = 1;
 	} else {
+		// no label
 		firstByte = 0;
 	}
 	// write a byte indicating whether the address is hardcoded, local or external to the module

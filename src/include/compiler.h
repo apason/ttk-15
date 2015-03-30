@@ -7,7 +7,7 @@
 typedef struct label_list {
 	struct label_list* next;
 	char label[MAX];
-	int32_t address;
+	int16_t address;
 	int size;
 	// used only with the dc keyword
 	int value;
@@ -18,8 +18,8 @@ typedef struct {
 	int lines;
 	char** array;
 	struct label_list* symbolList;
-	uint32_t moduleSize;
-	uint32_t codeSize;
+	MYTYPE moduleSize;
+	MYTYPE codeSize;
 	char out_name[MAX];
 } code_file;
 // reads the code file into the array in the struct and puts lenght in lines member
