@@ -83,6 +83,8 @@ int writeCodeFile(code_file* file) {
 	symbols = file->symbolList;
 	while (symbols != NULL) {
 		if (symbols->size >= 0) {
+			if (strlen(symbols->label)>32)
+				fprintf(stderr, "Warning symbol name more than 32 chars, will be cut: %s\n",symbols->label);
 			fwrite(symbols->label,sizeof(char),32,fh);
 			fwrite(&(symbols->address),sizeof(symbols->address),1,fh);
 		}
