@@ -83,7 +83,7 @@ static int findLabelAddressConstant(module **modules, int n, char *label){
   
   for(i = 0; i < n; i++)
     for(s = modules[i]->symbols; s; s = s->next)
-      if(!strncmp(s->label, label, LABELLENGTH) && s->value > 0)
+      if(!strncmp(s->label, label, LABELLENGTH) && s->value >= 0)
 	return modules[i]->address_constant / sizeof(MYTYPE);
   
   return -1; 

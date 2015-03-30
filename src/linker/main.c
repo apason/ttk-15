@@ -9,8 +9,8 @@
 
 static int findMain(module **modules, int n);
 static int containsMain(module *mod);
-//static void printModule(module *mod);
-//static void printSymbols(llist *l);
+static void printModule(module *mod);
+static void printSymbols(llist *l);
 
 int main(int argc, char **argv){
   module **modules = (module **) malloc(sizeof(module *) * (argc -1));
@@ -91,7 +91,7 @@ static int containsMain(module *mod){
   return 0;  
 }
 
-/*
+
 static void printModule(module *mod){
   printf("nsize: %d\tdstart: %d\tsstart %d\n", mod->size, mod->data_start, mod->symbol_start);
   if(!mod->symbols)
@@ -105,4 +105,4 @@ static void printSymbols(llist *l){
   for(;l;l = l->next)
     printf("%s\t%d\n",l->label,l->value);
 }
-*/
+
