@@ -69,7 +69,8 @@ int writeCodeFile(code_file* file) {
 			++cInstructions;
 			continue;
 		}
-		if (sscanf(file->array[i], "%s %s %s", label, word, val) != 3)
+		val[0] = '\0';
+		if (sscanf(file->array[i], "%s %s %s", label, word, val) < 2)
 			fprintf(stderr,"Error reading line: %d\n",cInstructions);//error
 		if (!isInstruction(label) && isInstruction(word)) {
 			writeInstruction(word,val,file->symbolList, fh);
@@ -417,7 +418,7 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte) {
 	label_list* temp = symbols;
 	int addr;
 	// is it a number?
-	if (isdigit(argument[0])) {
+	if (isdigit(argument[0]) || (isdigit(argument[1]) && argument[0] == '-')) {
 		addr = atoi(argument);
 	// is it not a hardcoded symbol, but a label?
 	} else if ((addr = getHardcodedSymbolValue(argument)) < 0) {

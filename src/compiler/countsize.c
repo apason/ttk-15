@@ -24,7 +24,7 @@ int countSize(code_file* file){
     if(isInstruction(word))
       ++size;
     else{
-      if(sscanf(code[i], "%s %s %s", label, word, val) != 3){
+      if(sscanf(code[i], "%s %s %s", label, word, val) < 2){
 	printf("invalid start of expression: %s\n", label);
 	exit(-1);
       }
