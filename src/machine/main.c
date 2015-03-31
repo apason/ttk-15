@@ -22,5 +22,7 @@ int main(int argc,char *argv[]){
   
   startMachine(m);
 
+  printf("\n");
+
   return 0;
 }

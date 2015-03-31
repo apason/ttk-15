@@ -1,11 +1,15 @@
 MACHINE=  ./src/machine
 COMPILER= ./src/compiler
 LINKER=   ./src/linker
+TEST=     ./test
 
 .c.o:
 	$(CC) $(CFLAGS) -I src/include $<
 
-all:	machine compiler linker
+all:	machine compiler linker 
+
+test:	machine compiler linker
+	$(MAKE) -C $(TEST) all
 
 linker:
 	$(MAKE) -C $(LINKER) all
