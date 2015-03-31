@@ -17,7 +17,7 @@ void link(FILE *fp, module **modules, int mi, int n ){
   char *label;
   module *mod     = modules[mi];
 
-  //filename to module struct and say module name instead of index number?
+  //filename to link
   printf("%s\n", modules[mi]->filename);
 
   codesize = (mod->data_start - CODESTART) / CODESIZE;
@@ -43,8 +43,8 @@ void link(FILE *fp, module **modules, int mi, int n ){
 
       //external label
       if(value < 0){
-	
-	buf -= value;
+	printf("value: %d\n", value);
+	buf &= 0xFFFF0000;
 	label_address_constant = findLabelAddressConstant(modules, n, label);
 
 
@@ -54,9 +54,10 @@ void link(FILE *fp, module **modules, int mi, int n ){
 	}
 
 	buf += label_address_constant +findLabelValue(modules, n, label);
+
       }
       
-      else buf += mod->address_constant;
+      else buf += mod->address_constant / sizeof(MYTYPE);
       
     }
     

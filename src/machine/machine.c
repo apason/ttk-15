@@ -27,6 +27,7 @@ machine *newMachine(long memsize){
 
   m->regs = (MYTYPE*)malloc(8* sizeof(MYTYPE));
   m->mem = (MYTYPE*)malloc(memsize);
+  memset(m->mem, 0, memsize);
 
   m->memsize = memsize;
 
@@ -82,8 +83,8 @@ static void execInstruction(machine *m){
     fprintf(stderr, "ERROR: incorrect operation code: %X\n", opc);
     exit(-1);
   }
-  printState(m);
-  getchar();
+  //  printState(m);
+  //getchar();
   
   instruction(m, rj, mode, ri, addr);
   

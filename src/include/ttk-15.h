@@ -73,7 +73,7 @@ extern MYTYPE calculatePointer(machine *m, uint8_t mode, uint8_t ri, int16_t add
 
 //helpers.c
 extern void initializeGlobals(void);
-extern void printState(machine *m);
+//extern void printState(machine *m);
 
 //bitwise.c
 extern uint8_t extractOpcode(MYTYPE x);
