@@ -69,7 +69,8 @@ int writeCodeFile(code_file* file) {
 			++cInstructions;
 			continue;
 		}
-		if (sscanf(file->array[i], "%s %s %s", label, word, val) != 3)
+		val[0] = '\0';
+		if (sscanf(file->array[i], "%s %s %s", label, word, val) < 2)
 			fprintf(stderr,"Error reading line: %d\n",cInstructions);//error
 		if (!isInstruction(label) && isInstruction(word)) {
 			writeInstruction(word,val,file->symbolList, fh);
