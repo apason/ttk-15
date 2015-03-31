@@ -1,0 +1,3 @@
+out r1,=CRT
+svc sp,=HALT
+

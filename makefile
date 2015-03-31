@@ -8,7 +8,7 @@ TEST=     ./test
 
 all:	machine compiler linker 
 
-test:	machine compiler linker
+tests:	machine compiler linker
 	$(MAKE) -C $(TEST) all
 
 linker:
