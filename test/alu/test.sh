@@ -12,6 +12,7 @@ green='\033[0;32m'
 NC='\033[0m'
 
 echo " "
+echo "TESTING ARITHMETIC LOGICAL MACHINE INSTRUCTIONS"
 
 for test in $(cat test.cfg | cut -f1 -d' '); do
 
