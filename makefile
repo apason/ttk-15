@@ -6,7 +6,7 @@ TEST=     ./test
 .c.o:
 	$(CC) $(CFLAGS) -I src/include $<
 
-all:	machine compiler linker 
+all:	machine compiler linker tests
 
 tests:	machine compiler linker
 	$(MAKE) -C $(TEST) all

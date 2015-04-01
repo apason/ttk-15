@@ -11,7 +11,7 @@ FUNCTION(nop){
 
 //does this work?
 FUNCTION(store){
-  mmuSetData(m->mmu, m->mem, m->cu->tr1, m->regs[rj]);
+  mmuSetData(m->mmu, m->mem, m->cu->tr2, m->regs[rj]);
 }
 
 FUNCTION(load){
