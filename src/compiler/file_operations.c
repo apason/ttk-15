@@ -231,6 +231,10 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 		if (nargs == 2) {
 			if ((reg = getRegister(val, 1)) < 0)
 				return;
+			// check if opcode is store
+			if (opCode == 1)
+				if (mode == 1)
+					mode = 0;
 		}
 		if (( temp = getRegister(argument, 0)) >= 0)
 			if (nargs == 2) {
