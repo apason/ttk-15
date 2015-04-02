@@ -7,6 +7,13 @@ compiler=$target"compiler"
 linker=$target"linker"
 machine=$target"ttk-15"
 
+red='\033[0;31m'
+green='\033[0;32m'
+NC='\033[0m'
+
+echo " "
+echo "TESTING ARITHMETIC LOGICAL MACHINE INSTRUCTIONS"
+
 for test in $(cat test.cfg | cut -f1 -d' '); do
 
 	cat head.k15 units/$(echo $test).k15 tail.k15 > test.k15
@@ -27,9 +34,9 @@ for test in $(cat test.cfg | cut -f1 -d' '); do
 	expected="$machine a.out.b15"
 	actual="$(cat test.cfg | grep $test | cut -f2 -d' ')"
 	if [ `$expected` != $actual ]; then
-		echo test $test FAILED! expected: `$expected` actual $actual
+		echo -e test $test ${red}FAILED!${NC} expected: $actual actual `$expected`
 	else
-		echo test $test PASSED!
+		echo -e test $test ${green}PASSED!${NC}
 	fi
 
 	rm *.b15
@@ -37,3 +44,4 @@ for test in $(cat test.cfg | cut -f1 -d' '); do
 	rm *.o15
 done
 
+echo " "

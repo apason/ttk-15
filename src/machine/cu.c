@@ -3,18 +3,17 @@
 
 //calculates second operand in instruction (result of addr field and mode field)
 MYTYPE calculateSecondOperand(machine *m, uint8_t mode, uint8_t ri, int16_t addr){
+  MYTYPE result;
   //calculate pointer
-  addr = calculatePointer(m, mode, ri, addr);
+  result = calculatePointer(m, mode, ri, addr);
 
   if(mode != 0){
-    mmuGetData(m->mmu, m->mem, addr);
-    addr = m->mmu->mbr;
+    mmuGetData(m->mmu, m->mem, result);
+    result = m->mmu->mbr;
   }
 
-  return addr;
+  return result;
 }
-
-//calculates pointer to second operand in instruction
 
 /*
  * ri=0 means no index register used 
@@ -22,22 +21,24 @@ MYTYPE calculateSecondOperand(machine *m, uint8_t mode, uint8_t ri, int16_t addr
  * puts 0 to it and recovers when done
  */
 
+//calculates pointer to second operand in instruction
 MYTYPE calculatePointer(machine *m, uint8_t mode ,uint8_t ri ,int16_t addr){
-  uint8_t i;
-  MYTYPE tmp = m->regs[0];             //save r0
-  m->regs[0] = 0;                      //set r0 to 0
+  MYTYPE tmp, result;
   
-  addr += (m->regs[ri]);               //handle indexed data
+  tmp = m->regs[0];                      //save r0
+  m->regs[0] = 0;                        //set r0 to 0
+
+  result = (MYTYPE) addr;
+  result += (m->regs[ri]);               //handle indexed data
 
 
-  /* fetch data from pointer if needed (if would
-   * be better here cause mode -1 is at most 1  */
-  for(i = 0; i < mode - 1; i++){
-    mmuGetData(m->mmu, m->mem, addr);
-    addr = m->mmu->mbr;
+  //fetch data from pointer if needed
+  if(mode -1 > 0){
+    mmuGetData(m->mmu, m->mem, result);
+    result = m->mmu->mbr;
   }
 
-  m->regs[0] = tmp;                    //recover r0
+  m->regs[0] = tmp;                      //recover r0
   
-  return addr;  
+  return result;  
 }

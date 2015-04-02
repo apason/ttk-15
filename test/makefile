@@ -1,7 +1,10 @@
 ## makefile for testing ##
-.PHONY: instructions
-all:	instructions
+.PHONY: alu general
+all:	alu general
 
-instructions:
-	bash instructions/test.sh
+alu:
+	bash alu/test.sh
+
+general: 
+	bash general/test.sh
 	
