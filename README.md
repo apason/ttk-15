@@ -10,3 +10,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * floating point unit + konekäskyt
  * pienin osoitettava muistiyksikkö keskusmuistissa MYTYPE:stä yhteen bittiin
  * n ydintä
+ * import tai include kääntäjä direktiivin toteutus kirjastofunktioille
+ * GUI
+ * käyttis
+ * c-kääntäjä
