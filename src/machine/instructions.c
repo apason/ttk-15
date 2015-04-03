@@ -5,11 +5,13 @@
 #include <ttk-15.h>
 #include <masks.h>
 
+#define MYTYPE_MIN 0x80000000
+#define MYTYPE_MAX 0x7FFFFFFF
+
 FUNCTION(nop){
   ;
 }
 
-//does this work?
 FUNCTION(store){
   mmuSetData(m->mmu, m->mem, m->cu->tr2, m->regs[rj]);
 }
@@ -27,6 +29,7 @@ FUNCTION(in){
   }
   else{
     fprintf(stderr, "ERROR: in instruction IN: reference to unknown device\n");
+    freeMachine(m);
     exit(-1);
   }
 }
@@ -37,53 +40,121 @@ FUNCTION(out){
     printf("%d\t", m->regs[rj]);
   else{
     fprintf(stderr, "in instruction OUT: reference to unknown device\n");
+    freeMachine(m);
     exit(-1);
   }
 }
 
+/*
+ *
+ * 64bit variables in functions add and sub
+ * are for detecting atirhmetical overflows
+ *
+ */
+
+
+/*
+ * there can not be arithmetic overflows in cases
+ * where operands are with different signs so the 
+ * checks are only made when operand are similar 
+ * to each other
+ */
+
 FUNCTION(add){
+  int64_t res;
+  int64_t in1_64 = m->alu->in1;
+  int64_t in2_64 = m->alu->in2;
+
+  if(in1_64 >= 0 && in2_64 >= 0){
+    res = in1_64 + in2_64;
+    
+    if(res > MYTYPE_MAX) m->cu->sr |= OFLAG;      //overflow detected!
+  }
+  else if(in1_64 < 0 && in2_64 < 0){
+    in1_64 = abs(in1_64);
+    in2_64 = abs(in2_64);
+    res = in1_64 + in2_64;
+    
+    if(res > MYTYPE_MIN) m->cu->sr |= OFLAG;      //overflow detected!
+  }
+    
   m->alu->out = m->alu->in1 + m->alu->in2;
-  m->regs[rj] = m->alu->out;
+  m->regs[rj] = (MYTYPE) m->alu->out;
+  
 }
 
+/*
+ * in this case arithmetical overflow can occur
+ * only if the operands are with different sign
+ */
+
 FUNCTION(sub){
+  int64_t res;
+  int64_t in1_64 = m->alu->in1;
+  int64_t in2_64 = m->alu->in2;
+
+  if(in1_64 < 0 && in2_64 >= 0){
+    in1_64 = abs(in1_64);
+    res = in1_64 + in2_64;
+
+    if(res > MYTYPE_MIN) m->cu->sr |= OFLAG;      //overflow detevted!
+  }
+  else if(in1_64 >= 0 && in2_64 < 0){
+    in2_64 = abs(in2_64);
+    res = in1_64 + in2_64;
+
+    if(res > MYTYPE_MAX) m->cu->sr |= OFLAG;      //overflow detected!
+  }
+  
   m->alu->out = m->alu->in1 - m->alu->in2;
-  m->regs[rj] = m->alu->out;
+  m->regs[rj] = (MYTYPE) m->alu->out;
 }
 
 FUNCTION(mul){
   m->alu->out = m->alu->in1 * m->alu->in2;
-  m->regs[rj] = m->alu->out;
+  m->regs[rj] = (MYTYPE) m->alu->out;
+
+  //check for overflow
+  if(m->alu->out / m->alu->in1 != m->alu->in2)
+    m->cu->sr |= OFLAG;                           //overflow detected
 }
 
 FUNCTION(divv){
-  m->alu->out = m->alu->in1 / m->alu->in2;
-  m->regs[rj] = m->alu->out;
+  if(m->alu->in2){
+    m->alu->out = m->alu->in1 / m->alu->in2;
+    m->regs[rj] = (MYTYPE) m->alu->out;
+  }
+  else
+    m->cu->sr |= ZFLAG;                           //division by zero!
 }
 
 FUNCTION(mod){
-  m->alu->out = m->alu->in1 % m->alu->in2;
-  m->regs[rj] = m->alu->out;
+  if(m->alu->in2){
+    m->alu->out = m->alu->in1 % m->alu->in2;
+    m->regs[rj] = (MYTYPE) m->alu->out;
+  }
+  else
+    m->cu->sr |=ZFLAG;                            //division by zefo!
 }
 
 FUNCTION(and){
   m->alu->out = m->alu->in1 & m->alu->in2;
-  m->regs[rj] = m->alu->out;
+  m->regs[rj] = (MYTYPE) m->alu->out;
 }
 
 FUNCTION(or){
   m->alu->out = m->alu->in1 | m->alu->in2;
-  m->regs[rj] = m->alu->out;
+  m->regs[rj] = (MYTYPE) m->alu->out;
 }
 
 FUNCTION(xor){
   m->alu->out = m->alu->in1 ^ m->alu->in2;
-  m->regs[rj] = m->alu->out;
+  m->regs[rj] = (MYTYPE) m->alu->out;
 }
 
 FUNCTION(shl){
   m->alu->out = m->alu->in1 << m->alu->in2;
-  m->regs[rj] = m->alu->out;
+  m->regs[rj] = (MYTYPE) m->alu->out;
 }
 
 FUNCTION(shr){
@@ -97,7 +168,7 @@ FUNCTION(shr){
 
 FUNCTION(not){
   m->alu->out =~ m->alu->in1;
-  m->regs[rj] = m->alu->out;
+  m->regs[rj] = (MYTYPE)m->alu->out;
 }
 
 FUNCTION(shra){
@@ -116,14 +187,14 @@ FUNCTION(shra){
 
 FUNCTION(comp){
   //reset GLE bits before comparation
-  m->cu->sr &= ~(GMASK|LMASK|EMASK);
+  m->cu->sr &= ~(GFLAG|LFLAG|EFLAG);
 
   if(m->alu->in1 > m->alu->in2)
-    m->cu->sr |= GMASK;
+    m->cu->sr |= GFLAG;
   else if(m->alu->in1 < m->alu->in2)
-    m->cu->sr |= LMASK;
+    m->cu->sr |= LFLAG;
   else
-    m->cu->sr |= EMASK;
+    m->cu->sr |= EFLAG;
 }
 
 FUNCTION(jump){
@@ -161,32 +232,32 @@ FUNCTION(jnpos){
 }
 
 FUNCTION(jles){
-  if(m->cu->sr & LMASK)
+  if(m->cu->sr & LFLAG)
     m->cu->pc = mem;
 }
 
 FUNCTION(jequ){
-  if(m->cu->sr & EMASK)
+  if(m->cu->sr & EFLAG)
     m->cu->pc = mem;
 }
 
 FUNCTION(jgre){
-  if(m->cu->sr & GMASK)
+  if(m->cu->sr & GFLAG)
     m->cu->pc = mem;
 }
 
 FUNCTION(jnles){
-  if(!(m->cu->sr & LMASK))
+  if(!(m->cu->sr & LFLAG))
     m->cu->pc = mem;
 }
 
 FUNCTION(jnequ){
-  if(!(m->cu->sr & EMASK))
+  if(!(m->cu->sr & EFLAG))
     m->cu->pc = mem;
 }
 
 FUNCTION(jngre){
-  if(!(m->cu->sr & GMASK))
+  if(!(m->cu->sr & GFLAG))
     m->cu->pc = mem;
 }
 
@@ -242,6 +313,12 @@ FUNCTION(popr){
 
 //at this point ttk-15 handles all svc commands as halt
 FUNCTION(svc){
-  exit(0);
+  if(m->cu->tr2 == HALT){
+    freeMachine(m);
+    exit(0);
+  }
+  fprintf(stderr, "unknown supervisor call ‰d!\n", m->cu->tr2);
+  freeMachine(m);
+  exit(-1);
 }
    

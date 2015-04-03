@@ -67,3 +67,12 @@ void initializeGlobals(void){
   printf("\n\n");
 }
 */
+
+//free all memory allocated to machine
+void freeMachine(machine *m){
+  free(m->regs);
+  free(m->alu);
+  free(m->mmu);
+  free(m->cu);
+  free(m->mem);
+}

@@ -1,5 +1,5 @@
-#ifndef ttk91
-#define ttk91
+#ifndef ttk15
+#define ttk15
 
 #include <stdint.h>
 
@@ -74,6 +74,7 @@ extern MYTYPE calculatePointer(machine *m, uint8_t mode, uint8_t ri, int16_t add
 //helpers.c
 extern void initializeGlobals(void);
 //extern void printState(machine *m);
+extern void freeMachine(machine *m);
 
 //bitwise.c
 extern uint8_t extractOpcode(MYTYPE x);

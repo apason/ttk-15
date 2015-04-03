@@ -1,3 +1,4 @@
+; what a stupid test
 x dc 256
 main load r1,x
 out r1,=crt

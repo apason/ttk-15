@@ -21,6 +21,7 @@ int main(int argc,char *argv[]){
   m->regs[7] = m->regs[6];
   
   startMachine(m);
+  freeMachine(m);
 
   printf("\n");
 
