@@ -3,10 +3,10 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
 
 # työn alla #
  * kääntäjän + linkkerin testaus (testauksen voisi tehdä esim niin että lataa originalin titokoneen kääntämiä tiedostoja machinen loader moduulilla ja vertaa data-aluetta compilerilla tehtyyn?)
- * integraatiotestaus: testit kirjoitettu jo ALUlle.
- * ylivuoto yms bitit kuntoon
+ * integraatiotestaus: testit kirjoitettu jo ALU\{bittioperaatiot}:lle.
 
 # tulevia #
- * kääntäjä hajoaa jos konekäskyn ensimmäisen ja toisne operandin välissä on whitespace!
+ * state registerin nollaus?
+ * floating point unit + konekäskyt
  * pienin osoitettava muistiyksikkö keskusmuistissa MYTYPE:stä yhteen bittiin
  * n ydintä

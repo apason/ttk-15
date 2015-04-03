@@ -275,7 +275,8 @@ FUNCTION(exitt){
   mmuGetData(m->mmu, m->mem, m->regs[7]);                 //get previous fp
   m->regs[7] = m->mmu->mbr;
 
-  /* decrease stack pointer.
+  /* 
+   * decrease stack pointer.
    * tr1 holds param for exit
    * and +2 comes from pc and fp
    */
@@ -311,13 +312,12 @@ FUNCTION(popr){
   }
 }
 
-//at this point ttk-15 handles all svc commands as halt
 FUNCTION(svc){
   if(m->cu->tr2 == HALT){
     freeMachine(m);
     exit(0);
   }
-  fprintf(stderr, "unknown supervisor call ‰d!\n", m->cu->tr2);
+  fprintf(stderr, "unknown supervisor call %d!\n", m->cu->tr2);
   freeMachine(m);
   exit(-1);
 }

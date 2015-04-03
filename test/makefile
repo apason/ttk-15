@@ -1,9 +1,9 @@
 ## makefile for testing ##
-.PHONY: alu general
-all:	alu general
+.PHONY: alu1 general
+all:	alu1 general
 
-alu:
-	bash alu/test.sh
+alu1:
+	bash alu1/test.sh
 
 general: 
 	bash general/test.sh

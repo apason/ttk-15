@@ -80,6 +80,7 @@ static void execInstruction(machine *m){
   instruction = instructions[opc];
   
   if(instruction == NULL){
+    m->cu->sr |= UFLAG;
     fprintf(stderr, "ERROR: incorrect operation code: %X\n", opc);
     exit(-1);
   }
