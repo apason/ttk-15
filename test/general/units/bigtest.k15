@@ -1,3 +1,4 @@
+;test for big (over 16b) numbers
 x dc 45835031
 main load r1,x
 out r1,=crt

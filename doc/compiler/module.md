@@ -21,8 +21,8 @@ copy (operated with labels as above)
 data block contains data of that module; Integers coded to 32 bit.
 
 #symbol table#
-symbol table consists of 36 byte sub blocks. each sub block contains 32 bytes reserved to label name 
-and value of that label (32 bit integer ). label values are ralative to start of that block. external 
+symbol table consists of 34 byte sub blocks. each sub block contains 32 bytes reserved to label name 
+and value of that label (16 bit integer ). label values are ralative to start of that block. external 
 labels are valued from -1 to down.
 
 ##summary##
