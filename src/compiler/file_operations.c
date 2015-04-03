@@ -32,6 +32,7 @@ int readCodeFile(code_file* file) {
 	
 	if ((file->lines = countLines(fh)) <= 0) {
 		fclose(fh);
+		fprintf(stderr, "Error linecount <= 0, is it an empty file?\n");
 		return -1;
 	}
 	printf("lines = %d\n",file->lines);
@@ -167,7 +168,10 @@ char** readCode(FILE* fh, int lines) {
 				break;
 			}
 			input[i][count++] = ch;
-			ch = fgetc(fh);
+			if (ch == ',')
+				while ((ch = fgetc(fh)) == ' ' || ch == '\t');
+			else
+				ch = fgetc(fh);
 		}
 		input[i][count] = 0;
 		printf("Line %d: %s\n",i+1,input[i]);
