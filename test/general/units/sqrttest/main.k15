@@ -1,4 +1,0 @@
-main load r1,=100
-call sqrt
-out r1,=crt
-svc sp,=halt
