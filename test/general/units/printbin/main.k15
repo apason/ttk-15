@@ -1,0 +1,3 @@
+main load r1,=-1
+	call printbin
+	svc sp,=halt
