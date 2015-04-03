@@ -24,7 +24,7 @@ for test in $(cat test.cfg | cut -f1 -d' '); do
 		bash dirtest.sh $test $expected 
 		continue
 	fi
-	
+
 	cp "units/"$test $test
 	$compiler $test > /dev/null
 

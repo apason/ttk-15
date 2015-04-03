@@ -9,13 +9,12 @@ red='\033[0;31m'
 green='\033[0;32m'
 NC='\033[0m'
 
-
-rm -f *.b15 
+rm -f *.b15
 rm -f *.k15
 rm -f *.o15
 
 codedir="units/"$1
-cp $codedir/* .
+cp $codedir/*.k15 .
 
 for file in $(ls | grep .k15); do
 
@@ -34,11 +33,10 @@ if [ $? != 0 ]; then
 fi
 
 actual="$machine a.out.b15"
-
 if [ `$actual` != $2 ]; then
-	echo -e test $test ${red}FAILED!${NC} expected: $2 actual `$actual`
+	echo -e test $1 ${red}FAILED!${NC} expected: $2 actual `$actual`
 else
-        echo -e test $test ${green}PASSED!${NC}
+        echo -e test $1 ${green}PASSED!${NC}
 fi
 
 rm -f *.b15
