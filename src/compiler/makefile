@@ -2,7 +2,7 @@ CC= 	  gcc
 STD=	  _GNU_SOURCE_
 OBJS=	  compiler.o countsize.o file_operations.o
 INCLUDE=  -I "../include/"
-CFLAGS=   -Wall -D$(STD) $(INCLUDE) -c
+CFLAGS=   -Wall -D$(STD) $(INCLUDE) -c -fsigned-char
 TARGET=   ../../target/
 
 .c.o:

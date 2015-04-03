@@ -7,6 +7,9 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * ylivuoto yms bitit kuntoon
 
 # tulevia #
- * kääntäjä hajoaa jos konekäskyn ensimmäisen ja toisne operandin välissä on whitespace!
  * pienin osoitettava muistiyksikkö keskusmuistissa MYTYPE:stä yhteen bittiin
  * n ydintä
+ * import tai include kääntäjä direktiivin toteutus kirjastofunktioille
+ * GUI
+ * käyttis
+ * c-kääntäjä
