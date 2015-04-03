@@ -22,7 +22,7 @@ FUNCTION(load){
 
 //simulation
 FUNCTION(in){
-  int tmp;
+  MYTYPE tmp;
   if(m->cu->tr2 == KBD){
     scanf("%d", &tmp);
     m->regs[rj] = tmp;
