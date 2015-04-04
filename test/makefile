@@ -1,13 +1,17 @@
 ## makefile for testing ##
 
-.PHONY: alu1 general
-all:	converter alu1 general 
+.PHONY: alu general converter bitwise
+all:	converter alu general bitwise
 
-alu1:
-	bash alu1/test.sh
+alu:
+	bash alu/test.sh
+
+bitwise:
+	bash bitwise/test.sh
 
 general: 
 	bash general/test.sh
 	
 converter:
 	$(MAKE) -C src/converter/ 
+	bash ttk91vs15/test.sh

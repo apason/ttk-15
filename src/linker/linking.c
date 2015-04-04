@@ -8,7 +8,7 @@
 
 static char *getLabelName(llist *s, uint32_t instruction);
 static int16_t findLabelValue(module **modules, int n, char *label);
-static int findLabelAddressConstant(module **modules, int n, char *label); 
+static int findLabelAddressConstant(module **modules, int n, char *label);
 
 void link(FILE *fp, module **modules, int mi, int n ){
   int i;
@@ -72,7 +72,7 @@ void link(FILE *fp, module **modules, int mi, int n ){
 
   //copy data segment to executable ERROR endianess fucked up
   for(i = 0; i < datasize; i++)
-    fwrite(mod->data +mod->data_start +i, sizeof(MYTYPE), 1, fp);
+    fwrite(mod->data +mod->data_start +i*sizeof(MYTYPE), sizeof(MYTYPE), 1, fp);
 
   freeRedundant(mod);
 }
@@ -122,3 +122,4 @@ static int16_t findLabelValue(module **modules, int n, char *label){
   
   return -1;
 }
+

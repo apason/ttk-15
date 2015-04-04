@@ -56,7 +56,7 @@ static module *readModule(FILE *fp, char *filename){
   //copy file to module
   for(i = 0; i < mod->size; i++)
     fread(mod->data +i, 1, 1, fp);
-  
+
   return mod;
 }
 
