@@ -12,5 +12,3 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * n ydintä
  * import tai include kääntäjä direktiivin toteutus kirjastofunktioille
  * GUI
- * käyttis
- * c-kääntäjä

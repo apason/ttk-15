@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <errno.h>
 
 //project header
 #include <ttk-15.h>
@@ -30,11 +31,12 @@ int loadFile91(MYTYPE *mem, char *file){
   int cstart, cend, dstart, dend, i;
   char buffer[BUFSIZE];
 
-  if( (fp = fopen(file,"r")) == NULL){
-    fprintf(stderr, "ERROR: cannot open binary file %s\n", file);
+  fp = fopen(file, "r");
+  if(!fp){
+    perror("fopen");
     exit(-1);
   }
-  
+
   do{
     fgets(buffer, BUFSIZE, fp);
   }while(sscanf(buffer,"%d %d", &cstart, &cend) != 2);

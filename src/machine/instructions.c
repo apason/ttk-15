@@ -168,7 +168,7 @@ FUNCTION(shr){
 
 FUNCTION(not){
   m->alu->out =~ m->alu->in1;
-  m->regs[rj] = (MYTYPE)m->alu->out;
+  m->regs[rj] = (MYTYPE) m->alu->out;
 }
 
 FUNCTION(shra){
