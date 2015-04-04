@@ -13,7 +13,7 @@ green='\033[0;32m'
 NC='\033[0m'
 
 echo " "
-echo "TESTING MACHINE MEMORY WITH TTK91 AND TTK15 FORMATS"
+echo "COMPARING BINARIES OF TTK-91 AND TTK-15 FORMATS"
 
 
 for test in $(cat test.cfg | cut -f1 -d' '); do
@@ -25,36 +25,38 @@ for test in $(cat test.cfg | cut -f1 -d' '); do
 	fi
 	
 	dir="units/"$test
-	$converter $dir/$test.b91
+	binary91=$(ls ${dir}/*.b91 | awk '{print $1;}')
+	$converter $binary91 > /dev/null
 	
 	if [ $? != 0 ]; then
-		echo converting .b91 to .b15 failed in $test
+		echo converting $dir/$binery91 to .b15 failed in $test
 		continue
 	fi
 
-	$compiler $dir/$test.k15 -o $test.o15
+	source15=$(ls ${dir}/*.k15 | awk '{print $1;}')
+	$compiler $source15 -o a.out.o15 > /dev/null
 	
 	if [ $? != 0 ]; then
-		echo compiling in $test failed
+		echo compiling $source15 in $test failed
 		rm result.b15
 		continue
 	fi
 	
-	$linker $test.o15
+	$linker a.out.o15 > /dev/null
 	
 	if [ $? != 0 ]; then
 		echo linking in $test failed
-		rm $test.o15
+		rm a.out.o15
 		rm result.b15
 		continue
 	fi
 	why=$(cmp result.b15 a.out.b15)
 	if [ $(echo $why | wc -w) == "0" ]; then
-		echo -e test $test ${green}PASSED!${NC}
+		echo -e TEST: $test ${green}PASSED!${NC}
 	else
-		echo -e test $tes ${red}FAILED!${NC} : $why
+		echo -e TEST: $tes ${red}FAILED!${NC} : $why
 	fi
-	rm $test.o15
+	rm a.out.o15
 	rm result.b15
 	rm a.out.b15
 
