@@ -16,8 +16,9 @@ echo " "
 echo "COMPARING BINARIES OF TTK-91 AND TTK-15 FORMATS"
 
 
-for test in $(cat test.cfg | cut -f1 -d' '); do
-
+for fullpathtest in units/*; do
+	
+	test=${fullpathtest##*/}
 	isdir=$(ls -l units/ | grep $test | cut -c1)
 
 	if [ ! $isdir = "d" ]; then
