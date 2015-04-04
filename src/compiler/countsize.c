@@ -34,7 +34,7 @@ int countSize(code_file* file){
       else if(!strncmp(word, "dc", MAX)) {
 	 label_node->size = 1;
 	// store the value to be inserted later
-	 label_node->value = atoi(val);
+	sscanf(val, "%u", &(label_node->value));
 	}
       else if(!strncmp(word, "ds", MAX)) {
 	// remember the size

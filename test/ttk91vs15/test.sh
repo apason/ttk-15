@@ -19,9 +19,7 @@ echo "COMPARING BINARIES OF TTK-91 AND TTK-15 FORMATS"
 for fullpathtest in units/*; do
 	
 	test=${fullpathtest##*/}
-	isdir=$(ls -l units/ | grep $test | cut -c1)
-
-	if [ ! $isdir = "d" ]; then
+	if [ ! -d $fullpathtest ]; then
 		continue
 	fi
 	
@@ -55,7 +53,8 @@ for fullpathtest in units/*; do
 	if [ $(echo $why | wc -w) == "0" ]; then
 		echo -e TEST: $test ${green}PASSED!${NC}
 	else
-		echo -e TEST: $tes ${red}FAILED!${NC} : $why
+		echo -e TEST: $test ${red}FAILED!${NC} : $why
+		exit -1
 	fi
 	rm a.out.o15
 	rm result.b15

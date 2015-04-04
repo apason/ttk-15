@@ -83,7 +83,7 @@ int writeCodeFile(code_file* file) {
 	label_list* symbols = file->symbolList;
 	while (symbols!=NULL) {
 		if (symbols->size == 1) {
-			fwrite(&(symbols->value),sizeof(symbols->value),1,fh);
+			fwrite(&(symbols->value),sizeof(MYTYPE),1,fh);
 		} else if (symbols->size > 1) {
 			for (i = 0; i < symbols->size; ++i) {
 				MYTYPE nul = 0;
