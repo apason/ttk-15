@@ -1,11 +1,12 @@
-## ttk-15 ##
+# ttk-15 #
 ttk-15 on ttk-91 klooni pienillä muutoksilla
 
-# työn alla #
+## työn alla ##
  * kääntäjän + linkkerin testaus (testauksen voisi tehdä esim niin että lataa originalin titokoneen kääntämiä tiedostoja machinen loader moduulilla ja vertaa data-aluetta compilerilla tehtyyn?)
- * integraatiotestaus: testit kirjoitettu jo ALU\{bittioperaatiot}:lle.
+ * integraatiotestaus: testit kirjoitettu jo ALU:lle.
+ * dokumentointi
 
-# tulevia #
+## tulevia ##
  * state registerin nollaus?
  * floating point unit + konekäskyt
  * pienin osoitettava muistiyksikkö keskusmuistissa MYTYPE:stä yhteen bittiin

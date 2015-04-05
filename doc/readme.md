@@ -1,4 +1,4 @@
-###ttk-15 project###
+#ttk-15 project#
 
 ttk-15 is general register machine, fully (backward) compatible with ttk-91.
 At this point, ttk-15 project consists of 3 parts.
@@ -26,7 +26,7 @@ be run in machine.
 
 
 
-#authors#
+###authors###
 
-Arttu Kilpinen
-Hiski Rauhala
+Arttu Kilpinen - apason
+Hiski Rauhala  - praetoria
