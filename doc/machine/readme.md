@@ -58,17 +58,22 @@ that use state registers GEL bits. In arithmetic logical instructions
 rj is first (or only in case of NOT) operand and the result of operation is
 stored to it. In jump instructions (excluding those specified above) rj:s value
 is used to determine if jump occurs. In PUSH, POP, PUSHR, POPR, SVC, CALL and
-EXIT operations, rj is used as stack register.
+EXIT operations, rj is used as stack pointer.
 
 m ri and d jointly determines the second operand:
 
 let addr = ri (value in that register) + d
 
 If m == 0, value of second operand is addr.
+
 if m == 1, value of second operand is mem[addr]
+
 if m == 2, value of second operand is mem[mem[addr]]
 
-NOTE! register r0 can not be used as index register! 
+NOTE! register r0 can not be used as index register! (when r0 is used as index
+register, it behaves like theres 0 in it. (r0 is not zeroed, it just behaves
+like that)
+
 NOTE! In low level calculation of second operand ALLWAYS works like this!
 See notes in compilers readme!
 

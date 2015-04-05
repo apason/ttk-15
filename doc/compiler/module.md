@@ -28,11 +28,19 @@ labels are valued from -1 to down.
 ##summary##
 
 +--------------+    +-------------------------------+
+
 | header       | -> | 32bit integer | 32bit integer |
+
 +--------------+    +-------------------------------+
+
 | code block   | -> +---------------------------------+
+
 +--------------+    | 8bit marker | 32bit instruction |
+
 | data block   |    +---------------------------------+
+
 +--------------+    +-------------------------------+
-| symbol table | -> | 32 char label | 16bit integer | 
+
+| symbol table | -> | 32 char label | 16bit integer |
+
 +--------------+    +-------------------------------+
