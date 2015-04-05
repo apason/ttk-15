@@ -4,7 +4,9 @@
 #include <linker.h>
 #include <ttk-15.h>
 
-#define LABEL 1
+#define LABEL                   1
+#define LABEL_NOT_FOUND        -2
+#define MULTIPLE_DECLARATIONS  -1
 
 static char *getLabelName(llist *s, uint32_t instruction);
 static int16_t findLabelValue(module **modules, int n, char *label);
@@ -43,16 +45,19 @@ void link(FILE *fp, module **modules, int mi, int n ){
 
       //external label
       if(value < 0){
-	printf("value: %d\n", value);
 	buf &= 0xFFFF0000;
 	label_address_constant = findLabelAddressConstant(modules, n, label);
 
-
-	if(label_address_constant < 0){
-	  fprintf(stderr, "Undefined label %s. Aborting!\n", label);
+	if(label_address_constant == LABEL_NOT_FOUND){
+	  fprintf(stderr, "ERROR: Undefined label %s. Aborting!\n", label);
 	  exit(-1);
 	}
 
+	if(label_address_constant == MULTIPLE_DECLARATIONS){
+	  fprintf(stderr, "ERROR: ambiguous label name %s. Aborting!\n", label);
+	  exit(-1);
+	}
+	
 	buf += label_address_constant +findLabelValue(modules, n, label);
 
       }
@@ -79,15 +84,19 @@ void link(FILE *fp, module **modules, int mi, int n ){
 
 //find label address among all modules
 static int findLabelAddressConstant(module **modules, int n, char *label){
-  int i;
+  int i, ac = LABEL_NOT_FOUND;
   llist *s;
   
   for(i = 0; i < n; i++)
     for(s = modules[i]->symbols; s; s = s->next)
-      if(!strncmp(s->label, label, LABELLENGTH) && s->value >= 0)
-	return modules[i]->address_constant / sizeof(MYTYPE);
+      if(!strncmp(s->label, label, LABELLENGTH) && s->value >= 0){
+	if(ac == LABEL_NOT_FOUND)
+	  ac = modules[i]->address_constant / sizeof(MYTYPE);
+	else
+	  return MULTIPLE_DECLARATIONS;
+      }
   
-  return -1; 
+  return ac; 
 }
 
 //gets label name from modules own table

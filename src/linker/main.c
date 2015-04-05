@@ -7,6 +7,9 @@
 #include <compiler.h>
 #include <linker.h>
 
+#define NOMAIN       -2
+#define SEVERALMAINS -1
+
 static int findMain(module **modules, int n);
 static int containsMain(module *mod);
 //static void printModule(module *mod);
@@ -25,8 +28,13 @@ int main(int argc, char **argv){
 
   //determine which module contains main
   printf("finding main module..\t");
-  if((mainnbr = findMain(modules, argc -1)) < 0){
-    printf("error: no main module found!\n");
+  if((mainnbr = findMain(modules, argc -1)) == NOMAIN){
+    fprintf(stderr, "error: no main module found!\n");
+    exit(-1);
+  }
+
+  if(mainnbr == SEVERALMAINS){
+    fprintf(stderr, "error: several main modules!\n");
     exit(-1);
   }
   
@@ -74,13 +82,17 @@ int main(int argc, char **argv){
 
 //determine main module (use first main containing module! change later)
 static int findMain(module **modules, int n){
-  int i;
+  int i, mainnbr = -2;
 
   for(i = 0; i < n; i++)
-    if(containsMain(modules[i]))
-      return i;
+    if(containsMain(modules[i])){
+      if(mainnbr == -2)
+	mainnbr = i;
+      else
+	return -1;
+    }
   
-  return -1;
+  return mainnbr;
 }
 
 //returns 1 if main label found
