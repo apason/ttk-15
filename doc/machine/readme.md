@@ -124,8 +124,5 @@ NOTE: see compilers documentation!
  * POP       34	  pop value from stack pointed by ri to rj
  * PUSHR     35	  push all registers to stack pointed by ri
  * POPR      36	  pops all registers from stack pointed by ri
-
  * SVC       70	  call supervisor function addr. use ri as stack pointer
-
-
 
