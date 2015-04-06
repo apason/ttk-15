@@ -7,12 +7,13 @@
 
 //initializes all global variables excluded machine itself
 void initializeGlobals(void){
-  int i;
+  int i = 0;
 
   // mytype length in bytes
   mtl = sizeof(MYTYPE) * 8; 
 
-  for(i = 0; i < 255; i++) instructions[i] = NULL;
+  for(i = 0; i < 255; i++)
+    instructions[i] = NULL;
 
   instructions[NOP]   = nop;
   instructions[STORE] = store;

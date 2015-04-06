@@ -1,3 +1,9 @@
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+
+//project header
 #include <linker.h>
 
 #define SYMBOLSIZE 34  //size of one symbol sub block in .o15 format
@@ -8,8 +14,8 @@ static module *readModule(FILE *fp, char *filename);
 
 //create all modules determined by argv
 void createModules(int n, char **argv, module **modules){
-  FILE *fp;
-  int i;
+  FILE *fp = NULL;;
+  int   i  = 0;
   
   for(i = 0; i < n; i++){
     
@@ -30,8 +36,10 @@ void createModules(int n, char **argv, module **modules){
 
 //initializes one module
 static module *readModule(FILE *fp, char *filename){
-  module *mod = (module *)malloc(sizeof(module));
-  int i, data_size, code_size;
+  int i               = 0;
+  uint32_t data_size  = -1;
+  uint32_t code_size  = -1;
+  module *mod         = (module *)malloc(sizeof(module));
 
   mod->filename = filename;
 
@@ -62,7 +70,7 @@ static module *readModule(FILE *fp, char *filename){
 
 //constructs code array in module 
 static void readCode(module *mod){
-  int i;
+  int i    = 0;
   int size = (mod->data_start -CODESTART );
   
   mod->codes = (char **)malloc(sizeof(char *) * size);
@@ -71,13 +79,14 @@ static void readCode(module *mod){
     mod->codes[i] = (char *)malloc(sizeof(char) * CODESIZE);
     memcpy(mod->codes[i], mod->data +(i * CODESIZE) +CODESTART, CODESIZE);
   }
+  
 }
 
 //constructs symbol list in module
 static void readSymbols(module *mod){
-  llist *symbol;
-  int size = (mod->size - mod->symbol_start) / SYMBOLSIZE;
-  int i;
+  int size      = (mod->size - mod->symbol_start) / SYMBOLSIZE;
+  int i         = 0;
+  llist *symbol = NULL;
 
   mod->symbols = (llist *)malloc(sizeof(llist));  
   symbol = mod->symbols;

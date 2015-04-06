@@ -22,7 +22,8 @@ FUNCTION(load){
 
 //simulation
 FUNCTION(in){
-  MYTYPE tmp;
+  MYTYPE tmp = 0;
+  
   if(m->cu->tr2 == KBD){
     scanf("%d", &tmp);
     m->regs[rj] = tmp;
@@ -61,7 +62,7 @@ FUNCTION(out){
  */
 
 FUNCTION(add){
-  int64_t res;
+  int64_t res    = 0;
   int64_t in1_64 = m->alu->in1;
   int64_t in2_64 = m->alu->in2;
 
@@ -172,7 +173,7 @@ FUNCTION(not){
 }
 
 FUNCTION(shra){
-  int sign;
+  int sign    = -1;
   MYTYPE mask = 0xFFFFFFFF;
 
   if(rj < 0) sign = 1;
@@ -304,7 +305,7 @@ FUNCTION(pushr){
 }
 
 FUNCTION(popr){
-  int i;
+  int i = 0;
   for(i = 0; i < 7; i++){
     mmuGetData(m->mmu, m->mem, m->regs[rj]);
     m->regs[i] = m->mmu->mbr;
@@ -312,6 +313,7 @@ FUNCTION(popr){
   }
 }
 
+//could be better
 FUNCTION(svc){
   if(m->cu->tr2 == HALT){
     freeMachine(m);

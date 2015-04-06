@@ -7,9 +7,10 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * dokumentointi
 
 ## tulevia ##
- * error testit! testataan kaikkia mahdollisia error caseja (esim. usea
- linkattava moduuli jossa main label)
- * sama labeli voi olla samassa moduulissa useaan kertaan!
+ * pienet funktiot makroiksi
+ * testit overflow yms flageille!
+ * tr2 pois ja cu.c kuntoon static!
+ * linkkerin parametrit kuntoon (epäkorrekti syöte aiheuttaa segfaultin)
  * state registerin nollaus?
  * floating point unit + konekäskyt
  * pienin osoitettava muistiyksikkö keskusmuistissa MYTYPE:stä yhteen bittiin

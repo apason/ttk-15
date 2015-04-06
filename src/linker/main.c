@@ -4,11 +4,13 @@
 #include <string.h>
 #include <errno.h>
 
+//project headers
 #include <compiler.h>
 #include <linker.h>
 
-#define NOMAIN       -2
-#define SEVERALMAINS -1
+//used as return value of findMain
+#define NO_MAIN       -2
+#define SEVERAL_MAINS -1
 
 static int findMain(module **modules, int n);
 static int containsMain(module *mod);
@@ -16,11 +18,13 @@ static int containsMain(module *mod);
 //static void printSymbols(llist *l);
 
 int main(int argc, char **argv){
-  module **modules = (module **) malloc(sizeof(module *) * (argc -1));
-  module *tmp;
-  FILE *output;
-  int i, mainnbr;
+  int    mainnbr    = NO_MAIN;     
+  int    i          = 0;
+  FILE   *output    = NULL;        
+  module **modules  = NULL;
+  module *tmp       = NULL;
 
+  modules  = (module **) malloc(sizeof(module *) * (argc -1));
 
   //create module structs for each module
   printf("creating modules..\n");
@@ -28,13 +32,15 @@ int main(int argc, char **argv){
 
   //determine which module contains main
   printf("finding main module..\t");
-  if((mainnbr = findMain(modules, argc -1)) == NOMAIN){
+  if((mainnbr = findMain(modules, argc -1)) == NO_MAIN){
     fprintf(stderr, "error: no main module found!\n");
+    freeModules(modules, argc -1);
     exit(-1);
   }
 
-  if(mainnbr == SEVERALMAINS){
+  if(mainnbr == SEVERAL_MAINS){
     fprintf(stderr, "error: several main modules!\n");
+    freeModules(modules, argc -1);
     exit(-1);
   }
   
@@ -56,7 +62,8 @@ int main(int argc, char **argv){
 
   output = fopen("a.out.b15", "wb");
 
-  if(!output){
+  if(output == NULL){
+    freeModules(modules, argc -1);
     perror("fopen");
     exit(-1);
   }
@@ -72,30 +79,29 @@ int main(int argc, char **argv){
   //link others
   for(i = 1; i < argc -1; i++) link(output, modules, i, argc -1);
 
-  //free all modules
-  for(i = 0; i < argc -1; i++) freeModule(modules[i]);
-
+  freeModules(modules, argc -1);
   fclose(output);
 
   return 0;
 }
 
-//determine main module (use first main containing module! change later)
+//determine main module
 static int findMain(module **modules, int n){
-  int i, mainnbr = -2;
+  int i = 0;
+  int mainnbr = NO_MAIN;
 
   for(i = 0; i < n; i++)
     if(containsMain(modules[i])){
-      if(mainnbr == -2)
+      if(mainnbr == NO_MAIN)
 	mainnbr = i;
       else
-	return -1;
+	return SEVERAL_MAINS;
     }
   
   return mainnbr;
 }
 
-//returns 1 if main label found
+//returns 1 if main label is found
 static int containsMain(module *mod){
   llist *li;
   

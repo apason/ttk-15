@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <linker.h>
 #include <ttk-15.h>
@@ -13,14 +14,17 @@ static int16_t findLabelValue(module **modules, int n, char *label);
 static int findLabelAddressConstant(module **modules, int n, char *label);
 
 void link(FILE *fp, module **modules, int mi, int n ){
-  int i;
-  uint32_t codesize, datasize, buf;
-  int16_t value, label_address_constant;
-  char *label;
-  module *mod     = modules[mi];
+  int i                            =  0;
+  uint32_t codesize                = -1;
+  uint32_t datasize                = -1;
+  uint32_t buf                     =  0;
+  int16_t  value                   =  0;
+  int16_t  label_address_constant  = -1;
+  char *label                      = NULL;
+  module *mod                      = modules[mi];
 
   //filename to link
-  printf("%s\n", modules[mi]->filename);
+  printf("linking %s\n", modules[mi]->filename);
 
   codesize = (mod->data_start - CODESTART) / CODESIZE;
   datasize = (mod->symbol_start -mod->data_start) / sizeof(MYTYPE);
@@ -37,7 +41,7 @@ void link(FILE *fp, module **modules, int mi, int n ){
       label = getLabelName(mod->symbols, buf);
       value = (int16_t) buf;
 
-      if(!label){
+      if(label == NULL){
 	fprintf(stderr, "ERROR: Incorrect symbol table: nameless label with");
 	fprintf(stderr, " value %d. Aborting!\n", value);
 	exit(-1);
@@ -84,8 +88,9 @@ void link(FILE *fp, module **modules, int mi, int n ){
 
 //find label address among all modules
 static int findLabelAddressConstant(module **modules, int n, char *label){
-  int i, ac = LABEL_NOT_FOUND;
-  llist *s;
+  int    i  = 0;
+  int    ac = LABEL_NOT_FOUND;
+  llist *s  = NULL;
   
   for(i = 0; i < n; i++)
     for(s = modules[i]->symbols; s; s = s->next)
@@ -101,9 +106,9 @@ static int findLabelAddressConstant(module **modules, int n, char *label){
 
 //gets label name from modules own table
 static char *getLabelName(llist *s, uint32_t instruction){
-  int16_t label;
+  int16_t label = 0;
 
-  if(!s) printf("llist is null\n");
+  if(s == NULL) printf("llist is null\n");
 
   label = (int16_t) instruction;
 
@@ -116,10 +121,10 @@ static char *getLabelName(llist *s, uint32_t instruction){
 
 //get labels real value from arbitrary module
 static int16_t findLabelValue(module **modules, int n, char *label){
-  int i;
-  llist *s;
+  int    i = 0;
+  llist *s = NULL;
 
-  if(!label){
+  if(label == NULL){
     printf("label name null! aborting..\n");
     exit(-1);
   }

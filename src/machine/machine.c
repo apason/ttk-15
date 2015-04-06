@@ -12,10 +12,10 @@ static void execInstruction(machine *m);
 //static void handleInterrupts(machine *m);
 
 machine *newMachine(long memsize){
-  machine       *m = (machine*)malloc(sizeof(machine));
+  machine       *m   = (machine*)malloc(sizeof(machine));
   alu_unit      *alu = (alu_unit*)malloc(sizeof(alu_unit));
   mm_unit       *mmu = (mm_unit*)malloc(sizeof(mm_unit));
-  control_unit  *cu = (control_unit*)malloc(sizeof(control_unit));
+  control_unit  *cu  = (control_unit*)malloc(sizeof(control_unit));
 
   memset(alu, 0, 3* sizeof(MYTYPE));
   memset(mmu, 0, 4* sizeof(MYTYPE));
@@ -23,7 +23,7 @@ machine *newMachine(long memsize){
   
   m->alu = alu;
   m->mmu = mmu;
-  m->cu = cu;
+  m->cu  = cu;
 
   m->regs = (MYTYPE*)malloc(8* sizeof(MYTYPE));
   m->mem = (MYTYPE*)malloc(memsize);
@@ -35,7 +35,6 @@ machine *newMachine(long memsize){
 }
 
 void startMachine(machine *m){
-  //single program mode
   m->mmu->base = 0;
   m->mmu->limit = m->memsize;
   while(1){

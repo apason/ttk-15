@@ -3,7 +3,8 @@
 
 //calculates second operand in instruction (result of addr field and mode field)
 MYTYPE calculateSecondOperand(machine *m, uint8_t mode, uint8_t ri, int16_t addr){
-  MYTYPE result;
+  MYTYPE result = 0;
+  
   //calculate pointer
   result = calculatePointer(m, mode, ri, addr);
 
@@ -23,7 +24,8 @@ MYTYPE calculateSecondOperand(machine *m, uint8_t mode, uint8_t ri, int16_t addr
 
 //calculates pointer to second operand in instruction
 MYTYPE calculatePointer(machine *m, uint8_t mode ,uint8_t ri ,int16_t addr){
-  MYTYPE tmp, result;
+  MYTYPE tmp    = 0;
+  MYTYPE result = 0;
   
   tmp = m->regs[0];                      //save r0
   m->regs[0] = 0;                        //set r0 to 0
