@@ -1,5 +1,6 @@
 ; count next prime into stack
 ; takes argument in r1
+; needs sqrt function!!
 nextprime push sp,r5
 push sp,r4
 push sp,r3
@@ -16,8 +17,7 @@ loop add r1,=1
 	load r2,=1
 	innerloop load r5,r1
 		mod r5,r3
-		mul r2,r5
-		comp r2,=0
+		comp r5,=0
 		jequ loop
 		comp r4,r3
 		add r3,=1

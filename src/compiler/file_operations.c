@@ -354,7 +354,7 @@ int getOpCode(char* word) {
 		"svc\0\0\0\x70" };
 	int i;
 	for (i = 0; i < 38; ++i) {
-		if (strncmp(opcodes[i],word,strlen(opcodes[i])) == 0) {
+		if (strncmp(opcodes[i],word,6) == 0) {
 			return opcodes[i][6];
 		}
 	}
