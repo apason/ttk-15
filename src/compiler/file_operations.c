@@ -9,7 +9,7 @@
 int countLines(FILE*);
 int nextLine(FILE*);
 char** readCode(FILE*, int);
-void writeInstruction(char* instr,char* val,label_list* symbols, FILE*);
+void writeInstruction(char* instr,char* val,label_list* symbols, FILE*,int);
 void freeSymbols(code_file*);
 void freeCodeArray(code_file*);
 
@@ -66,7 +66,7 @@ int writeCodeFile(code_file* file) {
 		val[0] = '\0';
 		sscanf(file->array[i], "%s %s", word, val);
 		if (isInstruction(word)) {
-			writeInstruction(word,val,file->symbolList, fh);
+			writeInstruction(word,val,file->symbolList, fh, file->ttk_15);
 			++cInstructions;
 			continue;
 		}
@@ -74,7 +74,7 @@ int writeCodeFile(code_file* file) {
 		if (sscanf(file->array[i], "%s %s %s", label, word, val) < 2)
 			fprintf(stderr,"Error reading line: %d\n",cInstructions);//error
 		if (!isInstruction(label) && isInstruction(word)) {
-			writeInstruction(word,val,file->symbolList, fh);
+			writeInstruction(word,val,file->symbolList, fh, file->ttk_15);
 			++cInstructions;
 		}
 
@@ -182,7 +182,7 @@ char** readCode(FILE* fh, int lines) {
 
 
 
-void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
+void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, int ttk_15) {
 
 	uint8_t firstByte = 0;
 	uint32_t instruction = 0;
@@ -236,15 +236,20 @@ void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh) {
 			if ((reg = getRegister(val, 1)) < 0)
 				return;
 			// check if opcode is store
-			if (opCode == 1)
-				if (mode == 1)
-					mode = 0;
+			if (opCode == 1 && !ttk_15) {
+				if (--mode < 0) {
+					fprintf(stderr, "invalid mode %d on store! %s\n",mode,argument);
+					return;
+				}
+			}
 		}
 		if (( temp = getRegister(argument, 0)) >= 0)
 			if (nargs == 2) {
 				ireg = temp;
-				if (mode == 1)
-					mode = 0;
+				if (--mode < 0) {
+					fprintf(stderr, "invalid mode!\n");
+					return;
+				}
 			} else
 				reg = temp;
 		else
@@ -349,7 +354,7 @@ int getOpCode(char* word) {
 		"svc\0\0\0\x70" };
 	int i;
 	for (i = 0; i < 38; ++i) {
-		if (strncmp(opcodes[i],word,strlen(opcodes[i])) == 0) {
+		if (strncmp(opcodes[i],word,6) == 0) {
 			return opcodes[i][6];
 		}
 	}

@@ -3,10 +3,10 @@ x ds 2
 main load r3,=1     ;used only as index register
 
 load r1,=11    ;x[0] would hold walue of address of x[1]
-store r1,x     
+store r1,=x     
 
 load r1,=31    ;just some 2^n -1
-store r1,x(r3) ;
+store r1,=x(r3) ;
 store r1,=31
 
 load r1,=128   ;128 is comparation value and r1 is comparation register

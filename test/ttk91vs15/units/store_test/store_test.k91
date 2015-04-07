@@ -1,0 +1,4 @@
+x dc 10
+main load r1,=1337
+store r1,x
+svc sp,=halt
