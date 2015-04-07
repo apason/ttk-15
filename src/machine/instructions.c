@@ -298,21 +298,31 @@ FUNCTION(pop){
 
 //push registers 0-6 to stack pointed by rj
 FUNCTION(pushr){
-  int i = 0;
-  for(i = 0; i < 7; i++){
+  int i  = 0;
+  int sp = m->regs[rj];
+  
+  for(i = 0; i < 6; i++){
     m->regs[rj]++;
-    mmuSetData(m->mmu, m->mem, m->regs[rj], m->cu->tr2);
+    mmuSetData(m->mmu, m->mem, m->regs[rj], *(m->regs +i));
   }
+  m->regs[rj]++;
+  mmuSetData(m->mmu, m->mem, m->regs[rj], sp);
 }
 
 //pop registers 0-6 from stack pointed by rj
 FUNCTION(popr){
-  int i = 0;
-  for(i = 0; i < 7; i++){
-    mmuGetData(m->mmu, m->mem, m->regs[rj]);
-    m->regs[i] = m->mmu->mbr;
+  int i  = 0;
+  int sp = 0;
+  
+  mmuGetData(m->mmu, m->mem, m->regs[rj]);
+  sp = m->mmu->mbr;
+	     
+  for(i = 0; i < 6; i++){
+    mmuGetData(m->mmu, m->mem, m->regs[rj] -1);
+    m->regs[6 -i -1] = m->mmu->mbr;
     m->regs[rj]--;
   }
+  m->regs[rj] = sp;
 }
 
 //could be better

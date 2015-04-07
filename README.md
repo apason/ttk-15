@@ -7,6 +7,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * dokumentointi
 
 ## tulevia ##
+ * popr ja pushr menee rikki jos sp != r6
  * yksimoduuliset ei tarvitse main labelia
  * kääntäjän virheilmoitukset riveittäin (taulukon avulla)
  * pienet funktiot makroiksi
