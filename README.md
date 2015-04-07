@@ -7,6 +7,8 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * dokumentointi
 
 ## tulevia ##
+ * yksimoduuliset ei tarvitse main labelia
+ * kääntäjän virheilmoitukset riveittäin (taulukon avulla)
  * pienet funktiot makroiksi
  * testit overflow yms flageille!
  * tr2 pois ja cu.c kuntoon static!
