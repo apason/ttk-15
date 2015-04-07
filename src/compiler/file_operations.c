@@ -338,7 +338,8 @@ int getOpCode(char* word) {
 		"jzer\0\0\x22",\
 		"jpos\0\0\x23",\
 		"jnneg\0\x24",\
-		"jnpos\0\x25",\
+		"jnzer\0\x25",\
+		"jnpos\0\x26",\
 		"jles\0\0\x27",\
 		"jequ\0\0\x28",\
 		"jgre\0\0\x29",\
