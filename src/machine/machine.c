@@ -85,7 +85,7 @@ static void execInstruction(machine *m){
   }
   //  printState(m);
   //getchar();
-  
+
   instruction(m, rj, mode, ri, addr);
   
 }

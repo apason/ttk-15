@@ -296,14 +296,16 @@ FUNCTION(pop){
   m->regs[rj]--;
 }
 
+//push registers 0-6 to stack pointed by rj
 FUNCTION(pushr){
-  int i;
-  for(i = 0; i < 7;i++){
+  int i = 0;
+  for(i = 0; i < 7; i++){
     m->regs[rj]++;
-    mmuSetData(m->mmu, m->mem, m->regs[rj], m->cu->tr1);
+    mmuSetData(m->mmu, m->mem, m->regs[rj], m->cu->tr2);
   }
 }
 
+//pop registers 0-6 from stack pointed by rj
 FUNCTION(popr){
   int i = 0;
   for(i = 0; i < 7; i++){
