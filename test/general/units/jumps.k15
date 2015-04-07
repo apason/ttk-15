@@ -1,0 +1,64 @@
+; test for jump instructiuons.
+; this test just jumps arount.
+; each section adds 1 to x
+; expected result 6
+; tested jump instructions
+; jgre, jequ, jles, jnpos, jpos, jnequ, jnles, jngre, jneg, jzer, jnzer
+
+x dc 0
+y dc 3
+s1 dc 0
+
+main load r1,=section1
+     load r2,=0
+     load r3,=1
+     comp r2,r1
+     jgre end
+     jequ end
+     jles section1
+
+end  load r1,x
+     out r1,=crt	
+     svc sp,=halt
+
+
+section1 load r5,y
+	 sub r5,=1
+	 store r5,=y
+	 load r5,x
+	 add r5,=1
+	 store r5,=x
+	 load r5,s1
+	 add r5,=1
+	 store r5,=s1
+	 load r5,y
+	 jnpos r5,section3
+	jpos r5,section2
+
+section2 load r5,x
+	 add r5,=1
+	 store r5,=x
+	 load r5,=section2
+	 comp r1,r5
+	 jnequ section1
+
+section3 load r5,x
+	 add r5,=1
+	 store r5,=x
+	 load r1,=0
+	 comp r1,r5
+	 jnles end
+	 jngre section4
+
+section4 load r5,x
+	 add r5,=1
+	 store r5,=x
+	 jneg r1,end
+	 jzer r1,end
+	 add r5,=1
+	 store r5,=x
+	 jnzer r5,end
+	 
+
+	load r1,=-999
+	out r1,=halt

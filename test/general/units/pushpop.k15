@@ -1,0 +1,49 @@
+; tests if stack pointer is increased
+; and decreased correctly
+
+osp dc 0
+fsp dc 0
+
+main load r1,sp
+     store r1,=fsp
+     push sp,=1
+     push sp,=0
+     add r1,=2
+     comp sp,r1
+     load r5,=1
+     jnequ error
+     
+     load r1,=0(sp)
+     store r1,=osp
+     pushr sp
+     add r1,=7
+     comp sp,r1
+     load r5,=2
+     jnequ error
+     
+     load r2,sp
+     sub r2,=7
+     comp r2,osp
+     load r5,=3
+     jnequ error
+     
+     popr sp
+     load r1,osp
+     comp r1,sp
+     load r5,=4
+     jnequ error
+     
+     pop sp,r1
+     pop sp,r1
+     load r1,fsp
+     comp r1,sp
+     load r5,=5
+     jnequ error
+     
+     load r1,=0
+     out r1,=crt
+     svc sp,=halt
+     
+error out r5,=crt
+      svc sp,=halt
+      
