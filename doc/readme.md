@@ -30,4 +30,4 @@ be run in machine.
 
 Arttu Kilpinen - apason
 
-Hiski Rauhala  - praetoria
+Hiski Ruhanen  - praetoria
