@@ -13,6 +13,7 @@ int main (int argc, char* argv[]) {
 	// we take the first argument to be name of a .ttk91 file
 	code_file codeFile;
 	codeFile.name = argv[1];
+	codeFile.ttk_15 = 0;
 
 	// read the codeFile
 	if (readCodeFile(&codeFile) < 0) return -1;
@@ -20,6 +21,8 @@ int main (int argc, char* argv[]) {
 	// find the suffix of the file
 	char* suffix = strrchr(argv[1], '.');
 	if (suffix && strlen(suffix) > 3) {
+		if (!strncmp(suffix,".k15",5))
+			codeFile.ttk_15 = 1;
 		strncpy(suffix, ".o15",4);
 	}
 	if (argc == 4 && !strncmp(argv[2],"-o",3)) {

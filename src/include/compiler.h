@@ -17,6 +17,7 @@ typedef struct label_list {
 typedef struct {
 	char* name;
 	int lines;
+	int ttk_15;
 	char** array;
 	struct label_list* symbolList;
 	MYTYPE moduleSize;

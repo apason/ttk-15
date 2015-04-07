@@ -32,11 +32,11 @@ for fullpathtest in units/*; do
 		continue
 	fi
 
-	source15=$(ls ${dir}/*.k15 | awk '{print $1;}')
-	$compiler $source15 -o a.out.o15 > /dev/null
+	ttksource=$(ls ${dir}/*.k* | awk '{print $1;}')
+	$compiler $ttksource -o a.out.o15 > /dev/null
 	
 	if [ $? != 0 ]; then
-		echo compiling $source15 in $test failed
+		echo compiling $ttksource in $test failed
 		rm result.b15
 		continue
 	fi
