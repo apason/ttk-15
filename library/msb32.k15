@@ -1,0 +1,18 @@
+	; calculate seed value 
+	load r5,=31	; upper limit
+	load r3,=1	; lower limit
+	seedloop load r4,r5 ; count average between upper and lower limit into r4
+		add r4,r3
+		shr r4,=1
+		load r2,=1
+		shl r2,r4 ;  r2 = 2^r4
+		comp r2,r1 ; if r1 is more than r2 lower limit is now r4
+		jles greaterseed
+			comp r3,r4
+			jequ iterationstart
+			load r5,r4
+			jump seedloop
+		greaterseed comp r3,r4
+		jequ iterationstart
+		load r3,r4
+		jump seedloop
