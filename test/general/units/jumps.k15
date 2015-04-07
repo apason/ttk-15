@@ -24,27 +24,27 @@ end  load r1,x
 
 section1 load r5,y
 	 sub r5,=1
-	 store r5,y
+	 store r5,=y
 	 load r5,x
 	 add r5,=1
-	 store r5,x
+	 store r5,=x
 	 load r5,s1
 	 add r5,=1
-	 store r5,s1
+	 store r5,=s1
 	 load r5,y
 	 jnpos r5,section3
-	 jpos r5,section2
+	jpos r5,section2
 
 section2 load r5,x
 	 add r5,=1
-	 store r5,x
+	 store r5,=x
 	 load r5,=section2
 	 comp r1,r5
 	 jnequ section1
 
 section3 load r5,x
 	 add r5,=1
-	 store r5,=1
+	 store r5,=x
 	 load r1,=0
 	 comp r1,r5
 	 jnles end
@@ -52,10 +52,13 @@ section3 load r5,x
 
 section4 load r5,x
 	 add r5,=1
-	 store r5,x
-	 jneg end
-	 jzer end
+	 store r5,=x
+	 jneg r1,end
+	 jzer r1,end
 	 add r5,=1
-	 store r5,x
+	 store r5,=x
 	 jnzer r5,end
 	 
+
+	load r1,=-999
+	out r1,=halt
