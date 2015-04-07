@@ -46,6 +46,84 @@ int readCodeFile(code_file* file) {
 	return 0;
 }
 
+char** readCode(FILE* fh, int lines) {
+	int i;
+
+	// reserve space and read the code lines from the file
+	char** input = (char**) malloc(lines*sizeof(char*));
+	for (i = 0; i < lines; ++i) {
+		if (feof(fh)) {
+			fprintf(stderr, "Error reading the source file!\n");
+			return NULL;
+		}
+		int ch = fgetc(fh);
+
+		// Skip comment lines and whitespaces
+		do {
+			if (ch == '\n') {
+				ch = fgetc(fh);
+				continue;
+			}
+			if (ch == ';') {
+				while (fgetc(fh) != '\n');
+				ch = fgetc(fh);
+			}
+			while (isspace(ch)) ch = fgetc(fh);
+		} while (ch == ';' || ch == '\n');
+
+		// reserve space for the next line
+		input[i] = (char*) malloc(MAX * sizeof(char));
+		int count = 0;
+		while (ch != EOF && ch != '\n') {
+			if (ch == ';') {
+				while (fgetc(fh) != '\n');
+				break;
+			}
+			
+			input[i][count++] = ch;
+			if (ch == ',')
+				while (isspace(ch = fgetc(fh)));
+			else
+				ch = fgetc(fh);
+		}
+		input[i][count] = 0;
+		printf("Line %d: %s\n",i+1,input[i]);
+	
+	}
+	return input;
+}
+
+int countLines (FILE* fh) {
+	if (fh == NULL) return -1;
+	int lines = 0;
+	while (!feof(fh)) {
+		lines += nextLine(fh);
+	}
+	return lines;
+}
+
+int nextLine(FILE* fh) {
+	int ch = fgetc(fh);
+	// Strip whitespaces from beginning
+	while (ch != EOF && isspace(ch)) ch = fgetc(fh);
+	// If this line is a comment, let's skip it
+	if (ch == ';') {
+		while ((ch = fgetc(fh)) != EOF && ch != '\n');
+		return 0;
+	}
+	// If this line is empty, skip it too
+	if (ch == '\n') {
+		fgetc(fh);
+		return 0;
+	}
+	// If we have reached end of file, there is no line
+	if (ch == EOF) return 0;
+	// Valid line so seek through and add 1 to line count
+	while (ch != EOF && ch != '\n') ch = fgetc(fh);
+	return 1;
+}
+
+
 // this is also a function to be used outside of this file
 int writeCodeFile(code_file* file) {
 	printf("Opening output file: %s\n",file->out_name);
@@ -105,81 +183,6 @@ int writeCodeFile(code_file* file) {
 	fclose(fh);
 	return 0;
 }
-
-int countLines (FILE* fh) {
-	if (fh == NULL) return -1;
-	int lines = 0;
-	while (!feof(fh)) {
-		lines += nextLine(fh);
-	}
-	return lines;
-}
-
-int nextLine(FILE* fh) {
-	int ch = fgetc(fh);
-	// Strip whitespaces and tabs from beginning
-	while (ch != EOF && (ch == ' ' || ch == '\t' || ch == '\r')) ch = fgetc(fh);
-	// If this line is a comment, let's skip it
-	if (ch == ';') {
-		while ((ch = fgetc(fh)) != EOF && ch != '\n');
-		return 0;
-	}
-	// If this line is empty, skip it too
-	if (ch == '\n') {
-		fgetc(fh);
-		return 0;
-	}
-	// If we have reached end of file, there is no line
-	if (ch == EOF) return 0;
-	// Valid line so seek through and add 1 to line count
-	while (ch != EOF && ch != '\n') ch = fgetc(fh);
-	return 1;
-}
-
-char** readCode(FILE* fh, int lines) {
-	int i;
-
-	// reserve space and read the code lines from the file
-	char** input = (char**) malloc(lines*sizeof(char*));
-	for (i = 0; i < lines; ++i) {
-		if (feof(fh)) {
-			fprintf(stderr, "Error reading the source file!\n");
-			return NULL;
-		}
-		int ch = fgetc(fh);
-		// skip whitespaces
-		while (ch == ' ' || ch == '\t') ch = fgetc(fh);
-		// Skip comment lines
-		while (ch == ';' || ch == '\n') {
-			if (ch == '\n') {
-				ch = fgetc(fh);
-				continue;
-			}
-			while (fgetc(fh) != '\n');
-			ch = fgetc(fh);
-			while (ch == ' ' || ch == '\t') ch = fgetc(fh);
-		}
-		// reserve space for the next line
-		input[i] = (char*) malloc(MAX * sizeof(char));
-		int count = 0;
-		while (ch != EOF && ch != '\n') {
-			if (ch == ';') {
-				while (fgetc(fh) != '\n');
-				break;
-			}
-			input[i][count++] = ch;
-			if (ch == ',')
-				while ((ch = fgetc(fh)) == ' ' || ch == '\t');
-			else
-				ch = fgetc(fh);
-		}
-		input[i][count] = 0;
-		printf("Line %d: %s\n",i+1,input[i]);
-	
-	}
-	return input;
-}
-
 
 
 void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, int ttk_15) {

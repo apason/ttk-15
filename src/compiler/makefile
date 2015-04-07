@@ -11,10 +11,10 @@ TARGET=   ../../target/
 all:	compiler
 
 compiler:	$(OBJS)
-		$(CC) $(OBJS) -o $(TARGET)compiler
+		$(CC) $(OBJS) -o $(TARGET)ttc
 
 clean:
 	rm -f *.o
 
 clobber:	clean
-	rm $(TARGET)compiler
+	rm $(TARGET)ttc
