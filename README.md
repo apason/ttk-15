@@ -15,7 +15,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * testit uudelle parametrisyntaksille                                      2,4 : 3
  * import tai include kääntäjä direktiivin toteutus kirjastofunktioille     2,5 : 3.5
  * headereille uudet paikat (jos a.h tarvitaan vain esim. linkkerissä niin siitterään src/linker)  2
- * dokumentointi!!!
+ * dokumentointi!!!                                             4
 
  ## backlog ##
  * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)       5,6 : 5.5
