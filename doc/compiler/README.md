@@ -27,8 +27,9 @@ or
  parts inside the square brackets are optional, except for some
 operations which require at least one or two operands.
 
-And care must be taken, if you use a register as an operand,
-you can't use an index register
+And care must be taken, if you use a register in the place of the second
+operand, you can't use an index register. If you want to know why,
+check out the "other aliases" section.
 
 ##notes##
 
