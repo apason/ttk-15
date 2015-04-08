@@ -12,13 +12,14 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * parametrit paremmiksi linkkerille                            5, 3 : 4
  * parametrit paremmiksi masiinalle                             5, 3 : 4
  * parametrit paremmiksi kääntäjälle                            5, 3 : 4
- * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)       5,6 : 5.5
- * testit floateille                                                        4
  * testit uudelle parametrisyntaksille                                      2,4 : 3
  * import tai include kääntäjä direktiivin toteutus kirjastofunktioille     2,5 : 3.5
  * headereille uudet paikat (jos a.h tarvitaan vain esim. linkkerissä niin siitterään src/linker)  2
+ * dokumentointi!!!
 
  ## backlog ##
+ * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)       5,6 : 5.5
+ * testit floateille                                                        4
  * "wrapper" skripti tms joka kapseloi linkkerin ja kääntäjän (ehkä masiinan?)
  * konekäskyt state registerin tutkimiseen
  * overflow tarkistus tehokkaammaksi xor menetelmällä
