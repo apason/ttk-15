@@ -60,15 +60,11 @@ char** readCode(FILE* fh, int lines) {
 
 		// Skip comment lines and whitespaces
 		do {
-			if (ch == '\n') {
-				ch = fgetc(fh);
-				continue;
-			}
+			while (isspace(ch)) ch = fgetc(fh);
 			if (ch == ';') {
 				while (fgetc(fh) != '\n');
 				ch = fgetc(fh);
 			}
-			while (isspace(ch)) ch = fgetc(fh);
 		} while (ch == ';' || ch == '\n');
 
 		// reserve space for the next line
@@ -113,7 +109,6 @@ int nextLine(FILE* fh) {
 	}
 	// If this line is empty, skip it too
 	if (ch == '\n') {
-		fgetc(fh);
 		return 0;
 	}
 	// If we have reached end of file, there is no line
