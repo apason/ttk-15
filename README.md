@@ -1,22 +1,27 @@
 # ttk-15 #
 ttk-15 on ttk-91 klooni pienillä muutoksilla
 
-## työn alla ##
- * kääntäjän + linkkerin testaus (testauksen voisi tehdä esim niin että lataa originalin titokoneen kääntämiä tiedostoja machinen loader moduulilla ja vertaa data-aluetta compilerilla tehtyyn?)
- * integraatiotestaus: testit kirjoitettu jo ALU:lle.
- * dokumentointi
+##v0.2 valmiina##
 
-## tulevia ##
- * popr ja pushr menee rikki jos sp != r6
- * yksimoduuliset ei tarvitse main labelia
- * kääntäjän virheilmoitukset riveittäin (taulukon avulla)
- * pienet funktiot makroiksi
+## v0.2 työn alla ##
+ * popr ja pushr menee rikki jos sp != r6                       
+ * yksimoduuliset ei tarvitse main labelia                      
+ * kääntäjän virheilmoitukset riveittäin (taulukon avulla)      
+ * pienet funktiot makroiksi                                    
+ * tr2 pois ja cu.c kuntoon static!                             
+ * parametrit paremmiksi linkkerille                            
+ * parametrit paremmiksi masiinalle                             
+ * parametrit paremmiksi kääntäjälle                            
+ * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)
+ * import tai include kääntäjä direktiivin toteutus kirjastofunktioille
+ 
+
+## backlog ##
+ * konekäskyt state registerin tutkimiseen
  * testit overflow yms flageille!
- * tr2 pois ja cu.c kuntoon static!
- * linkkerin parametrit kuntoon (epäkorrekti syöte aiheuttaa segfaultin)
  * state registerin nollaus?
- * floating point unit + konekäskyt
+ * moduuleille uusi rakenne. import ja export taulut!
+ * GUI 
  * pienin osoitettava muistiyksikkö keskusmuistissa MYTYPE:stä yhteen bittiin
  * n ydintä
- * import tai include kääntäjä direktiivin toteutus kirjastofunktioille
- * GUI
+
