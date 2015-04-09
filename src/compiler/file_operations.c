@@ -87,7 +87,7 @@ static char** readCode(FILE* fh, int lines, int**ppcode_text) {
 		}
 		input[i][count] = 0;
 		code_text[i] = text_lines++;
-		printf("Line %d: %s\n",i+1,input[i]);
+		//printf("Line %d: %s\n",i+1,input[i]);
 	
 	}
 	return input;
