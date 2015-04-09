@@ -19,7 +19,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * dokumentointi!!!                                             4
 
  ## backlog ##
- * aliakset jumpille ja callille
+ * aliakset jumpille ja callille ja exitille
  * jumpit ignoraa moden????
  * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)       5,6 : 5.5
  * testit floateille                                                        4
