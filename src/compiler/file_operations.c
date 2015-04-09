@@ -145,9 +145,10 @@ int writeCodeFile(code_file* file) {
 		sscanf(file->array[i], "%s %s", word, val);
 		if (isInstruction(word)) {
 			error = writeInstruction(word,val,file->symbolList, fh, file->ttk_15);
+			// print error if found
 			if (error < 0) {
 				print_error(error, file->code_text[cInstructions]);
-				fprintf(stderr,"%s\n",file->array[i]);
+				fprintf(stderr,"\t%s\n",file->array[i]);
 			}
 			++cInstructions;
 			continue;
@@ -157,9 +158,10 @@ int writeCodeFile(code_file* file) {
 			fprintf(stderr,"Error reading line: %d\n",file->code_text[cInstructions]);//error
 		if (!isInstruction(label) && isInstruction(word)) {
 			error = writeInstruction(word,val,file->symbolList, fh, file->ttk_15);
+			// print error if found
 			if (error < 0) {
 				print_error(error, file->code_text[cInstructions]);
-				fprintf(stderr,"%s\n",file->array[i]);
+				fprintf(stderr,"\t%s\n",file->array[i]);
 			}
 			++cInstructions;
 		}
