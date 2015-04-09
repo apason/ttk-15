@@ -7,15 +7,22 @@
 int writeFile(MYTYPE *mem, int dend);
 
 int main(int argc, char *argv[]){
-  int dend;
-  MYTYPE *mem = (MYTYPE *) malloc(sizeof(MYTYPE) * 256);
+  int     dend = -1;
+  FILE   *fp   = NULL;
+  MYTYPE *mem  = (MYTYPE *) malloc(sizeof(MYTYPE) * 512);
 
   if(argc != 2){
     fprintf(stderr, "Please give .b91 file as parameter!\n");
     exit(-1);
   }
 
-  dend = loadFile91(mem, argv[1]);
+  fp = fopen(argv[1], "rb");
+  if(fp == NULL){
+    perror("opening b91 file");
+    exit(-1);
+  }
+
+  dend = loadFile91(mem, fp);
 
   return writeFile(mem,dend);
 }
@@ -26,7 +33,7 @@ int writeFile(MYTYPE *mem, int dend){
 
   out = fopen("result.b15", "wb");
   if(!out){
-    perror("fopen");
+    perror("writing result file");
     exit(-1);
   }
 

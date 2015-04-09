@@ -60,6 +60,7 @@ typedef struct MACHINE{
 typedef struct OPTIONS{
   FILE *file;
   int   mode;
+  int   debug;
 } options;
 
 //prototype for machine instruction
