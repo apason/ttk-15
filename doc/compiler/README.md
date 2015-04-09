@@ -51,6 +51,7 @@ with the ttk-91 source code format.
  Compatibility is achieved by these aliases:
  - store r1,variable; is turned into store r1,=variable
  - jump r1,label; is turned into jump r1,=label
+ - call r1,label; is turned into call r1,=label
 
 ##other aliases##
 
