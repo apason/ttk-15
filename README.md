@@ -2,15 +2,15 @@
 ttk-15 on ttk-91 klooni pienillä muutoksilla
 
 ##v0.2 valmiina##
- * popr ja pushr menee rikki jos sp != r6                       1 tod 20m
- * yksimoduuliset ei tarvitse main labelia                      1 tod 10m
- * tr2 pois ja cu.c kuntoon static!                             1 tod 30m
+ * popr ja pushr menee rikki jos sp != r6                       1 
+ * yksimoduuliset ei tarvitse main labelia                      1 
+ * tr2 pois ja cu.c kuntoon static!                             1 
+ * parametrit paremmiksi masiinalle                             5, 3 : 4
  
 ## v0.2 työn alla ##
  * kääntäjän virheilmoitukset riveittäin (taulukon avulla)      2, 3 : 2.5
  * pienet funktiot makroiksi                                    3, 2 : 2.5
  * parametrit paremmiksi linkkerille                            5, 3 : 4
- * parametrit paremmiksi masiinalle                             5, 3 : 4
  * parametrit paremmiksi kääntäjälle                            5, 3 : 4
  * testit uudelle parametrisyntaksille                                      2,4 : 3
  * import tai include kääntäjä direktiivin toteutus kirjastofunktioille     2,5 : 3.5
