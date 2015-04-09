@@ -6,13 +6,15 @@
 #include <compiler.h>
 #include <ttk-15.h>
 #include "utility.h"
+#include "errorcodes.h"
 
 static int countLines(FILE*);
 static int nextLine(FILE*);
 static char** readCode(FILE*, int, int**);
-static void writeInstruction(char* instr,char* val,label_list* symbols, FILE*,int);
+static int writeInstruction(char* instr,char* val,label_list* symbols, FILE*,int);
 static void freeSymbols(code_file*);
 static void freeCodeArray(code_file*);
+static void print_error(int error, int line);
 
 
 // this is a function to be used outside this file
@@ -123,6 +125,7 @@ static int nextLine(FILE* fh) {
 
 // this is also a function to be used outside of this file
 int writeCodeFile(code_file* file) {
+	int error = 0;
 	printf("Opening output file: %s\n",file->out_name);
 	FILE* fh = fopen(file->out_name,"wb");
 	if (fh == NULL) {
@@ -141,7 +144,11 @@ int writeCodeFile(code_file* file) {
 		val[0] = '\0';
 		sscanf(file->array[i], "%s %s", word, val);
 		if (isInstruction(word)) {
-			writeInstruction(word,val,file->symbolList, fh, file->ttk_15);
+			error = writeInstruction(word,val,file->symbolList, fh, file->ttk_15);
+			if (error < 0) {
+				print_error(error, file->code_text[cInstructions]);
+				fprintf(stderr,"%s\n",file->array[i]);
+			}
 			++cInstructions;
 			continue;
 		}
@@ -149,7 +156,11 @@ int writeCodeFile(code_file* file) {
 		if (sscanf(file->array[i], "%s %s %s", label, word, val) < 2)
 			fprintf(stderr,"Error reading line: %d\n",file->code_text[cInstructions]);//error
 		if (!isInstruction(label) && isInstruction(word)) {
-			writeInstruction(word,val,file->symbolList, fh, file->ttk_15);
+			error = writeInstruction(word,val,file->symbolList, fh, file->ttk_15);
+			if (error < 0) {
+				print_error(error, file->code_text[cInstructions]);
+				fprintf(stderr,"%s\n",file->array[i]);
+			}
 			++cInstructions;
 		}
 
@@ -182,7 +193,7 @@ int writeCodeFile(code_file* file) {
 }
 
 
-static void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, int ttk_15) {
+static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, int ttk_15) {
 
 	uint8_t firstByte = 0;
 	uint32_t instruction = 0;
@@ -197,7 +208,7 @@ static void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh,
 
 	// find out the operation code
 	opCode = getOpCode(word);
-	if (opCode == -1) return;
+	if (opCode == -1) return INVALIDOPCODE;
 
 	// find number of arguments
 	char* argument = NULL;
@@ -224,32 +235,28 @@ static void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh,
 		int temp;
 		// get indexing mode
 		if ((temp = getIndexingMode(argument)) < 0)
-			return;
+			return INVALIDMODE;
 		if (temp != 1)
 			++argument;
 		mode = temp;
 		// get index register
 		if ((ireg = getIndexRegister(argument)) < 0)
-			return;
+			return INVALIDIREG;
 		// two arguments, first one has to be a register
 		if (nargs == 2) {
 			if ((reg = getRegister(val, 1)) < 0)
-				return;
+				return INVALIDREG;
 			// check if opcode is store
 			if (opCode == 1 && !ttk_15) {
-				if (--mode < 0) {
-					fprintf(stderr, "invalid mode %d on store! %s\n",mode,argument);
-					return;
-				}
+				if (--mode < 0)
+					return INVALIDMODE;
 			}
 		}
 		if (( temp = getRegister(argument, 0)) >= 0)
 			if (nargs == 2) {
 				ireg = temp;
-				if (--mode < 0) {
-					fprintf(stderr, "invalid mode!\n");
-					return;
-				}
+				if (--mode < 0)
+					return INVALIDMODE;
 			} else
 				reg = temp;
 		else
@@ -268,6 +275,7 @@ static void writeInstruction(char* word,char* val,label_list* symbols, FILE* fh,
 	fwrite(&firstByte,sizeof(firstByte),1,fh);
 	// write the compiled instruction
 	fwrite(&instruction,sizeof(instruction),1,fh);
+	return 0;
 }
 
 void freeCodeFile(code_file* file) {
@@ -290,4 +298,24 @@ static void freeCodeArray(code_file* file) {
 	}
 	free(file->array);
 	free(file->code_text);
+}
+
+static void print_error(int error, int line) {
+	++line;
+	switch(error) {
+		case INVALIDOPCODE:
+			fprintf(stderr,"Invalid operation code on line: %d\n",line);
+			break;
+		case INVALIDMODE:
+			fprintf(stderr,"Invalid mode on line: %d\n",line);
+			break;
+		case INVALIDIREG:
+			fprintf(stderr,"Invalid index register on line: %d\n",line);
+			break;
+		case INVALIDREG:
+			fprintf(stderr,"Invalid register on line: %d\n",line);
+			break;
+		default:
+			fprintf(stderr,"Unknown syntax error on line: %d\n",line);
+	}
 }
