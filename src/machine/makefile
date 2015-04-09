@@ -1,6 +1,6 @@
 CC= 	  gcc
 STD=	  _GNU_SOURCE_
-OBJS=	  main.o bitwise.o cu.o helpers.o instructions.o machine.o mmu.o loader.o
+OBJS=	  main.o bitwise.o cu.o helpers.o instructions.o machine.o mmu.o loader.o options.o
 INCLUDE=  -I "../include/"
 CFLAGS=   -Wall -D$(STD) $(INCLUDE) -c
 TARGET=   ../../target/

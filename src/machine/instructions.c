@@ -13,18 +13,18 @@ FUNCTION(nop){
 }
 
 FUNCTION(store){
-  mmuSetData(m->mmu, m->mem, m->cu->tr2, m->regs[rj]);
+  mmuSetData(m->mmu, m->mem, m->cu->tr, m->regs[rj]);
 }
 
 FUNCTION(load){
-  m->regs[rj] = m->cu->tr2;
+  m->regs[rj] = m->cu->tr;
 }
 
 //simulation
 FUNCTION(in){
   MYTYPE tmp = 0;
   
-  if(m->cu->tr2 == KBD){
+  if(m->cu->tr == KBD){
     scanf("%d", &tmp);
     m->regs[rj] = tmp;
   }
@@ -37,7 +37,7 @@ FUNCTION(in){
 
 //simulation
 FUNCTION(out){
-  if(m->cu->tr2 == CRT)
+  if(m->cu->tr == CRT)
     printf("%d\t", m->regs[rj]);
   else{
     fprintf(stderr, "in instruction OUT: reference to unknown device\n");
@@ -161,8 +161,8 @@ FUNCTION(shl){
 FUNCTION(shr){
   MYTYPE mask = 0xFFFFFFFF;
 
-  m->regs[rj] >>= m->cu->tr2;
-  mask <<= (mtl -m->cu->tr2);
+  m->regs[rj] >>= m->cu->tr;
+  mask <<= (mtl -m->cu->tr);
 
   m->regs[rj] &= (~mask);
 }
@@ -179,8 +179,8 @@ FUNCTION(shra){
   if(rj < 0) sign = 1;
   else       sign = 0;
     
-  m->regs[rj] >>= m->cu->tr2;
-  mask <<= (mtl -m->cu->tr2);
+  m->regs[rj] >>= m->cu->tr;
+  mask <<= (mtl -m->cu->tr);
 
   if(sign) m->regs[rj] |= mask;
   else     m->regs[rj] &= (~mask);
@@ -266,7 +266,7 @@ FUNCTION(call){
   mmuSetData(m->mmu, m->mem, m->regs[rj] +1, m->cu->pc);  //save pc
   mmuSetData(m->mmu, m->mem, m->regs[rj] +2, m->regs[7]); //save fp
   m->regs[rj] += 2;                                       
-  m->cu->pc = m->cu->tr1;
+  m->cu->pc = m->cu->tr;
   m->regs[7] = m->regs[rj];
 }
 
@@ -278,16 +278,16 @@ FUNCTION(exitt){
 
   /* 
    * decrease stack pointer.
-   * tr1 holds param for exit
+   * tr holds param for exit
    * and +2 comes from pc and fp
    */
   
-  m->regs[rj] -= m->cu->tr1 +2;
+  m->regs[rj] -= m->cu->tr +2;
 }
 
 FUNCTION(push){
   m->regs[rj]++;
-  mmuSetData(m->mmu, m->mem, m->regs[rj], m->cu->tr2);
+  mmuSetData(m->mmu, m->mem, m->regs[rj], m->cu->tr);
 }
 
 FUNCTION(pop){
@@ -298,15 +298,14 @@ FUNCTION(pop){
 
 //push registers 0-6 to stack pointed by rj
 FUNCTION(pushr){
-  int i  = 0;
-  int sp = m->regs[rj];
+  int i   = 0;
+  int sp  = m->regs[rj];
   
-  for(i = 0; i < 6; i++){
+  for(i = 0; i < 7; i++){
     m->regs[rj]++;
     mmuSetData(m->mmu, m->mem, m->regs[rj], *(m->regs +i));
   }
-  m->regs[rj]++;
-  mmuSetData(m->mmu, m->mem, m->regs[rj], sp);
+  mmuSetData(m->mmu, m->mem, *(m->regs + rj), sp);
 }
 
 //pop registers 0-6 from stack pointed by rj
@@ -314,24 +313,26 @@ FUNCTION(popr){
   int i  = 0;
   int sp = 0;
   
-  mmuGetData(m->mmu, m->mem, m->regs[rj]);
-  sp = m->mmu->mbr;
-	     
-  for(i = 0; i < 6; i++){
-    mmuGetData(m->mmu, m->mem, m->regs[rj] -1);
-    m->regs[6 -i -1] = m->mmu->mbr;
+  for(i = 6; i >= 0; i--){
+    mmuGetData(m->mmu, m->mem, m->regs[rj]);
+    
+    if(i != rj)
+      m->regs[i] = m->mmu->mbr;
+    else
+      sp = m->mmu->mbr;
     m->regs[rj]--;
   }
+  
   m->regs[rj] = sp;
 }
 
 //could be better
 FUNCTION(svc){
-  if(m->cu->tr2 == HALT){
+  if(m->cu->tr == HALT){
     freeMachine(m);
     exit(0);
   }
-  fprintf(stderr, "unknown supervisor call %d!\n", m->cu->tr2);
+  fprintf(stderr, "unknown supervisor call %d!\n", m->cu->tr);
   freeMachine(m);
   exit(-1);
 }
