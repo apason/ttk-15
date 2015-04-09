@@ -23,6 +23,7 @@ typedef struct {
 	MYTYPE moduleSize;
 	MYTYPE codeSize;
 	char out_name[MAX];
+	int* code_text;
 } code_file;
 // reads the code file into the array in the struct and puts lenght in lines member
 int readCodeFile(code_file*);
