@@ -86,7 +86,7 @@ static char** readCode(FILE* fh, int lines, int**ppcode_text) {
 				ch = fgetc(fh);
 		}
 		input[i][count] = 0;
-		code_text[i] = text_lines++;
+		code_text[i] = ++text_lines;
 		//printf("Line %d: %s\n",i+1,input[i]);
 	
 	}
@@ -304,7 +304,6 @@ static void freeCodeArray(code_file* file) {
 }
 
 static void print_error(int error, int line) {
-	++line;
 	switch(error) {
 		case INVALIDOPCODE:
 			fprintf(stderr,"Invalid operation code on line: %d\n",line);
