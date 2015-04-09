@@ -36,19 +36,19 @@ int main (int argc, char* argv[]) {
 	countSize(&codeFile);
 
 	// print module size
-	printf("module size = %d\n",codeFile.moduleSize);
+//	printf("module size = %d\n",codeFile.moduleSize);
 
 	// write the code file
 	writeCodeFile(&codeFile);
 
 	// print the symbol table
-	printf("Symbols:\n");
+/*	printf("Symbols:\n");
 	label_list* temp = codeFile.symbolList;
 	while (temp != NULL) {
 		printf("%s : %0x : %d : %d\n",temp->label, (uint16_t)temp->address, temp->size, temp->value);
 		temp = temp->next;
 	}
-
+*/
 	// free the space reserved for dynamic data in codeFile
 	freeCodeFile(&codeFile);
 

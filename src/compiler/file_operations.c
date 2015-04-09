@@ -25,14 +25,14 @@ int readCodeFile(code_file* file) {
 		return -1;
 	}
 	
-	printf("file is : %s\n",file->name);
+	//printf("file is : %s\n",file->name);
 	
 	if ((file->lines = countLines(fh)) <= 0) {
 		fclose(fh);
 		fprintf(stderr, "Error linecount <= 0, is it an empty file?\n");
 		return -1;
 	}
-	printf("lines = %d\n",file->lines);
+	//printf("lines = %d\n",file->lines);
 	
 	rewind(fh);
 
