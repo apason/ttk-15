@@ -9,12 +9,12 @@
 static options *newOptions(void);
 static int      openFile(options *opts, char *filename);
 static int      getMode(char *filename);
-static int findM(int argc, char *argv[]);
+static int      countPosition(options *opts);
 
 options *getOptions(int argc, char *argv[]){
   int         optch       = 0;
   int         arg         = 0;
-  static char optstring[] = "f:m:";
+  static char optstring[] = "f:m:g";
   options    *opts        = newOptions();
 
   //we first need to determine the type of file
@@ -38,6 +38,7 @@ options *getOptions(int argc, char *argv[]){
   //reset optind
   optind = 1;
 
+  //then we determine the file and debug flad
   while((optch = getopt(argc, argv, optstring)) != -1){
     if(optch == 'f'){
       
@@ -45,10 +46,12 @@ options *getOptions(int argc, char *argv[]){
       if(openFile(opts, optarg) != 0)
 	return NULL;
     }
+    if(optch == 'g')
+      opts->debug = ON;
   }
 
   //filename is only argument
-  if(opts->file == NULL && opts->mode == UNDEFINED){
+  if(opts->file == NULL && opts->mode == UNDEFINED && opts->debug == 0){
     if(argc != 2){
       fprintf(stderr, "ERROR: invalid arguments!\n");
       return NULL;
@@ -58,36 +61,30 @@ options *getOptions(int argc, char *argv[]){
       return NULL;
   }
 
-  //mode defined, file is no
-  if(opts->mode != UNDEFINED && opts->file == NULL){
-    if(argc != 4){
-      fprintf(stderr, "ERROR: invalid arguments!\n");
+  //determine file if its not already determined
+  if(opts->file == NULL){
+    arg = countPosition(opts);
+    if(arg != argc -1){
+      fprintf(stderr, "ERROR: Invalid arguments!\n");
       return NULL;
     }
 
-    arg = findM(argc, argv);
-
-    //set arg to filename argument
-    if(arg == 1) arg = 3;
-    else if(arg == 2) arg = 1;
-
+    if(opts->mode == UNDEFINED)
+      opts->mode = getMode(argv[arg]);
     if(openFile(opts, argv[arg]) != 0)
       return NULL;
-  
   }
-  
+    
   return opts;
 }
 
-//find parameter "-m" from argv
-static int findM(int argc, char *argv[]){
-  int i = 0;
-  for(i = 0; i < argc; i++)
-    if(!strncmp(argv[i], "-m", strlen(argv[i])))
-       return i;
+static int countPosition(options *opts){
+  int ret = 1;
+  
+  if(opts->mode  != UNDEFINED) ret +=2;
+  if(opts->debug != 0)         ret +=1;
 
-  //this can not happen!
-  return -1;
+  return ret;
 }
 
 static int openFile(options *opts, char *filename){
@@ -130,8 +127,9 @@ static int getMode(char *filename){
 static options *newOptions(void){
   options *opts = (options*) malloc(sizeof(options));
 
-  opts->mode = UNDEFINED;
-  opts->file = NULL;
+  opts->mode  = UNDEFINED;
+  opts->file  = NULL;
+  opts->debug = OFF;
 
   return opts;
 }

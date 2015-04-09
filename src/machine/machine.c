@@ -34,11 +34,17 @@ machine *newMachine(long memsize){
   return m;
 }
 
-void startMachine(machine *m){
+void startMachine(machine *m, int debug){
   m->mmu->base = 0;
   m->mmu->limit = m->memsize;
   while(1){
     getInstruction(m);
+
+    if(debug){
+      printState(m);
+      getchar();
+    }
+
     increasePC(m);
     execInstruction(m);
     //handleInterrupts(m);
@@ -83,8 +89,6 @@ static void execInstruction(machine *m){
     fprintf(stderr, "ERROR: incorrect operation code: %X\n", opc);
     exit(-1);
   }
-  //  printState(m);
-  //getchar();
 
   instruction(m, rj, mode, ri, addr);
   

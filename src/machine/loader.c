@@ -5,8 +5,11 @@
 
 //project header
 #include <ttk-15.h>
+#include <instructions.h>
 
 #define BUFSIZE 32
+
+static int needFix(MYTYPE buf);
 
 int loadFile(MYTYPE *mem, FILE *file){
   int   i  = 0;
@@ -24,6 +27,8 @@ int loadFile91(MYTYPE *mem, FILE *file){
   uint32_t  dstart = -1;
   uint32_t  dend   = -1;
   int       i      =  0;
+  MYTYPE    buf    =  0;
+  
   
   char      buffer[BUFSIZE];
 
@@ -33,7 +38,11 @@ int loadFile91(MYTYPE *mem, FILE *file){
 
   for(i = cstart; i <= cend; i++){
     fgets(buffer, BUFSIZE, file);
-    sscanf(buffer, "%d", mem +i);
+    sscanf(buffer, "%d", &buf);
+    if(needFix(buf))
+      buf &= 0xFFE7FFFF;
+
+    *(mem +i) = buf;
   }
  
   do{
@@ -49,4 +58,16 @@ int loadFile91(MYTYPE *mem, FILE *file){
 
   return dend;
   
+}
+
+//use mtl here!
+static int needFix(MYTYPE buf){
+  int opcode = buf >> 24;
+
+  opcode &= 0x000000FF;
+
+  if(opcode >= JUMP && opcode <= EXIT)
+    return 1;
+
+  return 0;
 }

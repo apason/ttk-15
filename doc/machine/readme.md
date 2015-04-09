@@ -1,15 +1,45 @@
 #ttk-15#
 
+ttk-15 machine is for running ttk-15 or ttk-91(titokones format) binaries
+
 ##usage##
 
-To run .b15 binary file just start the machin from CLI and give it name of
-executable file. e.g:
+To run .b15 or .b91 binary file start the machin from CLI with following syntax:
 
-[apa@jalla]$ ./ttk-15 my_executable.b15
+./ttk-15 [options] [file]
 
-When running old .b91 file one must specify it with param -91. e.g:
+NOTE! File and options can be in any order!
+NOTE! All options are optional so ./ttk-15 tito.b91 works just fine
 
-[apa@jalla]$ ./ttk-15 -91 my_executable.b91
+###options###
+
+-m mode , where mode is either "b91" or "b15" specifies mode of binary.
+if there is no mode option, ttk-15 will define mode from file suffix.
+if file suffix is not .b91 or .b15 and -m is not used, then machine
+will use b15 as default. NOTE! mode option has higher priority than
+filename suffix! (see examples)
+
+-f file , where file is name of executable file. If -f flag is not used,
+ttk-15 will use first non-option argument as binary file
+
+-g causes ttk-15 to run in interactive (debugging) mode. It prints whole CPU
+state and first dozens memory slots between every instruction and holds
+execution until user prompts enter. (make sure your terminal is big enough
+to see output correctly)
+
+###examples###
+
+./ttk-15 -m b91 foobar
+execute file "foobar" (treated as b91 file)
+
+./ttk-15 -g foobar.b91
+execute file "foobar" (treated as b91 file because of filename suffix)
+in debugging mode.
+
+./ttk-15 -f program.b15 -m b91
+execute program.b15 as b91 file regardless of file suffix!
+NOTE! this can be confusing. the program.b15 should be really b91 program!
+
 
 
 At this point the machine has no graphical user interface. It prints its

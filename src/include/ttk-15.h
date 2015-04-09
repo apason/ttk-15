@@ -23,6 +23,8 @@
 #define UNDEFINED -1
 #define TTK15      15
 #define TTK91      91
+#define ON         1
+#define OFF        0
 
 typedef struct ALU_UNIT{
   MYTYPE in1;
@@ -75,7 +77,7 @@ extern options *getOptions(int argc, char *argv[]);
 
 //machine.c
 extern machine *newMachine(long memsize);
-extern void startMachine(machine *m);
+extern void startMachine(machine *m, int debug);
 
 //mmu.c
 extern void mmuGetData(mm_unit *mmu, MYTYPE *mem, MYTYPE x);
@@ -86,7 +88,7 @@ extern MYTYPE calculateSecondOperand(machine *m, uint8_t mode, uint8_t ri, int16
 
 //helpers.c
 extern void initializeGlobals(void);
-//extern void printState(machine *m);
+extern void printState(machine *m);
 extern void freeMachine(machine *m);
 
 //bitwise.c
