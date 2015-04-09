@@ -5,23 +5,27 @@
 #include <ttk-15.h>
 
 int main(int argc,char *argv[]){
-  
-  machine *m = newMachine(65536);
+  options *opts = getOptions(argc, argv);
+  machine *m    = newMachine(65536);
 
   initializeGlobals();
   m->cu->pc = 0;
 
-  if(argc >= 3){
-    if(!strncmp(argv[1], "-91", 3))
-       m->regs[6] = (MYTYPE)loadFile91(m->mem, argv[2]);
+  if(opts == NULL){
+    freeMachine(m);
+    return -1;
   }
-  else
-    m->regs[6] = (MYTYPE)loadFile(m->mem, argv[1]);
+
+  if(opts->mode == TTK91)
+    m->regs[6] = (MYTYPE) loadFile91(m->mem, opts->file);
+  else if(opts->mode == TTK15)
+    m->regs[6] = (MYTYPE) loadFile(m->mem, opts->file);
        
   m->regs[7] = m->regs[6];
   
   startMachine(m);
   freeMachine(m);
+  //freeopts
 
   printf("\n");
 

@@ -1,6 +1,8 @@
 #ifndef ttk15
 #define ttk15
 
+#include <stdio.h>
+
 #include <stdint.h>
 
 #define MYTYPE int32_t
@@ -16,6 +18,11 @@
 #define WRITE  0xD
 #define TIME   0xE
 #define DATE   0xF
+
+//used in options
+#define UNDEFINED -1
+#define TTK15      15
+#define TTK91      91
 
 typedef struct ALU_UNIT{
   MYTYPE in1;
@@ -33,23 +40,27 @@ typedef struct MM_UNIT{
 } mm_unit;
 
 typedef struct CONTROL_UNIT{
-  MYTYPE tr1;
-  MYTYPE tr2;
+  MYTYPE tr;
   MYTYPE ir;
   MYTYPE pc;
   MYTYPE sr;
 
 } control_unit;
 
-typedef struct MACHINE {
+typedef struct MACHINE{
   MYTYPE        *regs;
   alu_unit      *alu;
   mm_unit       *mmu;
   control_unit  *cu;
   MYTYPE        *mem;
-  long          memsize;
+  long           memsize;
 
 } machine;
+
+typedef struct OPTIONS{
+  FILE *file;
+  int   mode;
+} options;
 
 //prototype for machine instruction
 typedef void(*instructionptr)(machine*, uint8_t, uint8_t, uint8_t, uint16_t);
@@ -58,6 +69,8 @@ typedef void(*instructionptr)(machine*, uint8_t, uint8_t, uint8_t, uint16_t);
 instructionptr instructions[255];
 short mtl;
 
+//options.c
+extern options *getOptions(int argc, char *argv[]);
 
 //machine.c
 extern machine *newMachine(long memsize);
@@ -69,7 +82,6 @@ extern void mmuSetData(mm_unit *mmu, MYTYPE *mem, MYTYPE addr, MYTYPE data);
 
 //cu.c
 extern MYTYPE calculateSecondOperand(machine *m, uint8_t mode, uint8_t ri, int16_t addr);
-extern MYTYPE calculatePointer(machine *m, uint8_t mode, uint8_t ri, int16_t addr);
 
 //helpers.c
 extern void initializeGlobals(void);
@@ -84,8 +96,8 @@ extern uint8_t extractMode(MYTYPE x);
 extern uint8_t extractRi(MYTYPE x);
 
 //loader.c
-extern int loadFile(MYTYPE *mem, char *file);
-extern int loadFile91(MYTYPE *mem, char *file);
+extern int loadFile(MYTYPE *mem, FILE *file);
+extern int loadFile91(MYTYPE *mem, FILE *file);
 
 //instructions.c
 extern FUNCTION(nop);

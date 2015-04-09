@@ -30,6 +30,9 @@ int main(int argc, char **argv){
   printf("creating modules..\n");
   createModules(argc -1, argv +1, modules);
 
+  //if there is only 1 object module to link, skip main finding
+  if(argc -1 < 2) goto link;
+    
   //determine which module contains main
   printf("finding main module..\t");
   if((mainnbr = findMain(modules, argc -1)) == NO_MAIN){
@@ -52,6 +55,8 @@ int main(int argc, char **argv){
     modules[0] = modules[mainnbr];
     modules[mainnbr] = tmp;
   }
+
+ link:
 
   //main module
   modules[0]->address_constant = 0;

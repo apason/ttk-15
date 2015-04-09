@@ -2,13 +2,13 @@
 ttk-15 on ttk-91 klooni pienillä muutoksilla
 
 ##v0.2 valmiina##
-
+ * popr ja pushr menee rikki jos sp != r6                       1 tod 20m
+ * yksimoduuliset ei tarvitse main labelia                      1 tod 10m
+ * tr2 pois ja cu.c kuntoon static!                             1 tod 30m
+ 
 ## v0.2 työn alla ##
- * popr ja pushr menee rikki jos sp != r6                       1
- * yksimoduuliset ei tarvitse main labelia                      1
  * kääntäjän virheilmoitukset riveittäin (taulukon avulla)      2, 3 : 2.5
  * pienet funktiot makroiksi                                    3, 2 : 2.5
- * tr2 pois ja cu.c kuntoon static!                             1
  * parametrit paremmiksi linkkerille                            5, 3 : 4
  * parametrit paremmiksi masiinalle                             5, 3 : 4
  * parametrit paremmiksi kääntäjälle                            5, 3 : 4
@@ -28,5 +28,6 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * moduuleille uusi rakenne. import ja export taulut!
  * GUI 
  * pienin osoitettava muistiyksikkö keskusmuistissa MYTYPE:stä yhteen bittiin
+ * konekäskyt 16 ja 8 bitin käsittelyyn
  * n ydintä
 

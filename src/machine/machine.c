@@ -70,11 +70,11 @@ static void execInstruction(machine *m){
   uint8_t    ri   = extractRi(ins);
   uint8_t    mode = extractMode(ins);
 
-  m->cu->tr1 = calculatePointer(m, mode, ri, addr);       //pointer to operand
-  m->cu->tr2 = calculateSecondOperand(m, mode, ri, addr); //value of operand
- 
+  m->cu->tr = calculateSecondOperand(m, mode, ri, addr); //value of operand
+
+  //set ALU operands
   m->alu->in1 = m->regs[rj];
-  m->alu->in2 = m->cu->tr2;
+  m->alu->in2 = m->cu->tr;
 
   instruction = instructions[opc];
   
