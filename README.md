@@ -8,8 +8,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * parametrit paremmiksi masiinalle                             5, 3 : 4
  
 ## v0.2 työn alla ##
- * kääntäjän virheilmoitukset riveittäin (taulukon avulla)      2, 3 : 2.5
-[ei toimi vielä kokonaan, tarvii errorkoodit erilaisille virheille writeInstructionista]
+ * kääntäjän virheilmoitukset kaikki errorcodes.h:n ja printtaamaan rivi
  * pienet funktiot makroiksi                                    3, 2 : 2.5
  * parametrit paremmiksi linkkerille                            5, 3 : 4
  * parametrit paremmiksi kääntäjälle                            5, 3 : 4
