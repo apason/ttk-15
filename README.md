@@ -18,6 +18,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * dokumentointi!!!                                             4
 
  ## backlog ##
+ * jumpit ignoraa moden????
  * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)       5,6 : 5.5
  * testit floateille                                                        4
  * "wrapper" skripti tms joka kapseloi linkkerin ja kääntäjän (ehkä masiinan?)

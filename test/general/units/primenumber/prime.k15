@@ -3,7 +3,7 @@ main nop
 load r5,=100
 load r1,=1
 	loop nop
-	call sp,nextprime
+	call sp,=nextprime
 	comp r1,r5
 	jles loop
 out r1,=crt
