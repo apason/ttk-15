@@ -148,26 +148,27 @@ int writeCodeFile(code_file* file) {
 			// print error if found
 			if (error < 0) {
 				print_error(error, file->code_text[cInstructions]);
-				fprintf(stderr,"\t%s\n",file->array[i]);
+				fprintf(stderr,"\t\"%s\"\n",file->array[i]);
 			}
 			++cInstructions;
 			continue;
 		}
 		val[0] = '\0';
-		if (sscanf(file->array[i], "%s %s %s", label, word, val) < 2)
+		if (sscanf(file->array[i], "%s %s %s", label, word, val) < 2) {
 			fprintf(stderr,"Error reading line: %d\n",file->code_text[cInstructions]);//error
+			fprintf(stderr,"\t\"%s\"\n",file->array[i]);
+		}
 		if (!isInstruction(label) && isInstruction(word)) {
 			error = writeInstruction(word,val,file->symbolList, fh, file->ttk_15);
 			// print error if found
 			if (error < 0) {
 				print_error(error, file->code_text[cInstructions]);
-				fprintf(stderr,"\t%s\n",file->array[i]);
+				fprintf(stderr,"\t\"%s\"\n",file->array[i]);
 			}
 			++cInstructions;
 		}
 
 	}
-	printf("Starting to write the symbol list\n");
 	label_list* symbols = file->symbolList;
 	while (symbols!=NULL) {
 		if (symbols->size == 1) {
@@ -184,7 +185,7 @@ int writeCodeFile(code_file* file) {
 	while (symbols != NULL) {
 		if (symbols->size >= 0) {
 			if (strlen(symbols->label)>32)
-				fprintf(stderr, "Warning symbol name more than 32 chars, will be cut: %s\n",symbols->label);
+				fprintf(stderr, "Warning: symbol name more than 32 chars, will be cut: %s\n",symbols->label);
 			fwrite(symbols->label,sizeof(char),32,fh);
 			fwrite(&(symbols->address),sizeof(symbols->address),1,fh);
 		}
