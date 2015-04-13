@@ -5,7 +5,6 @@
 #include <errno.h>
 
 //project headers
-#include <compiler.h>
 #include "linker.h"
 
 //used as return value of findMain
