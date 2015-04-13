@@ -9,14 +9,14 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * parametrit paremmiksi linkkerille                            5, 3 : 4 
  * virheilmoituksien rivinumerot
  * kääntäjän virheilmoitukset kaikki errorcodes.h:n
- 
-## v0.2 työn alla ##
- * pienet funktiot makroiksi                                    3, 2 : 2.5
  * parametrit paremmiksi kääntäjälle                            5, 3 : 4
+ * pienet funktiot makroiksi (mmu ja machine loop)              3, 2 : 2.5 
+## v0.2 työn alla ##
  * testit uudelle parametrisyntaksille                                      2,4 : 3
  * import tai include kääntäjä direktiivin toteutus kirjastofunktioille     2,5 : 3.5
  * headereille uudet paikat (jos a.h tarvitaan vain esim. linkkerissä niin siitterään src/linker)  2
  * dokumentointi!!!                                             4
+ * pitää kääntyä windowsilla (ainakin cygwinillä)
 
 ## backlog ##
  * kaikki mytypeks mikä kannattaa

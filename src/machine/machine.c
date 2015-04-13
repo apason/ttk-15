@@ -8,8 +8,15 @@
 #include "machine.h"
 #include "mmu.h"
 
-static void getInstruction(machine *m);
-static void increasePC(machine *m);
+//macros for machine loop
+#define getInstruction(M)                \
+  mmuGetData(M->mmu, M->mem, M->cu->pc); \
+  M->cu->ir = M->mmu->mbr;               \
+
+#define increasePC(M) \
+  M->cu->pc++
+
+
 static void execInstruction(machine *m);
 //static void handleInterrupts(machine *m);
 
@@ -36,6 +43,7 @@ machine *newMachine(long memsize){
   return m;
 }
 
+
 void startMachine(machine *m, int debug){
   m->mmu->base = 0;
   m->mmu->limit = m->memsize;
@@ -51,15 +59,6 @@ void startMachine(machine *m, int debug){
     execInstruction(m);
     //handleInterrupts(m);
   }
-}
-
-static void getInstruction(machine *m){
-  mmuGetData(m->mmu,m->mem,m->cu->pc);
-  m->cu->ir=m->mmu->mbr;
-}
-
-static void increasePC(machine *m){
-  m->cu->pc++;
 }
 
 /*
@@ -92,7 +91,6 @@ static void execInstruction(machine *m){
     exit(-1);
   }
 
-  instruction(m, rj, mode, ri, addr);
-  
+  instruction(m, rj, mode, ri, addr);  
 }
 

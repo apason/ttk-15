@@ -6,15 +6,14 @@
 
 int main (int argc, char* argv[]) {
 
-
   options *opts = getOptions(argc,argv);
-  opts = opts;
   int debug = 0;
   //options now includes information of mode int opts->mode
   //outputfile in opts->output and number of files to compile
   //opts->count. source files are in end of argv as 
   //note. output file is already open!
   //SO. source files are argv[argc -opts->count] to argv[argc -1]
+
   if (argc < 2) return 0;
   int n;
   FILE* output = opts->outputs[0];

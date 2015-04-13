@@ -18,34 +18,42 @@ options *getOptions(int argc, char *argv[]){
 
   //suppose all arguments are source files
   opts->count = argc -1;
-   
+
   while((optch = getopt(argc, argv, optstring)) != -1){
+
+    //special case! when -o is defined there is only one source file
     if(optch == 'o'){
-      opts->count -= 2;
+      opts->count = 1;
+      opts->outputs = (FILE **) malloc(sizeof(FILE *));
       openFile(opts->outputs, optarg);
     }
+
+    //mode speficied. valid modes: k91, k15. otherwise error caused.
     if(optch == 'm'){
       opts->count -= 2;
-      if(!strncmp("k91", optarg, strlen(optarg)))
-	opts->mode = TTK91;
-      else if(!strncmp("k15", optarg, strlen(optarg)))
-	opts->mode = TTK15;
+      
+      if(!strncmp("k91", optarg, strlen(optarg)))      opts->mode = TTK91;
+      else if(!strncmp("k15", optarg, strlen(optarg))) opts->mode = TTK15;
       else{
 	fprintf(stderr, "ERROR: unknown mode: %s\n", optarg);
 	exit(-1);
       }
     }
+
+    //check if there is -g flag for debugging.
     if(optch == 'g'){
       opts->debug = ON;
       opts->count -= 1;
     }
   }
 
-  opts->outputs = (FILE **) malloc(opts->count*sizeof(FILE *));
+  //flag -o not used. there should be numerous of source files
+  if(opts->outputs == NULL){
+    opts->outputs = (FILE **) malloc(opts->count*sizeof(FILE *));
 
-  for(i = 0; i < opts->count; i++)
-    openFile(opts->outputs, argv[optind + i]);
-  
+    for(i = 0; i < opts->count; i++)
+      openFile(opts->outputs, argv[optind + i]);
+  }
 
   return opts;
 }
