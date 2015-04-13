@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
-//project header
+//project headers
 #include <ttk-15.h>
+#include "machine.h"
 
 int main(int argc,char *argv[]){
   options *opts = getOptions(argc, argv);

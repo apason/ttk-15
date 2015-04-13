@@ -2,8 +2,9 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <compiler.h>
-#include <linker.h>
+
 
 int countSize(code_file* file){
   file->symbolList = (label_list*)malloc(sizeof(label_list));

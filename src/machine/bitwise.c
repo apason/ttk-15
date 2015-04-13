@@ -1,5 +1,6 @@
-//project header
+//project headers
 #include <ttk-15.h>
+#include "machine.h"
 
 //lengths of bit fields
 #define OPCODE_L  8

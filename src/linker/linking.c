@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <linker.h>
+#include "linker.h"
 #include <ttk-15.h>
 
 #define LABEL                   1
@@ -13,7 +13,7 @@ static char *getLabelName(llist *s, uint32_t instruction);
 static int16_t findLabelValue(module **modules, int n, char *label);
 static int findLabelAddressConstant(module **modules, int n, char *label);
 
-void link(FILE *fp, module **modules, int mi, int n ){
+void linkModule(FILE *fp, module **modules, int mi, int n ){
   int i                            =  0;
   uint32_t codesize                = -1;
   uint32_t datasize                = -1;

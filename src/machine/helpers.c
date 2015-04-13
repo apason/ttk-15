@@ -4,6 +4,7 @@
 //project headers
 #include <ttk-15.h>
 #include <instructions.h>
+#include "machine.h"
 
 //initializes all global variables excluded machine itself
 void initializeGlobals(void){

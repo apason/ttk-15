@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+//project headers
 #include <ttk-15.h>
+#include "machine.h"
 
 static options *newOptions(void);
 static int      openFile(options *opts, char *filename);

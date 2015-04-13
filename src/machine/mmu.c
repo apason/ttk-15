@@ -4,6 +4,7 @@
 //project header
 #include <ttk-15.h>
 #include <masks.h>
+#include "machine.h"
 
 static void mmuCheckAddress(mm_unit *mmu, MYTYPE x);
 

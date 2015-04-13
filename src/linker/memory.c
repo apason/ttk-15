@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include <linker.h>
+#include "linker.h"
 
 static void freeSymbolList(llist *l);
 static void freeModule(module *mod);

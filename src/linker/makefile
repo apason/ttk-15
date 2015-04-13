@@ -1,6 +1,6 @@
 CC= 	  gcc
 STD=	  _GNU_SOURCE_
-OBJS=	  main.o linking.o modulecreation.o memory.o
+OBJS=	  main.o linking.o modulecreation.o memory.o options.o
 INCLUDE=  -I "../include/"
 CFLAGS=   -Wall -D$(STD) $(INCLUDE) -c
 TARGET=   ../../target/

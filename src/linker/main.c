@@ -6,7 +6,7 @@
 
 //project headers
 #include <compiler.h>
-#include <linker.h>
+#include "linker.h"
 
 //used as return value of findMain
 #define NO_MAIN       -2
@@ -18,32 +18,38 @@ static int containsMain(module *mod);
 //static void printSymbols(llist *l);
 
 int main(int argc, char **argv){
-  int    mainnbr    = NO_MAIN;     
-  int    i          = 0;
-  FILE   *output    = NULL;        
+  int      mainnbr  = NO_MAIN;     
+  int      i        = 0;
   module **modules  = NULL;
-  module *tmp       = NULL;
+  module  *tmp      = NULL;
+  options *opts     = NULL;
 
-  modules  = (module **) malloc(sizeof(module *) * (argc -1));
+  opts    = getOptions(argc, argv);
+  modules = (module **) malloc(sizeof(module *) * (opts->count));
+
+  if(opts->count < 1){
+    printf("no modules specified!\n");
+    exit(-1);
+  }
 
   //create module structs for each module
   printf("creating modules..\n");
-  createModules(argc -1, argv +1, modules);
+  createModules(opts->count, argv +1, modules);
 
   //if there is only 1 object module to link, skip main finding
-  if(argc -1 < 2) goto link;
+  if(opts->count <= 1) goto link;
     
   //determine which module contains main
   printf("finding main module..\t");
-  if((mainnbr = findMain(modules, argc -1)) == NO_MAIN){
+  if((mainnbr = findMain(modules, opts->count)) == NO_MAIN){
     fprintf(stderr, "error: no main module found!\n");
-    freeModules(modules, argc -1);
+    freeModules(modules, opts->count);
     exit(-1);
   }
 
   if(mainnbr == SEVERAL_MAINS){
     fprintf(stderr, "error: several main modules!\n");
-    freeModules(modules, argc -1);
+    freeModules(modules, opts->count);
     exit(-1);
   }
   
@@ -61,31 +67,23 @@ int main(int argc, char **argv){
   //main module
   modules[0]->address_constant = 0;
 
-  for(i = 1; i < argc -1; i++)
+  for(i = 1; i < opts->count; i++)
     modules[i]->address_constant = modules[i -1]->linked_size \
                                    +modules[i -1]->address_constant;
 
-  output = fopen("a.out.b15", "wb");
-
-  if(output == NULL){
-    freeModules(modules, argc -1);
-    perror("fopen");
-    exit(-1);
-  }
-
-  //  for(i = 0; i < argc -1; i++)
+  //  for(i = 0; i < opts->count; i++)
   //  printModule(modules[i]);
   
   printf("linking modules..\n");
   
   //link main containing module first
-  link(output, modules, 0, argc -1);
+  linkModule(opts->output, modules, 0, opts->count);
 
   //link others
-  for(i = 1; i < argc -1; i++) link(output, modules, i, argc -1);
+  for(i = 1; i < opts->count; i++) linkModule(opts->output, modules, i, opts->count);
 
-  freeModules(modules, argc -1);
-  fclose(output);
+  freeModules(modules, opts->count);
+  fclose(opts->output);
 
   return 0;
 }

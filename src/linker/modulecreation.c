@@ -2,9 +2,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 //project header
-#include <linker.h>
+#include "linker.h"
 
 #define SYMBOLSIZE 34  //size of one symbol sub block in .o15 format
 
@@ -14,13 +15,15 @@ static module *readModule(FILE *fp, char *filename);
 
 //create all modules determined by argv
 void createModules(int n, char **argv, module **modules){
-  FILE *fp = NULL;;
+  FILE *fp = NULL;
   int   i  = 0;
   
   for(i = 0; i < n; i++){
+
     
-    if((fp = fopen(argv[i], "rb")) == NULL){
-      printf("ERROR: cannot open file: %s\n", argv[i]);
+    fp = fopen(argv[i], "rb");
+    if(fp == NULL){
+      perror("opening module");
       exit(-1);
     }
 

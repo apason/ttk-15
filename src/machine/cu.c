@@ -1,5 +1,6 @@
-//project header
+//project headers
 #include <ttk-15.h>
+#include "machine.h"
 
 /*
  * ri=0 means no index register used 

@@ -6,11 +6,11 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * yksimoduuliset ei tarvitse main labelia                      1 
  * tr2 pois ja cu.c kuntoon static!                             1 
  * parametrit paremmiksi masiinalle                             5, 3 : 4
+ * parametrit paremmiksi linkkerille                            5, 3 : 4 
  
 ## v0.2 työn alla ##
  * kääntäjän virheilmoitukset kaikki errorcodes.h:n ja printtaamaan rivi
  * pienet funktiot makroiksi                                    3, 2 : 2.5
- * parametrit paremmiksi linkkerille                            5, 3 : 4
  * parametrit paremmiksi kääntäjälle                            5, 3 : 4
  * testit uudelle parametrisyntaksille                                      2,4 : 3
  * import tai include kääntäjä direktiivin toteutus kirjastofunktioille     2,5 : 3.5

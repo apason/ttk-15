@@ -6,6 +6,7 @@
 //project header
 #include <ttk-15.h>
 #include <instructions.h>
+#include "machine.h"
 
 #define BUFSIZE 32
 
