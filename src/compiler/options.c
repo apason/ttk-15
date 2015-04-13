@@ -35,8 +35,10 @@ options *getOptions(int argc, char *argv[]){
 	exit(-1);
       }
     }
-    if(optch == 'g')
+    if(optch == 'g'){
       opts->debug = ON;
+      opts->count -= 1;
+    }
   }
 
   opts->outputs = (FILE **) malloc(opts->count*sizeof(FILE *));
