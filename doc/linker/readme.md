@@ -7,14 +7,22 @@ See compilers doc folder for .o15 file format!
 
 Just run linker with object modules as parameters:
 
-[apa@jalla]$ ./linker mod1.o15 mod2.o15 mod3.o15
+./linker mod1.o15 mod2.o15 mod3.o15
 
 Output file is named a.out.b15
 
+Optionally one can use -o flag to determine output file:
+
+./linker mod1.o15 mod2.o15 -o myprog
+
+modules and output flag can be in any order
+
 ##notes##
 
- * One and only one of modules MUST contain label "main". That module will be
-linked first and program will start from code block of that module!
+ * One and only one of modules must contain label "main". That module will be
+linked first and program will start from code block of that module! (if there
+is only 1 module to link, main label is not necessary)
+
 
  * Since ttk-15 object modules does not have internal labels (all labels are
  visible to all linked modules!) it is important to make sure that there is no
