@@ -70,9 +70,12 @@ static void openFile(FILE **outputs, char *filename){
   strncpy(fn, filename, MAX);
   dot = strrchr(fn, '.');
 
-  if(dot == NULL) strncat(fn, ".o15", MAX -strlen(fn));
-
-  strncat(dot, ".o15", MAX -(strlen(fn) +5)); //suffix
+  if(dot == NULL)
+    strncat(fn, ".o15", MAX -strlen(fn));
+  else{
+    *dot = '\0';
+    strncat(fn, ".o15", MAX -strlen(fn)); //suffix
+  }
 
   fp = fopen(fn, "wb");
 	  
