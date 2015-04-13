@@ -18,12 +18,12 @@ typedef struct label_list {
 typedef struct {
 	char* name;
 	int lines;
-	int ttk_15;
+	int mode;
 	char** array;
 	struct label_list* symbolList;
 	MYTYPE moduleSize;
 	MYTYPE codeSize;
-	char out_name[MAX];
+	FILE* fh_out;
 	int* code_text;
 } code_file;
 
@@ -35,7 +35,7 @@ typedef struct OPTIONS {
 
 } options;
 // reads the code file into the array in the struct and puts lenght in lines member
-int readCodeFile(code_file*);
+int readCodeFile(code_file*, int);
 // free space for code_file
 void freeCodeFile(code_file*);
 // counts the size of the code and creates the symbol table
