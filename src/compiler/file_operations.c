@@ -9,7 +9,7 @@
 
 static int countLines(FILE*);
 static int nextLine(FILE*);
-static char** readCode(FILE*, int, int**);
+static char** readCode(FILE*, int, int**, int);
 static int writeInstruction(char* instr,char* val,label_list* symbols, FILE*,int);
 static void freeSymbols(code_file*);
 static void freeCodeArray(code_file*);
