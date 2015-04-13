@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdio.h>
-#include <compiler.h>
-#include "utility.h"
+#include "compiler.h"
 
 int getHardcodedSymbolValue(char* arg) {
 	if (!strncmp(arg, "crt", 4))

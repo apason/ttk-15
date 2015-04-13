@@ -3,10 +3,9 @@
 #include <ctype.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <compiler.h>
 #include <ttk-15.h>
-#include "utility.h"
 #include "errorcodes.h"
+#include "compiler.h"
 
 static int countLines(FILE*);
 static int nextLine(FILE*);

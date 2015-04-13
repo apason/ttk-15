@@ -1,9 +1,22 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <compiler.h>
+
+#include "compiler.h"
 
 int main (int argc, char* argv[]) {
+
+
+  options *opts = getOptions(argc,argv);
+  opts = opts;
+  //options now includes information of mode int opts->mode
+  //outputfile in opts->output and number of files to compile
+  //opts->count. source files are in end of argv as 
+  //note. output file is already open!
+  //SO. source files are argv[argc -opts->count] to argv[argc -1]
+  
+
+  
 	if (argc < 2) return -1;
 	if (strlen(argv[1]) >= MAX) {
 		fprintf(stderr, "Too long filename: %s\n",argv[1]);

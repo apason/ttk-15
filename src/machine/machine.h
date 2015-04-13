@@ -8,9 +8,6 @@
 #define FUNCTION(function) void function(machine *m, uint8_t rj, uint8_t mod, uint8_t ri, uint16_t mem)
 
 //used in options
-#define UNDEFINED -1
-#define TTK15      15
-#define TTK91      91
 #define ON         1
 #define OFF        0
 

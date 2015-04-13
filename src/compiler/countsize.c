@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <compiler.h>
+#include "compiler.h"
 
 
 int countSize(code_file* file){

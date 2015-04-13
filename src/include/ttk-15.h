@@ -19,6 +19,10 @@
 
 #define LABELLENGTH  32 //only first 32 chars are counted!
 
+#define UNDEFINED -1
+#define TTK15     15
+#define TTK91     91
+
 typedef struct ALU_UNIT{
   MYTYPE in1;
   MYTYPE in2;
