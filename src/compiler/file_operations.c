@@ -17,7 +17,7 @@ static void print_error(int error, int line);
 
 
 // this is a function to be used outside this file
-int readCodeFile(code_file* file) {
+int readCodeFile(code_file* file, int debug) {
 	FILE* fh = fopen(file->name,"r");
 	if (fh == NULL) {
 		fprintf(stderr, "Error opening file: %s\n",file->name);
@@ -31,18 +31,19 @@ int readCodeFile(code_file* file) {
 		fprintf(stderr, "Error linecount <= 0, is it an empty file?\n");
 		return -1;
 	}
-	//printf("lines = %d\n",file->lines);
+	if (debug)
+		printf("lines = %d\n",file->lines);
 	
 	rewind(fh);
 
 	// read code lines to an array
-	file->array = readCode(fh, file->lines,&(file->code_text));
+	file->array = readCode(fh, file->lines,&(file->code_text), debug);
 
 	fclose(fh);
 	return 0;
 }
 
-static char** readCode(FILE* fh, int lines, int**ppcode_text) {
+static char** readCode(FILE* fh, int lines, int**ppcode_text, int debug) {
 	int i;
 	int text_lines = 0;
 	int* code_text = (int*) malloc((lines + 1)*sizeof(int));
@@ -86,7 +87,8 @@ static char** readCode(FILE* fh, int lines, int**ppcode_text) {
 		}
 		input[i][count] = 0;
 		code_text[i] = ++text_lines;
-		//printf("Line %d: %s\n",i+1,input[i]);
+		if (debug)
+			printf("Line %d: %s\n",i+1,input[i]);
 	
 	}
 	return input;
@@ -125,12 +127,8 @@ static int nextLine(FILE* fh) {
 // this is also a function to be used outside of this file
 int writeCodeFile(code_file* file) {
 	int error = 0;
-	printf("Opening output file: %s\n",file->out_name);
-	FILE* fh = fopen(file->out_name,"wb");
-	if (fh == NULL) {
-		fprintf(stderr, "Error opening file!!!!!\n");
-		return -1;
-	}
+	FILE* fh = file->fh_out;
+
 	// write header to the object file
 	MYTYPE dataSegmentAddress = file->codeSize*5 + 8;
 	MYTYPE symbolTableAddress =  dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
@@ -143,7 +141,7 @@ int writeCodeFile(code_file* file) {
 		val[0] = '\0';
 		sscanf(file->array[i], "%s %s", word, val);
 		if (isInstruction(word)) {
-			error = writeInstruction(word,val,file->symbolList, fh, file->ttk_15);
+			error = writeInstruction(word,val,file->symbolList, fh, file->mode);
 			// print error if found
 			if (error < 0) {
 				print_error(error, file->code_text[cInstructions]);
@@ -158,7 +156,7 @@ int writeCodeFile(code_file* file) {
 			fprintf(stderr,"\t\"%s\"\n",file->array[i]);
 		}
 		if (!isInstruction(label) && isInstruction(word)) {
-			error = writeInstruction(word,val,file->symbolList, fh, file->ttk_15);
+			error = writeInstruction(word,val,file->symbolList, fh, file->mode);
 			// print error if found
 			if (error < 0) {
 				print_error(error, file->code_text[cInstructions]);
@@ -195,10 +193,11 @@ int writeCodeFile(code_file* file) {
 }
 
 
-static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, int ttk_15) {
+static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, int ttk_mode) {
 
 	uint8_t firstByte = 0;
 	uint32_t instruction = 0;
+	int ttk_15 = (ttk_mode == TTK15);
 
 	int opCode = 0;
 	int reg = 0;

@@ -8,9 +8,9 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * parametrit paremmiksi masiinalle                             5, 3 : 4
  * parametrit paremmiksi linkkerille                            5, 3 : 4 
  * virheilmoituksien rivinumerot
+ * kääntäjän virheilmoitukset kaikki errorcodes.h:n
  
 ## v0.2 työn alla ##
- * kääntäjän virheilmoitukset kaikki errorcodes.h:n
  * pienet funktiot makroiksi                                    3, 2 : 2.5
  * parametrit paremmiksi kääntäjälle                            5, 3 : 4
  * testit uudelle parametrisyntaksille                                      2,4 : 3
