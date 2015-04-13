@@ -7,9 +7,10 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * tr2 pois ja cu.c kuntoon static!                             1 
  * parametrit paremmiksi masiinalle                             5, 3 : 4
  * parametrit paremmiksi linkkerille                            5, 3 : 4 
+ * virheilmoituksien rivinumerot
  
 ## v0.2 työn alla ##
- * kääntäjän virheilmoitukset kaikki errorcodes.h:n ja printtaamaan rivi
+ * kääntäjän virheilmoitukset kaikki errorcodes.h:n
  * pienet funktiot makroiksi                                    3, 2 : 2.5
  * parametrit paremmiksi kääntäjälle                            5, 3 : 4
  * testit uudelle parametrisyntaksille                                      2,4 : 3
@@ -17,7 +18,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * headereille uudet paikat (jos a.h tarvitaan vain esim. linkkerissä niin siitterään src/linker)  2
  * dokumentointi!!!                                             4
 
- ## backlog ##
+## backlog ##
  * kaikki mytypeks mikä kannattaa
  * aliakset jumpille ja callille ja exitille
  * jumpit ignoraa moden????

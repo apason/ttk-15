@@ -45,7 +45,7 @@ int readCodeFile(code_file* file) {
 static char** readCode(FILE* fh, int lines, int**ppcode_text) {
 	int i;
 	int text_lines = 0;
-	int* code_text = (int*) malloc(lines*sizeof(int));
+	int* code_text = (int*) malloc((lines + 1)*sizeof(int));
 	*ppcode_text = code_text;
 	// reserve space and read the code lines from the file
 	char** input = (char**) malloc(lines*sizeof(char*));

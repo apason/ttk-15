@@ -36,15 +36,18 @@ int countSize(code_file* file){
 	 label_node->size = 1;
 	// store the value to be inserted later
 	sscanf(val, "%u", &(label_node->value));
+	file->code_text[i+1]++;
 	}
       else if(!strncmp(word, "ds", MAX)) {
 	// remember the size
 	label_node->size = atoi(val);
+	file->code_text[i+1]++;
 	}
       else if(!strncmp(word, "equ", MAX)) {
 	// now address/label is inserted into label
 	label_node->address = atoi(val);
 	label_node->size = -1;
+	file->code_text[i+1]++;
 	}
       else{
 	printf("ERROR: invalid instruction %s\n", word);
