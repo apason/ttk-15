@@ -6,6 +6,7 @@
 #include <ttk-15.h>
 #include <masks.h>
 #include "machine.h"
+#include "mmu.h"
 
 static void getInstruction(machine *m);
 static void increasePC(machine *m);

@@ -5,6 +5,7 @@
 #include <ttk-15.h>
 #include <masks.h>
 #include "machine.h"
+#include "mmu.h"
 
 #define MYTYPE_MIN 0x80000000
 #define MYTYPE_MAX 0x7FFFFFFF

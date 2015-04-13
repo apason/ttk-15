@@ -7,10 +7,6 @@
 
 #define FUNCTION(function) void function(machine *m, uint8_t rj, uint8_t mod, uint8_t ri, uint16_t mem)
 
-//used in options
-#define ON         1
-#define OFF        0
-
 typedef struct OPTIONS{
   FILE *file;
   int   mode;

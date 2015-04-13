@@ -28,9 +28,10 @@ typedef struct {
 } code_file;
 
 typedef struct OPTIONS {
-  int mode;
-  FILE *output;
-  int count;
+  int    mode;
+  int    count;
+  int    debug;
+  FILE **outputs;
 
 } options;
 // reads the code file into the array in the struct and puts lenght in lines member

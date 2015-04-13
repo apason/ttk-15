@@ -1,6 +1,7 @@
 //project headers
 #include <ttk-15.h>
 #include "machine.h"
+#include "mmu.h"
 
 /*
  * ri=0 means no index register used 
