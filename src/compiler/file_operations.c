@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <ttk-15.h>
+#include <instructions.h>
 #include "errorcodes.h"
 #include "compiler.h"
 
@@ -248,7 +249,7 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
 			if ((reg = getRegister(val, 1)) < 0)
 				return INVALIDREG;
 			// check if opcode is store
-			if (opCode == 1 && !ttk_15) {
+			if (( opCode == STORE || opCode == JUMP || opCode == EXIT) && !ttk_15) {
 				if (--mode < 0)
 					return INVALIDMODE;
 			}
