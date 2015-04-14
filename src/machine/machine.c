@@ -4,9 +4,10 @@
 
 //project headers
 #include <ttk-15.h>
-#include <masks.h>
+#include "masks.h"
 #include "machine.h"
 #include "mmu.h"
+#include "bitwise.h"
 
 //macros for machine loop
 #define getInstruction(M)                \
@@ -71,11 +72,18 @@ static void execInstruction(machine *m){
   void(*instruction)(machine*, uint8_t, uint8_t, uint8_t, uint16_t);
 
   MYTYPE     ins  = m->cu->ir;
-  uint8_t    opc  = extractOpcode(ins);
-  int16_t    addr = extractAddress(ins);
-  uint8_t    rj   = extractRj(ins);
-  uint8_t    ri   = extractRi(ins);
-  uint8_t    mode = extractMode(ins);
+  uint8_t    opc  = 0;
+  int16_t    addr = 0;
+  uint8_t    rj   = 0;
+  uint8_t    ri   = 0;
+  uint8_t    mode = 0;
+
+  extractOpcode(ins, opc);
+  extractAddress(ins, addr);
+  extractRj(ins, rj);
+  extractRi(ins, ri);
+  extractMode(ins, mode);
+  
 
   m->cu->tr = calculateSecondOperand(m, mode, ri, addr); //value of operand
 

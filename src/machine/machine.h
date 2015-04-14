@@ -2,7 +2,6 @@
 #define MACHINE
 
 #include <stdio.h>
-
 #include <stdint.h>
 
 #define FUNCTION(function) void function(machine *m, uint8_t rj, uint8_t mod, uint8_t ri, uint16_t mem)
@@ -39,13 +38,6 @@ extern MYTYPE calculateSecondOperand(machine *m, uint8_t mode, uint8_t ri, int16
 extern void initializeGlobals(void);
 extern void printState(machine *m);
 extern void freeMachine(machine *m);
-
-//bitwise.c
-extern uint8_t extractOpcode(MYTYPE x);
-extern int16_t extractAddress(MYTYPE X);
-extern uint8_t extractRj(MYTYPE x);
-extern uint8_t extractMode(MYTYPE x);
-extern uint8_t extractRi(MYTYPE x);
 
 //instructions.c
 extern FUNCTION(nop);

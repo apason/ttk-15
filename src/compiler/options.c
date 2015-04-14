@@ -47,9 +47,9 @@ options *getOptions(int argc, char *argv[]){
     }
   }
 
-  //flag -o not used. there should be numerous of source files
+  //flag -o not used. there may be numerous of source files
   if(opts->outputs == NULL){
-    opts->outputs = (FILE **) malloc(opts->count*sizeof(FILE *));
+    opts->outputs = (FILE **) malloc(opts->count * sizeof(FILE *));
 
     for(i = 0; i < opts->count; i++)
       openFile(opts->outputs, argv[optind + i]);
@@ -92,7 +92,5 @@ static void openFile(FILE **outputs, char *filename){
     exit(-1);
   }
 	  
-  outputs[i] = fp;
-
-  i++;
+  outputs[i++] = fp;
 }

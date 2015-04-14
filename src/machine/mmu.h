@@ -3,7 +3,7 @@
 
 //project header
 #include <ttk-15.h>
-#include <masks.h>
+#include "masks.h"
 #include "machine.h"
 
 #define mmuCheckAddress(MMU, X)                                       \

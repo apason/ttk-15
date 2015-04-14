@@ -3,7 +3,7 @@
 
 //project headers
 #include <ttk-15.h>
-#include <masks.h>
+#include "masks.h"
 #include "machine.h"
 #include "mmu.h"
 
