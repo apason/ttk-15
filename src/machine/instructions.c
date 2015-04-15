@@ -10,6 +10,8 @@
 #define MYTYPE_MIN 0x80000000
 #define MYTYPE_MAX 0x7FFFFFFF
 
+static int mtl = sizeof(MYTYPE) * 8;
+
 FUNCTION(nop){
   ;
 }

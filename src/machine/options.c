@@ -8,18 +8,62 @@
 #include <ttk-15.h>
 #include "machine.h"
 
+#define DEFAULT_MEMSIZE 512
+
 static options *newOptions(void);
-static int      openFile(options *opts, char *filename);
+static int      openFile(char *filename);
 static int      getMode(char *filename);
-static int      countPosition(options *opts);
+static int      handleModeOption(int argc, char **argv, char *optstring);
+static int      handleOtherOptions(int argc, char **argv, char *optstring);
+
+static options *opts;
 
 options *getOptions(int argc, char *argv[]){
-  int         optch       = 0;
-  int         arg         = 0;
-  static char optstring[] = "f:m:g";
-  options    *opts        = newOptions();
+  static char optstring[] = "f:m:gM:";
 
-  //we first need to determine the type of file
+  opts = newOptions();
+
+  //no flags used
+  if(argc == 2){
+    opts->mode = getMode(argv[1]);
+    if(openFile(argv[1]) != 0){
+      freeOptions(opts);
+      return NULL;
+    }
+    return opts;
+  }
+
+  //handle mode
+  if(handleModeOption(argc, argv, optstring) == -1){
+    freeOptions(opts);
+    return NULL;
+  }
+
+  //handle other options
+  if(handleOtherOptions(argc, argv, optstring) == -1){
+    freeOptions(opts);
+    return NULL;
+  }
+
+  //open file if its not already open
+  if(opts->file == NULL){
+    if(opts->mode == UNDEFINED)
+      opts->mode = getMode(argv[argc -1]);
+    if(openFile(argv[argc -1]) != 0){
+      freeOptions(opts);
+      return NULL;
+    }
+  }
+    
+  return opts;
+}
+
+static int handleModeOption(int argc, char **argv, char *optstring){
+  int optch = 0;
+
+  //seek from first parametern
+  optind = 1;
+  
   while((optch = getopt(argc, argv, optstring)) != -1){
     if(optch == 'm'){
       if(!strncmp(optarg, "b91", strlen(optarg))){
@@ -32,64 +76,46 @@ options *getOptions(int argc, char *argv[]){
       }
       else{
 	fprintf(stderr, "ERROR: unknown mode %s\n", optarg);
-	return NULL;
+	return -1;
       }
     }
   }
+  return 0;
+}
 
+static int handleOtherOptions(int argc, char **argv, char *optstring){
+  int memsize = 0;
+  int optch   = 0;
+  
   //reset optind
   optind = 1;
 
-  //then we determine the file and debug flad
   while((optch = getopt(argc, argv, optstring)) != -1){
+
+    //file flag
     if(optch == 'f'){
-      
-      if(opts->mode == UNDEFINED) opts->mode = getMode(optarg);
-      if(openFile(opts, optarg) != 0)
-	return NULL;
+      if(opts->mode == UNDEFINED)  opts->mode = getMode(optarg);
+      if(openFile(optarg) != 0)    return -1;
     }
+
+    //debug flag
     if(optch == 'g')
       opts->debug = ON;
-  }
 
-  //filename is only argument
-  if(opts->file == NULL && opts->mode == UNDEFINED && opts->debug == 0){
-    if(argc != 2){
-      fprintf(stderr, "ERROR: invalid arguments!\n");
-      return NULL;
+    //memory size
+    if(optch == 'M'){
+      if(sscanf(optarg, "%d", &memsize) != 1){
+	fprintf(stderr, "ERROR: memory size must be integer\n");
+	return -1;
+      }
+      opts->memsize = memsize;
     }
-    if(opts->mode == UNDEFINED) opts->mode = getMode(argv[1]);
-    if(openFile(opts, argv[1]) != 0)
-      return NULL;
-  }
-
-  //determine file if its not already determined
-  if(opts->file == NULL){
-    arg = countPosition(opts);
-    if(arg != argc -1){
-      fprintf(stderr, "ERROR: Invalid arguments!\n");
-      return NULL;
-    }
-
-    if(opts->mode == UNDEFINED)
-      opts->mode = getMode(argv[arg]);
-    if(openFile(opts, argv[arg]) != 0)
-      return NULL;
-  }
     
-  return opts;
+  }
+  return 0;
 }
 
-static int countPosition(options *opts){
-  int ret = 1;
-  
-  if(opts->mode  != UNDEFINED) ret +=2;
-  if(opts->debug != 0)         ret +=1;
-
-  return ret;
-}
-
-static int openFile(options *opts, char *filename){
+static int openFile(char *filename){
   if(opts->mode == UNDEFINED){
     fprintf(stderr, "binary type not defined! Using TTK-15 as default!\n");
     opts->mode = TTK15;
@@ -102,7 +128,8 @@ static int openFile(options *opts, char *filename){
       return -1;
     }
   }
-  else if(opts->mode == TTK91){
+  
+  if(opts->mode == TTK91){
     opts->file = fopen(filename, "r");
     if(opts->file == NULL){
       perror("Opening binary file");
@@ -113,6 +140,7 @@ static int openFile(options *opts, char *filename){
   return 0;
 }
 
+//get mode from filename
 static int getMode(char *filename){
   char *dot = strrchr(filename, '.');
 
@@ -125,17 +153,21 @@ static int getMode(char *filename){
   return UNDEFINED;
 }
 
-
+//create options and initialize to defaults
 static options *newOptions(void){
   options *opts = (options*) malloc(sizeof(options));
 
-  opts->mode  = UNDEFINED;
-  opts->file  = NULL;
-  opts->debug = OFF;
+  opts->mode    = UNDEFINED;
+  opts->file    = NULL;
+  opts->debug   = OFF;
+  opts->memsize = DEFAULT_MEMSIZE;
 
   return opts;
 }
 
-  
+void freeOptions(options *opts){
+  fclose(opts->file);
+  free(opts);
+}
 
   

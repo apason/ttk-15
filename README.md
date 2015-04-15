@@ -14,9 +14,9 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * headereille uudet paikat (jos a.h tarvitaan vain esim. linkkerissä niin siitterään src/linker)  2
  
 ## v0.2 työn alla ##
- * import tai include kääntäjä direktiivin toteutus kirjastofunktioille     2,5 : 3.5
  * dokumentointi!!!                                             4
  * pitää kääntyä windowsilla (ainakin cygwinillä)
+ 
 ## backlog ##
  * kaikki mytypeks mikä kannattaa
  * aliakset jumpille ja callille ja exitille

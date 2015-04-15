@@ -15,7 +15,8 @@
  *
  */
 
-MYTYPE tmp;
+MYTYPE tmp;                                //for handling instruction
+int mtl = sizeof(MYTYPE) * 8;              //size of mytype in bits
 
 //extract first byte
 #define extractOpcode(INS, X)                             \
