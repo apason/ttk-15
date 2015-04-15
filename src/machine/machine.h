@@ -2,27 +2,24 @@
 #define MACHINE
 
 #include <stdio.h>
-
 #include <stdint.h>
 
 #define FUNCTION(function) void function(machine *m, uint8_t rj, uint8_t mod, uint8_t ri, uint16_t mem)
 
 typedef struct OPTIONS{
-  FILE *file;
-  int   mode;
-  int   debug;
+  FILE  *file;
+  int    mode;
+  int    debug;
+  MYTYPE memsize;
 
 } options;
 
 //prototype for machine instruction
 typedef void(*instructionptr)(machine*, uint8_t, uint8_t, uint8_t, uint16_t);
 
-//global variables
-instructionptr instructions[255];
-short mtl;
-
 //options.c
 extern options *getOptions(int argc, char *argv[]);
+extern void freeOptions(options *opts);
 
 //machine.c
 extern machine *newMachine(long memsize);
@@ -32,22 +29,13 @@ extern void startMachine(machine *m, int debug);
 extern void mmuGetData(mm_unit *mmu, MYTYPE *mem, MYTYPE x);
 extern void mmuSetData(mm_unit *mmu, MYTYPE *mem, MYTYPE addr, MYTYPE data);
 
-//cu.c
+//utilities
 extern MYTYPE calculateSecondOperand(machine *m, uint8_t mode, uint8_t ri, int16_t addr);
-
-//helpers.c
-extern void initializeGlobals(void);
+extern void initializeInstructionArray(instructionptr *instructions);
 extern void printState(machine *m);
 extern void freeMachine(machine *m);
 
-//bitwise.c
-extern uint8_t extractOpcode(MYTYPE x);
-extern int16_t extractAddress(MYTYPE X);
-extern uint8_t extractRj(MYTYPE x);
-extern uint8_t extractMode(MYTYPE x);
-extern uint8_t extractRi(MYTYPE x);
-
-//instructions.c
+//instructions.c contains all machine instructions
 extern FUNCTION(nop);
 extern FUNCTION(store);
 extern FUNCTION(load);

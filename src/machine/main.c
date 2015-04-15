@@ -7,9 +7,8 @@
 
 int main(int argc,char *argv[]){
   options *opts = getOptions(argc, argv);
-  machine *m    = newMachine(65536);
+  machine *m    = newMachine(opts->memsize);
 
-  initializeGlobals();
   m->cu->pc = 0;
 
   if(opts == NULL){
@@ -26,7 +25,7 @@ int main(int argc,char *argv[]){
   
   startMachine(m, opts->debug);
   freeMachine(m);
-  //freeopts
+  freeOptions(opts);
 
   printf("\n");
 

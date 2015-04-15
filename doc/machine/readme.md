@@ -27,6 +27,9 @@ state and first dozens memory slots between every instruction and holds
 execution until user prompts enter. (make sure your terminal is big enough
 to see output correctly)
 
+-M memsize , where memsize is memory size reserved for machine. Size is
+declared in machine words (32bits) default value is 512
+
 ###examples###
 
 ./ttk-15 -m b91 foobar
@@ -39,6 +42,9 @@ in debugging mode.
 ./ttk-15 -f program.b15 -m b91
 execute program.b15 as b91 file regardless of file suffix!
 NOTE! this can be confusing. the program.b15 should be really b91 program!
+
+./ttk-15 -M 1024 program.b91 -g
+execute program.b91 in debugging mode with 1024 words of memory
 
 
 
