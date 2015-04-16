@@ -15,9 +15,9 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  
 ## v0.2 työn alla ##
  * dokumentointi!!!                                             4
- * pitää kääntyä windowsilla (ainakin cygwinillä)
  
 ## backlog ##
+ * pitää kääntyä windowsilla (ainakin cygwinillä)
  * kaikki mytypeks mikä kannattaa
  * aliakset jumpille ja callille ja exitille
  * jumpit ignoraa moden????
