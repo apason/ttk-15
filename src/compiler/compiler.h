@@ -39,7 +39,7 @@ int readCodeFile(code_file*, int);
 // free space for code_file
 void freeCodeFile(code_file*);
 // counts the size of the code and creates the symbol table
-int countSize(code_file*);
+int buildModule(code_file*);
 // writes the binary file
 int writeCodeFile(code_file*);
 // check's if word is a valid instruction

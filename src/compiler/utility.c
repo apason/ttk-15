@@ -4,6 +4,25 @@
 #include <stdio.h>
 #include "compiler.h"
 
+
+int isInstruction(char *word){
+    char *p = word;
+    // make word lowercase
+    for (; *p; ++p) *p = tolower(*p);
+    int i;
+    static char instructions[38][6] = {"nop", "store", "load", "in", "out",\
+        "add", "sub", "mul", "div", "mod",\
+            "and", "or", "xor", "shl", "shr", "not", "shra",\
+            "comp", "jump", "jneg", "jzer", "jpos", "jnneg", "jnzer", "jnpos",\
+            "jles", "jequ", "jgre", "jnles", "jnequ", "jngre",\
+            "call", "exit", "push", "pop", "pushr", "popr", "svc"};
+    for(i = 0; i < 38; i++)
+        if(!strncmp(instructions[i], word, LABELLENGTH))
+            return 1;
+    return 0;
+
+}
+
 int getHardcodedSymbolValue(char* arg) {
     if (!strncmp(arg, "crt", 4))
         return 0x0;

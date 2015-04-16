@@ -6,7 +6,7 @@
 #include "compiler.h"
 
 
-int countSize(code_file* file){
+int buildModule(code_file* file){
     file->symbolList = (label_list*)malloc(sizeof(label_list));
     if (file->symbolList == NULL) return -1;
     label_list* label_node = file->symbolList;
@@ -88,23 +88,5 @@ int countSize(code_file* file){
     file->moduleSize = size;
 
     return 0;
-}
-
-int isInstruction(char *word){
-    char *p = word;
-    // make word lowercase
-    for (; *p; ++p) *p = tolower(*p);
-    int i;
-    static char instructions[38][6] = {"nop", "store", "load", "in", "out",\
-        "add", "sub", "mul", "div", "mod",\
-            "and", "or", "xor", "shl", "shr", "not", "shra",\
-            "comp", "jump", "jneg", "jzer", "jpos", "jnneg", "jnzer", "jnpos",\
-            "jles", "jequ", "jgre", "jnles", "jnequ", "jngre",\
-            "call", "exit", "push", "pop", "pushr", "popr", "svc"};
-    for(i = 0; i < 38; i++)
-        if(!strncmp(instructions[i], word, LABELLENGTH))
-            return 1;
-    return 0;
-
 }
 

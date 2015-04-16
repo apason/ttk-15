@@ -40,7 +40,7 @@ int main (int argc, char* argv[]) {
 
 
         // calculate code size and create the symbol table
-        countSize(&codeFile);
+        buildModule(&codeFile);
 
         if (debug) {
             // print module size
