@@ -25,7 +25,8 @@ int readCodeFile(code_file* file, int debug) {
         return -1;
     }
 
-    //printf("file is : %s\n",file->name);
+    if (debug)
+         printf("file is : %s\n",file->name);
 
     if ((file->lines = countLines(fh)) <= 0) {
         fclose(fh);
@@ -81,6 +82,8 @@ static char** readCode(FILE* fh, int lines, int**ppcode_text, int debug) {
             }
 
             input[i][count++] = ch;
+            if(count >= MAX - 1)
+                break;
             if (ch == ',')
                 while (isspace(ch = fgetc(fh)));
             else
