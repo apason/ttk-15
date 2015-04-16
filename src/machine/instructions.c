@@ -203,67 +203,67 @@ FUNCTION(comp){
 }
 
 FUNCTION(jump){
-  m->cu->pc = mem;
+  m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(jneg){
   if(m->regs[rj] > 0)
-    m->cu->pc = mem;
+    m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(jzer){
   if(m->regs[rj] == 0)
-    m->cu->pc = mem;
+    m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(jpos){
   if(m->regs[rj] > 0)
-    m->cu->pc = mem;
+    m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(jnneg){
   if(m->regs[rj] >= 0)
-    m->cu->pc = mem;
+    m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(jnzer){
   if(!m->regs[rj])
-    m->cu->pc = mem;
+    m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(jnpos){
   if(m->regs[rj] <= 0)
-    m->cu->pc = mem;
+    m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(jles){
   if(m->cu->sr & LFLAG)
-    m->cu->pc = mem;
+    m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(jequ){
   if(m->cu->sr & EFLAG)
-    m->cu->pc = mem;
+    m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(jgre){
   if(m->cu->sr & GFLAG)
-    m->cu->pc = mem;
+    m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(jnles){
   if(!(m->cu->sr & LFLAG))
-    m->cu->pc = mem;
+    m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(jnequ){
   if(!(m->cu->sr & EFLAG))
-    m->cu->pc = mem;
+    m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(jngre){
   if(!(m->cu->sr & GFLAG))
-    m->cu->pc = mem;
+    m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(call){
