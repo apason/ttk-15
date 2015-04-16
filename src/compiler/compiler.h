@@ -42,11 +42,11 @@ void freeCodeFile(code_file*);
 int buildModule(code_file*);
 // writes the binary file
 int writeCodeFile(code_file*);
-// check's if word is a valid instruction
-int isInstruction(char *word);
 //options
 options *getOptions(int argc, char *argv[]);
 //from utility.h
+// check's if word is a valid instruction
+extern int isInstruction(char *word);
 extern int getHardcodedSymbolValue(char* argument);
 extern int getOpCode(char* operation);
 extern int getRegister(char* argument, int errors);
