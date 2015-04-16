@@ -1,32 +1,25 @@
 # ttk-15 #
 ttk-15 on ttk-91 klooni pienillä muutoksilla
 
-##v0.2 valmiina##
- * popr ja pushr menee rikki jos sp != r6                       1 
- * yksimoduuliset ei tarvitse main labelia                      1 
- * tr2 pois ja cu.c kuntoon static!                             1 
- * parametrit paremmiksi masiinalle                             5, 3 : 4
- * parametrit paremmiksi linkkerille                            5, 3 : 4 
- * virheilmoituksien rivinumerot
- * kääntäjän virheilmoitukset kaikki errorcodes.h:n
- * parametrit paremmiksi kääntäjälle                            5, 3 : 4
- * pienet funktiot makroiksi (mmu ja machine loop)              3, 2 : 2.5
- * headereille uudet paikat (jos a.h tarvitaan vain esim. linkkerissä niin siitterään src/linker)  2
- * dokumentointi!!!                                             4
- 
-## backlog ##
- * virhetilanteessa muistinvapautus ennen lopetusta
- * kaikki mytypeks mikä kannattaa
- * aliakset jumpille ja callille ja exitille
+##v0.3 valmiina##
+
+##v0.3 baglog##
  * jumpit ignoraa moden???? not cool
+ * aliakset jumpille ja callille ja exitille 
+ * kaikki mytypeks mikä kannattaa
+ * virhetilanteessa muistinvapautus ennen lopetusta
  * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)       5,6 : 5.5
  * testit floateille                                                        4
+ * moduuleille uusi rakenne. import ja export taulut!
+ 
+
+## backlog ##
+ 
  * "wrapper" skripti tms joka kapseloi linkkerin ja kääntäjän (ehkä masiinan?)
  * konekäskyt state registerin tutkimiseen
  * overflow tarkistus tehokkaammaksi xor menetelmällä
  * testit overflow yms flageille!
  * state registerin nollaus?
- * moduuleille uusi rakenne. import ja export taulut!
  * GUI 
  * pienin osoitettava muistiyksikkö keskusmuistissa MYTYPE:stä yhteen bittiin
  * konekäskyt 16 ja 8 bitin käsittelyyn
