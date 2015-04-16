@@ -33,7 +33,7 @@ for fullpathtest in units/*; do
 	fi
 
 	ttksource=$(ls ${dir}/*.k* | awk '{print $1;}')
-	$compiler $ttksource -o a.out.o15 > /dev/null
+	$compiler $ttksource -o a.out.o15 
 	
 	if [ $? != 0 ]; then
 		echo compiling $ttksource in $test failed

@@ -1,6 +1,6 @@
 CC= 	  gcc
 STD=	  _GNU_SOURCE_
-OBJS=	  compiler.o countsize.o file_operations.o utility.o options.o
+OBJS=	  compiler.o module.o file_operations.o utility.o options.o
 INCLUDE=  -I "../include/"
 CFLAGS=   -Wall -D$(STD) $(INCLUDE) -c
 TARGET=   ../../target/

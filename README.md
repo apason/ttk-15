@@ -13,7 +13,6 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * pienet funktiot makroiksi (mmu ja machine loop)              3, 2 : 2.5
  * headereille uudet paikat (jos a.h tarvitaan vain esim. linkkerissä niin siitterään src/linker)  2
  * dokumentointi!!!                                             4
- * pitää kääntyä windowsilla (ainakin cygwinillä)
  
 ## backlog ##
  * virhetilanteessa muistinvapautus ennen lopetusta
