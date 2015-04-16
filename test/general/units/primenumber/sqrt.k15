@@ -14,7 +14,7 @@ sqrt push sp,r4
 		add r2,r4
 		shr r2,=1
 		comp r0,=20
-		jles loop
+		jles =loop
 	load r1,r2
 	pop sp,r0
 	pop sp,r2

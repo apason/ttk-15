@@ -18,10 +18,10 @@ loop add r1,=1
 		mod r5,r3
 		mul r2,r5
 		comp r2,=0
-		jequ loop
+		jequ =loop
 		comp r4,r3
 		add r3,=1
-		jgre innerloop
+		jgre =innerloop
 pop sp,r2
 pop sp,r3
 pop sp,r4
