@@ -7,31 +7,31 @@
 #define MAX 128
 // single linked list for the symbol table
 typedef struct label_list {
-	struct label_list* next;
-	char label[LABELLENGTH + 1];
-	int16_t address;
-	MYTYPE size;
-	// used only with the dc keyword
-	MYTYPE value;
+    struct label_list* next;
+    char label[LABELLENGTH + 1];
+    int16_t address;
+    MYTYPE size;
+    // used only with the dc keyword
+    MYTYPE value;
 } label_list;
 // a structure for data from the file
 typedef struct {
-	char* name;
-	int lines;
-	int mode;
-	char** array;
-	struct label_list* symbolList;
-	MYTYPE moduleSize;
-	MYTYPE codeSize;
-	FILE* fh_out;
-	int* code_text;
+    char* name;
+    int lines;
+    int mode;
+    char** array;
+    struct label_list* symbolList;
+    MYTYPE moduleSize;
+    MYTYPE codeSize;
+    FILE* fh_out;
+    int* code_text;
 } code_file;
 
 typedef struct OPTIONS {
-  int    mode;
-  int    count;
-  int    debug;
-  FILE **outputs;
+    int    mode;
+    int    count;
+    int    debug;
+    FILE **outputs;
 
 } options;
 // reads the code file into the array in the struct and puts lenght in lines member
