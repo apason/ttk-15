@@ -52,3 +52,8 @@ void freeModules(module **modules, int n){
     freeModule(modules[i]);
   
 }
+
+void freeOptions(options *opts){
+    fclose(opts->output);
+    free(opts);
+}

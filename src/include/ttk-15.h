@@ -60,6 +60,6 @@ typedef struct MACHINE{
 } machine;
 
 //loader.c
-extern int loadFile(MYTYPE *mem, FILE *file);
-extern int loadFile91(MYTYPE *mem, FILE *file);
+extern int loadFile(MYTYPE *mem, FILE *file, MYTYPE memsize);
+extern int loadFile91(MYTYPE *mem, FILE *file, MYTYPE memsize);
 #endif

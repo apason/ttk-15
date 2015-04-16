@@ -140,8 +140,9 @@ logical bitwise operations:
  * NOT       1B	  not ri
  * SHRA      1C	  shift bits to right addr times. (arithmetic shift)
 
- * COMP      1F	  compare r1 and addr. set one of GEL bits to 1
+jump and compare operations
 
+ * COMP      1F	  compare r1 and addr. set one of GEL bits to 1
  * JUMP      20	  jump (set pc) to addr
  * JNEG      21	  jump to addr if ri < 0
  * JZER      22	  jump to addr if ri == 0
@@ -149,7 +150,6 @@ logical bitwise operations:
  * JNNEG     24	  jump to addr if ri >= 0
  * JNZER     25	  jump to addr if ri != 0
  * JNPOS     26	  jump to addr if ri <= 0
- 
  * JLES      27	  jump to addr if L bit is set in state register
  * JEQU      28	  jump to addr if E bit is set
  * JGRE      29	  jump to addr if G bit is set
@@ -157,7 +157,7 @@ logical bitwise operations:
  * JNEQU     2B	  jump to addr if E bit is not set
  * JNGRE     2C	  jump to addr if G bit is nor set
 
-NOTE: see compilers documentation!
+other operations
 
  * CALL      31	  call sub routine in addr.
  * EXIT      32	  exits from subroutine

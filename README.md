@@ -12,15 +12,14 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * parametrit paremmiksi kääntäjälle                            5, 3 : 4
  * pienet funktiot makroiksi (mmu ja machine loop)              3, 2 : 2.5
  * headereille uudet paikat (jos a.h tarvitaan vain esim. linkkerissä niin siitterään src/linker)  2
- 
-## v0.2 työn alla ##
  * dokumentointi!!!                                             4
  * pitää kääntyä windowsilla (ainakin cygwinillä)
  
 ## backlog ##
+ * virhetilanteessa muistinvapautus ennen lopetusta
  * kaikki mytypeks mikä kannattaa
  * aliakset jumpille ja callille ja exitille
- * jumpit ignoraa moden????
+ * jumpit ignoraa moden???? not cool
  * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)       5,6 : 5.5
  * testit floateille                                                        4
  * "wrapper" skripti tms joka kapseloi linkkerin ja kääntäjän (ehkä masiinan?)

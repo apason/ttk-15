@@ -32,7 +32,6 @@ MYTYPE calculateSecondOperand(machine *m, uint8_t mode, uint8_t ri, int16_t addr
   return result;
 }
 
-//initializes all global variables.
 void initializeInstructionArray(instructionptr *instructions){
   int i = 0;
 
@@ -89,8 +88,10 @@ void printState(machine *m){
   printf("MMU:\nbase: %d\tlimit: %d\tmar: %d\tmbr: %d\n\n",m->mmu->base,m->mmu->limit,m->mmu->mar,m->mmu->mbr);
   printf("CU:\ntr: %d\tir: %d\tpc: %d\tsr: %d\n\n",m->cu->tr,m->cu->ir,m->cu->pc,m->cu->sr);
   printf("ALU\nin1: %d\tin2: %d\tout: %d\n\n",m->alu->in1,m->alu->in2,m->alu->out);
+  
   for(i=0;i<10;i++)
     printf("%d\t\t\t%d\t\t\t%d\t\t\t%d\t\t\t%d\n", m->mem[i],m->mem[i+10],m->mem[i+20],m->mem[i+30],m->mem[i+40]);
+  
   printf("\n\n");
 }
 

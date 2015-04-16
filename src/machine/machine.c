@@ -19,7 +19,7 @@
 
 
 static void execInstruction(machine *m, instructionptr *instructions);
-//static void handleInterrupts(machine *m);
+static void handleInterrupts(machine *m);
 
 //create new initialized machine
 machine *newMachine(long memsize){
@@ -73,9 +73,9 @@ void startMachine(machine *m, int debug){
 }
 
 
-/* static void handleInterrupts(machine *m){ */
-/*   if(m->cu->sr&IMASK) ;                         //interrupt detected */
-/* } */
+static void handleInterrupts(machine *m){
+  if(m->cu->sr&IFLAG) ;                         //interrupt detected
+}
 
 
 static void execInstruction(machine *m, instructionptr *instructions){

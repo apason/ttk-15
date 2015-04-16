@@ -2,7 +2,7 @@ CC= 	  gcc
 STD=	  _GNU_SOURCE_
 OBJS=	  main.o utilities.o instructions.o machine.o loader.o options.o
 INCLUDE=  -I "../include/"
-CFLAGS=   -Wall -D$(STD) $(INCLUDE) -c
+CFLAGS=   -Wall -D$(STD) $(INCLUDE) -c -Werror -Wno-unused-function
 TARGET=   ../../target/
 
 .c.o:

@@ -35,10 +35,11 @@ typedef struct OPTIONS {
   
 } options;
 
-extern void linkModule(FILE *fp, module **modules, int mi, int n );
+extern void linkModule(FILE *fp, module **modulestoint, int mi, int m );
 extern void createModules(int n, char **argv, module **modules);
 extern void freeRedundant(module *mod);
 extern void freeModules(module **mod, int n);
 extern options *getOptions(int argc, char **argv);
+extern void freeOptions(options *opts);
 
 #endif
