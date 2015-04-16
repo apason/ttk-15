@@ -7,7 +7,7 @@
 int main (int argc, char* argv[]) {
 
     options *opts = getOptions(argc,argv);
-    int debug = 0;
+    int debug = (opts->debug == ON);
     //options now includes information of mode int opts->mode
     //outputfile in opts->output and number of files to compile
     //opts->count. source files are in end of argv as 
