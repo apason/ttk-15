@@ -2,10 +2,10 @@
 ttk-15 on ttk-91 klooni pienillä muutoksilla
 
 ##v0.3 valmiina##
-
-##v0.3 baglog##
  * jumpit ignoraa moden???? not cool
  * aliakset jumpille ja callille ja exitille 
+
+##v0.3 baglog##
  * kaikki mytypeks mikä kannattaa
  * virhetilanteessa muistinvapautus ennen lopetusta
  * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)       5,6 : 5.5

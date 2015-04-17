@@ -2,7 +2,6 @@
 #include <ttk-15.h>
 #include "machine.h"
 
-//lengths of bit fields
 #define OPCODE_L  8
 #define ADDR_L    16
 #define REG_L     3

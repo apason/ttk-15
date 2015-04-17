@@ -37,7 +37,7 @@ void initializeInstructionArray(instructionptr *instructions){
 
   //initialize all to null
   for(i = 0; i < 255; i++)
-    instructions[i] = NULL;
+      instructions[i] = haltMachine;
 
   //initialize valid instructions
   instructions[NOP]   = nop;

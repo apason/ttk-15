@@ -8,6 +8,7 @@
 int main(int argc,char *argv[]){
     options *opts = getOptions(argc, argv);
     machine *m    = newMachine(opts->memsize);
+    int      tmp  = 0;
 
     m->cu->pc = 0;
 
@@ -24,12 +25,16 @@ int main(int argc,char *argv[]){
     //otherwise error occured
     if(m->regs[6] > 0){
 	m->regs[7] = m->regs[6];
-  
-	startMachine(m, opts->debug);
-    }
-    freeMachine(m);
-    freeOptions(opts);
 
+	tmp = opts->debug;
+
+	//options are no longer needed
+	freeOptions(opts);
+	
+	startMachine(m, tmp);
+    }
+    
+    freeMachine(m);
     printf("\n");
 
     return 0;

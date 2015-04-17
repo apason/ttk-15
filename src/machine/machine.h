@@ -24,6 +24,7 @@ extern void freeOptions(options *opts);
 //machine.c
 extern machine *newMachine(long memsize);
 extern void startMachine(machine *m, int debug);
+extern FUNCTION(haltMachine);
 
 //mmu.c
 extern void mmuGetData(mm_unit *mmu, MYTYPE *mem, MYTYPE x);
