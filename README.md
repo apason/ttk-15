@@ -15,6 +15,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
 
 ## backlog ##
  
+ * testaa titokoneessa nollalla jakaminen ym. keskeytykset
  * "wrapper" skripti tms joka kapseloi linkkerin ja kääntäjän (ehkä masiinan?)
  * konekäskyt state registerin tutkimiseen
  * overflow tarkistus tehokkaammaksi xor menetelmällä

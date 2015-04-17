@@ -13,9 +13,9 @@ main load r1,=section1
      load r2,=0
      load r3,=1
      comp r2,r1
-     jgre end
-     jequ end
-     jles section1
+     jgre =end
+     jequ =end
+     jles =section1
 
 end  load r1,x
      out r1,=crt	
@@ -32,32 +32,32 @@ section1 load r5,y
 	 add r5,=1
 	 store r5,=s1
 	 load r5,y
-	 jnpos r5,section3
-	jpos r5,section2
+	 jnpos r5,=section3
+	jpos r5,=section2
 
 section2 load r5,x
 	 add r5,=1
 	 store r5,=x
 	 load r5,=section2
 	 comp r1,r5
-	 jnequ section1
+	 jnequ =section1
 
 section3 load r5,x
 	 add r5,=1
 	 store r5,=x
 	 load r1,=0
 	 comp r1,r5
-	 jnles end
-	 jngre section4
+	 jnles =end
+	 jngre =section4
 
 section4 load r5,x
 	 add r5,=1
 	 store r5,=x
-	 jneg r1,end
-	 jzer r1,end
+	 jneg r1,=end
+	 jzer r1,=end
 	 add r5,=1
 	 store r5,=x
-	 jnzer r5,end
+	 jnzer r5,=end
 	 
 
 	load r1,=-999
