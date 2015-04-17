@@ -8,6 +8,7 @@
 #include "machine.h"
 #include "mmu.h"
 #include "bitwise.h"
+#include "cu.h"
 
 //macros for machine loop
 #define getInstruction(M)			\
@@ -104,7 +105,7 @@ static void execInstruction(machine *m, instructionptr *instructions){
 
     ins = m->cu->ir;
 
-    //extract all fields from instruction
+    //extract all fields from instruction (macros)
     extractOpcode(ins, opc);
     extractAddress(ins, addr);
     extractRj(ins, rj);
@@ -112,14 +113,14 @@ static void execInstruction(machine *m, instructionptr *instructions){
     extractMode(ins, mode);
 
     //value of second operand is stored to temporary register
-    m->cu->tr = calculateSecondOperand(m, mode, ri, addr);
+    calculateSecondOperand(m, mode, ri, addr, m->cu->tr);
 
     //set ALU operands
     m->alu->in1 = m->regs[rj];
     m->alu->in2 = m->cu->tr;
 
     instruction = instructions[opc];
-    instruction(m, rj, mode, ri, addr);  
+    instruction(m, rj, mode, ri, addr);  //macro
 }
 
 //free all memory allocated to machine

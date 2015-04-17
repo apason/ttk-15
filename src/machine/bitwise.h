@@ -1,3 +1,6 @@
+#ifndef BITWISE_H
+#define BITWISE_H
+
 //project headers
 #include <ttk-15.h>
 #include "machine.h"
@@ -48,3 +51,5 @@ static int mtl = sizeof(MYTYPE) * 8;        //size of mytype in bits
     _tmp = INS >> (mtl - OPCODE_L - REG_L - MODE_L);			\
     X    = (uint8_t) _tmp & 0x3;               //bit pattern for 2 lsb set
 
+
+#endif

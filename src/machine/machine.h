@@ -31,7 +31,6 @@ extern void mmuGetData(mm_unit *mmu, MYTYPE *mem, MYTYPE x);
 extern void mmuSetData(mm_unit *mmu, MYTYPE *mem, MYTYPE addr, MYTYPE data);
 
 //utilities
-extern MYTYPE calculateSecondOperand(machine *m, uint8_t mode, uint8_t ri, int16_t addr);
 extern void initializeInstructionArray(instructionptr *instructions);
 extern void printState(machine *m);
 extern void freeMachine(machine *m);

@@ -1,3 +1,6 @@
+#ifndef CU_H
+#define CU_H
+
 #include <ttk-15.h>
 
 #ifndef int_i_macro
@@ -21,19 +24,20 @@ static MYTYPE _result;
  * puts 0 to it and recovers when done
  */
 
-#define calculateSecondOperand(M, MODE, RI, ADDR) \
-    _result = (MYTYPE) ADDR;			  \
-    _tmp = M->regs[0];                            \  //save r0
-    M->regs[0] = 0;                               \  //set r0 to 0
-    _result += M->regs[ri];                       \
-                                                  \
-   \ //fetch as many times as needed               
-    for(_i = 0; _i < MODE; _i++){                 \
-	mmuGetData(M->mmu, M->mem, _result);      \
-	_result = M->mmu->mbr;                    \
-    }                                             \ 
-			         		  \
-    M->regs[0] = _tmp;                            \  //restore r0
-
+#define calculateSecondOperand(M, MODE, RI, ADDR, TR) \
+    _result = (MYTYPE) ADDR;			      \
+    _tmp = M->regs[0];             /* save r0     */  \
+    M->regs[0] = 0;                /* set r0 to 0 */  \
+    _result += M->regs[ri];                           \
+                                                      \
+    /*fetch as many times as needed */                \
+    for(_i = 0; _i < MODE; _i++){                     \
+	mmuGetData(M->mmu, M->mem, _result);          \
+	_result = M->mmu->mbr;                        \
+    }                                                 \
+			         		      \
+    M->regs[0] = _tmp;             /* restore r0  */  \
+    TR = _result;
     
 
+#endif
