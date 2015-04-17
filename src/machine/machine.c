@@ -93,15 +93,14 @@ static void handleInterrupts(machine *m){
 
 
 static void execInstruction(machine *m, instructionptr *instructions){
-    //prototype for machine instruction
-    void(*instruction)(machine*, uint8_t, uint8_t, uint8_t, uint16_t);
-
     static MYTYPE     ins  = 0;
     static uint8_t    opc  = 0;
     static int16_t    addr = 0;
     static uint8_t    rj   = 0;
     static uint8_t    ri   = 0;
     static uint8_t    mode = 0;
+
+    static instructionptr instruction = NULL;
 
     ins = m->cu->ir;
 
@@ -120,14 +119,6 @@ static void execInstruction(machine *m, instructionptr *instructions){
     m->alu->in2 = m->cu->tr;
 
     instruction = instructions[opc];
-
-    if(instruction == NULL){
-	m->cu->sr |= UFLAG;
-	fprintf(stderr, "ERROR: incorrect operation code: %X\n", opc);
-	
-	exit(-1);
-    }
-
     instruction(m, rj, mode, ri, addr);  
 }
 
@@ -143,6 +134,8 @@ void freeMachine(machine *m){
 
 FUNCTION (haltMachine){
     uint8_t opc = 0;
+
+    m->cu->sr |= UFLAG;
     extractOpcode(m->cu->ir, opc);
     fprintf(stderr, "ERROR: incorrect operation code %X\n", opc);
     freeMachine(m);
