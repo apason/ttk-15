@@ -23,18 +23,21 @@ static void handleInterrupts(machine *m);
 
 //create new initialized machine
 machine *newMachine(long memsize){
-    machine       *m   = (machine*)malloc(sizeof(machine));
-    alu_unit      *alu = (alu_unit*)malloc(sizeof(alu_unit));
-    mm_unit       *mmu = (mm_unit*)malloc(sizeof(mm_unit));
-    control_unit  *cu  = (control_unit*)malloc(sizeof(control_unit));
+    machine       *m   = (machine *)      malloc(sizeof(machine));
+    alu_unit      *alu = (alu_unit *)     malloc(sizeof(alu_unit));
+    fpu_unit      *fpu = (fpu_unit *)     malloc(sizeof(fpu_unit));
+    mm_unit       *mmu = (mm_unit *)      malloc(sizeof(mm_unit));
+    control_unit  *cu  = (control_unit *) malloc(sizeof(control_unit));
 
     //initialize all to zero.
     memset(alu, 0, 3* sizeof(MYTYPE));
     memset(mmu, 0, 4* sizeof(MYTYPE));
     memset(cu, 0, 4* sizeof(MYTYPE));
+    memset(fpu, 0, 3* sizeof(MYTYPE));
 
     //set parts together
     m->alu = alu;
+    m->fpu = fpu;
     m->mmu = mmu;
     m->cu  = cu;
   
@@ -118,6 +121,10 @@ static void execInstruction(machine *m, instructionptr *instructions){
     m->alu->in1 = m->regs[rj];
     m->alu->in2 = m->cu->tr;
 
+    //set FPU operands
+    m->fpu->in1 = (MYTYPEF) m->regs[rj];
+    m->fpu->in2 = (MYTYPEF) m->cu->tr;
+
     instruction = instructions[opc];
     instruction(m, rj, mode, ri, addr);  
 }
@@ -126,6 +133,7 @@ static void execInstruction(machine *m, instructionptr *instructions){
 void freeMachine(machine *m){
     free(m->regs);
     free(m->alu);
+    free(m->fpu);
     free(m->mmu);
     free(m->cu);
     free(m->mem);

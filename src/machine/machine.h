@@ -76,4 +76,22 @@ extern FUNCTION(pushr);
 extern FUNCTION(popr);
 extern FUNCTION(svc);
 
+/*
+ * floating point extension
+ */
+
+extern FUNCTION(fin);
+extern FUNCTION(fout);
+extern FUNCTION(fadd);
+extern FUNCTION(fsub);
+extern FUNCTION(fmul);
+extern FUNCTION(fdiv);
+extern FUNCTION(fcomp);
+extern FUNCTION(fjneg);
+extern FUNCTION(fjzer);
+extern FUNCTION(fjpos);
+extern FUNCTION(fjnneg);
+extern FUNCTION(fjnzer);
+extern FUNCTION(fjnpos);
+
 #endif

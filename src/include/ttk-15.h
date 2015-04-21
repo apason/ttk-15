@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define MYTYPE int32_t
+#define MYTYPE   int32_t
+#define MYTYPEF  float
 
 //hardcoded symbols for machine
 #define CRT    0x0
@@ -27,35 +28,43 @@
 #define OFF        0
 
 typedef struct ALU_UNIT{
-  MYTYPE in1;
-  MYTYPE in2;
-  MYTYPE out;
+    MYTYPE in1;
+    MYTYPE in2;
+    MYTYPE out;
 
 } alu_unit;
 
+typedef struct FPU_UNIT{
+    MYTYPEF in1;
+    MYTYPEF in2;
+    MYTYPEF out;
+
+} fpu_unit;
+
 typedef struct MM_UNIT{
-  MYTYPE limit;
-  MYTYPE base;
-  MYTYPE mbr;
-  MYTYPE mar;
+    MYTYPE limit;
+    MYTYPE base;
+    MYTYPE mbr;
+    MYTYPE mar;
 
 } mm_unit;
 
 typedef struct CONTROL_UNIT{
-  MYTYPE tr;
-  MYTYPE ir;
-  MYTYPE pc;
-  MYTYPE sr;
+    MYTYPE tr;
+    MYTYPE ir;
+    MYTYPE pc;
+    MYTYPE sr;
 
 } control_unit;
 
 typedef struct MACHINE{
-  MYTYPE        *regs;
-  alu_unit      *alu;
-  mm_unit       *mmu;
-  control_unit  *cu;
-  MYTYPE        *mem;
-  long           memsize;
+    MYTYPE        *regs;
+    alu_unit      *alu;
+    fpu_unit      *fpu;
+    mm_unit       *mmu;
+    control_unit  *cu;
+    MYTYPE        *mem;
+    long           memsize;
 
 } machine;
 
