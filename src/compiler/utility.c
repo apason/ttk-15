@@ -10,16 +10,13 @@ int isInstruction(char *word){
     // make word lowercase
     for (; *p; ++p) *p = tolower(*p);
     int i;
-    static char instructions[][6] = {"nop", "store", "load", "in", "out",\
+    static char instructions[38][6] = {"nop", "store", "load", "in", "out",\
         "add", "sub", "mul", "div", "mod",\
             "and", "or", "xor", "shl", "shr", "not", "shra",\
             "comp", "jump", "jneg", "jzer", "jpos", "jnneg", "jnzer", "jnpos",\
             "jles", "jequ", "jgre", "jnles", "jnequ", "jngre",\
-            "call", "exit", "push", "pop", "pushr", "popr", "svc",\
-            "fin", "fout", "fadd", "fsub", "fmul", "fdiv",\
-            "fcomp", "fjneg", "fjzer", "fjpos", "fjnneg",\
-            "fjnzer", "fjnpos"};
-    for(i = 0; i < NOPCODES; i++)
+            "call", "exit", "push", "pop", "pushr", "popr", "svc"};
+    for(i = 0; i < 38; i++)
         if(!strncmp(instructions[i], word, LABELLENGTH))
             return 1;
     return 0;
@@ -49,61 +46,48 @@ int getHardcodedSymbolValue(char* arg) {
 }
 
 int getOpCode(char* word) {
-    static const char opcodes[NOPCODES][9] = {\
-        "nop\0\0\0\0\0",\
-            "store\0\0\x1",\
-            "load\0\0\0\x2",\
-            "in\0\0\0\0\0\x3",\
-            "out\0\0\0\0\x4",\
-            "add\0\0\0\0\x11",\
-            "sub\0\0\0\0\x12",\
-            "mul\0\0\0\0\x13",\
-            "div\0\0\0\0\x14",\
-            "mod\0\0\0\0\x15",\
-            "and\0\0\0\0\x16",\
-            "or\0\0\0\0\0\x17",\
-            "xor\0\0\0\0\x18",\
-            "shl\0\0\0\0\x19",\
-            "shr\0\0\0\0\x1A",\
-            "not\0\0\0\0\x1B",\
-            "shra\0\0\0\x1C",\
-            "comp\0\0\0\x1F",\
-            "jump\0\0\0\x20",\
-            "jneg\0\0\0\x21",\
-            "jzer\0\0\0\x22",\
-            "jpos\0\0\0\x23",\
-            "jnneg\0\0\x24",\
-            "jnzer\0\0\x25",\
-            "jnpos\0\0\x26",\
-            "jles\0\0\0\x27",\
-            "jequ\0\0\0\x28",\
-            "jgre\0\0\0\x29",\
-            "jnles\0\0\x2A",\
-            "jnequ\0\0\x2B",\
-            "jngre\0\0\x2C",\
-            "call\0\0\0\x31",\
-            "exit\0\0\0\x32",\
-            "push\0\0\0\x33",\
-            "pop\0\0\0\0\x34",\
-            "pushr\0\0\x35",\
-            "popr\0\0\0\x36",\
-            "svc\0\0\0\0\x70",\
-            "fin\0\0\0\0\x83",\
-            "fout\0\0\0\x84",\
-            "fadd\0\0\0\x91",\
-            "fsub\0\0\0\x92",\
-            "fmul\0\0\0\x93",\
-            "fdiv\0\0\0\x94",\
-            "fcomp\0\0\x9F",\
-            "fjneg\0\0\xA1",\
-            "fjzer\0\0\xA2",\
-            "fjpos\0\0\xA3",\
-            "fjnneg\0\xA4",\
-            "fjnzer\0\xA5",\
-            "fjnpos\0\xA6" };
+    static const char opcodes[38][8] = {\
+        "nop\0\0\0\0",\
+            "store\0\x1",\
+            "load\0\0\x2",\
+            "in\0\0\0\0\x3",\
+            "out\0\0\0\x4",\
+            "add\0\0\0\x11",\
+            "sub\0\0\0\x12",\
+            "mul\0\0\0\x13",\
+            "div\0\0\0\x14",\
+            "mod\0\0\0\x15",\
+            "and\0\0\0\x16",\
+            "or\0\0\0\0\x17",\
+            "xor\0\0\0\x18",\
+            "shl\0\0\0\x19",\
+            "shr\0\0\0\x1A",\
+            "not\0\0\0\x1B",\
+            "shra\0\0\x1C",\
+            "comp\0\0\x1F",\
+            "jump\0\0\x20",\
+            "jneg\0\0\x21",\
+            "jzer\0\0\x22",\
+            "jpos\0\0\x23",\
+            "jnneg\0\x24",\
+            "jnzer\0\x25",\
+            "jnpos\0\x26",\
+            "jles\0\0\x27",\
+            "jequ\0\0\x28",\
+            "jgre\0\0\x29",\
+            "jnles\0\x2A",\
+            "jnequ\0\x2B",\
+            "jngre\0\x2C",\
+            "call\0\0\x31",\
+            "exit\0\0\x32",\
+            "push\0\0\x33",\
+            "pop\0\0\0\x34",\
+            "pushr\0\x35",\
+            "popr\0\0\x36",\
+            "svc\0\0\0\x70" };
     int i;
-    for (i = 0; i < NOPCODES; ++i) {
-        if (strncmp(opcodes[i],word,7) == 0) {
+    for (i = 0; i < 38; ++i) {
+        if (strncmp(opcodes[i],word,6) == 0) {
             return opcodes[i][6];
         }
     }

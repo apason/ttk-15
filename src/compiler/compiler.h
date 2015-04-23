@@ -5,7 +5,6 @@
 #include <ttk-15.h>
 
 #define MAX 128
-#define NOPCODES 51
 // single linked list for the symbol table
 typedef struct label_list {
     struct label_list* next;
