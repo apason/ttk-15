@@ -188,12 +188,12 @@ int writeCodeFile(code_file* file) {
         symbols = symbols->next;	
     }
     // write the import and export tables
-    file->importSize = 0;
+    file->exportSize = 0;
     symbols = file->symbolList;
     while (symbols != NULL) {
-        if (symbols->mode == IMPORT)
-            file->importSize += 33;
-        if (symbols->size >= 0) {
+        if (symbols->mode == EXPORT)
+            file->exportSize += 33;
+        if (symbols->mode == EXPORT || symbols->mode == IMPORT) {
             if (strlen(symbols->label)>32)
                 fprintf(stderr, "Warning: symbol name more than 32 chars, will be cut: %s\n",symbols->label);
             fwrite(symbols->label,sizeof(char),32,fh);
@@ -203,13 +203,13 @@ int writeCodeFile(code_file* file) {
     }
     fseek(fh, 0, SEEK_SET);
     // write header to the object file
-    MYTYPE dataSegmentAddress = file->codeSize*5 + 8;
-    MYTYPE importTableAddress =  dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
-    MYTYPE exportTableAddress = importTableAddress + file->importSize;
+    MYTYPE dataSegmentAddress = file->codeSize*5 + 12;
+    MYTYPE exportTableAddress = dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
+    MYTYPE importTableAddress = exportTableAddress + file->exportSize;
 
     fwrite(&dataSegmentAddress, sizeof(MYTYPE),1,fh);
-    fwrite(&importTableAddress, sizeof(MYTYPE),1,fh);
     fwrite(&exportTableAddress, sizeof(MYTYPE),1,fh);
+    fwrite(&importTableAddress, sizeof(MYTYPE),1,fh);
     fclose(fh);
     return 0;
 }

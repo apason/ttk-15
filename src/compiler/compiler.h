@@ -24,7 +24,7 @@ typedef struct {
     struct label_list* symbolList;
     MYTYPE moduleSize;
     MYTYPE codeSize;
-    MYTYPE importSize;
+    MYTYPE exportSize;
     FILE* fh_out;
     int* code_text;
 } code_file;
