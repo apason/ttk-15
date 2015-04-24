@@ -203,7 +203,7 @@ int writeCodeFile(code_file* file) {
     }
     fseek(fh, 0, SEEK_SET);
     // write header to the object file
-    MYTYPE dataSegmentAddress = file->codeSize*5 + 8;
+    MYTYPE dataSegmentAddress = file->codeSize*5 + 12;
     MYTYPE exportTableAddress = dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
     MYTYPE importTableAddress = exportTableAddress + file->exportSize;
 
