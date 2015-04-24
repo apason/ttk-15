@@ -21,9 +21,10 @@ typedef struct MODULE {
     int     size;                 
     int     linked_size;
     int     data_start;
-    int     symbol_start;
+    int     import_start;
+    int     export_start;
     llist  *import;
-    list   *export;
+    llist  *export;
     char  **codes;
     char   *data;
     char   *filename;

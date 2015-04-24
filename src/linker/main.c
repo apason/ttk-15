@@ -112,20 +112,20 @@ static int findMain(module **modules, int n){
 static int containsMain(module *mod){
     llist *li;
   
-    for(li = mod->symbols; li != NULL; li = li->next)
+    for(li = mod->export; li != NULL; li = li->next)
 	if(!strncmp(li->label, "main", 32))
 	    return 1;
   
     return 0;  
 }
 
-
+//atm print only export table
 static void printModule(module *mod){
-    printf("size: %d\tlinksize %d\tdstart: %d\tsstart %d\tconstant %d\n", mod->size, mod->linked_size, mod->data_start, mod->symbol_start, mod->address_constant);
-    if(!mod->symbols)
+    printf("size: %d\tlinksize %d\tdstart: %d\tsstart %d\tconstant %d\n", mod->size, mod->linked_size, mod->data_start, mod->import_start, mod->address_constant);
+    if(!mod->export)
 	printf("symbol list = NULL\n");
     else
-	printSymbols(mod->symbols);
+	printSymbols(mod->export);
 
 }
 
