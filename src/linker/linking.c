@@ -13,7 +13,8 @@
 static char *getLabelName(llist *s, uint32_t instruction);
 static int16_t findLabelValue(char *label);
 static int findLabelAddressConstant(char *label);
-static void handleExternalLabel(int16_t value, uint32_t *buf,  char *label);
+static void handleExternalLabel(uint32_t *buf,  char *label);
+static int16_t findLocalLabel(char *label, llist *list);
 
 //used in every function. initialized in linkmodule
 static module **modules;
@@ -21,10 +22,10 @@ static int      n;
 
 
 void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
-    int tmp                          =  0
+    int tmp                          =  0;
     int i                            =  0;
     uint32_t codesize                = -1;
-    uint32n_t datasize               = -1;
+    uint32_t datasize                = -1;
     uint32_t buf                     =  0;
     int16_t  value                   =  0;
     char *label                      = NULL;
@@ -39,7 +40,7 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
     printf("linking %s\n", modules[mi]->filename);
 
     codesize = (mod->data_start - CODESTART) / CODESIZE;
-    datasize = (mod->symbol_start -mod->data_start) / sizeof(MYTYPE);
+    datasize = (mod->import_start -mod->data_start) / sizeof(MYTYPE);
 
     //copy code segment to executable
     for(i = 0; i < codesize; i++){
@@ -61,10 +62,10 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
 	    
 	//label from local symoltable
 	case EXPORT:
-	    label = GetLabelName(mod->export, buf);
+	    label = getLabelName(mod->export, buf);
 	    tmp = findLocalLabel(label, mod->export);
 	    if(tmp < 0) ;//fatal error
-	    buf += tmp +mod->address_constant / sizeof(MYTYPE)
+	    buf += tmp +mod->address_constant / sizeof(MYTYPE);
 	    break;
 
 	//addressing mode 0
@@ -84,7 +85,7 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
 	    fprintf(stderr, " value %d. Aborting!\n", value);
 	    exit(-1);
 	}
-    }
+    
 
     fwrite(&buf, sizeof(buf), 1, fp);
     
@@ -105,7 +106,6 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
 
 static void handleExternalLabel(uint32_t *buf, char *label){
     int16_t label_address_constant  = -1;
-    int16_t value                   = (int16_t) *buf;
     
     *buf &= 0xFFFF0000;
     label_address_constant = findLabelAddressConstant( label);
@@ -157,8 +157,8 @@ static char *getLabelName(llist *s, uint32_t instruction){
 }
 
 //get label from list
-static int16_t findLocalLabel(char *label, llist *list){
-    for(; list, list = list->next)
+static int16_t findLocalLabel(char *label, llist *list){ 
+    for(; list; list = list->next)
 	if(!strncmp(list->label, label, LABELLENGTH))
 	   return list->value;
     return -1;

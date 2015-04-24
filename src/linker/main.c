@@ -121,9 +121,13 @@ static int containsMain(module *mod){
 
 //atm print only export table
 static void printModule(module *mod){
-    printf("size: %d\tlinksize %d\tdstart: %d\tsstart %d\tconstant %d\n", mod->size, mod->linked_size, mod->data_start, mod->import_start, mod->address_constant);
+    printf("size: %d\tlinksize %d\tdstart: %d\tistart %d\nestart %d\tconstant %d\n", mod->size, mod->linked_size, mod->data_start, mod->import_start, mod->address_constant);
+    if(!mod->import)
+	printf("import list = NULL\n");
+    else
+	printSymbols(mod->import);
     if(!mod->export)
-	printf("symbol list = NULL\n");
+	printf("export list = NULL\n");
     else
 	printSymbols(mod->export);
 

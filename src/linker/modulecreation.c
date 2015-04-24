@@ -56,8 +56,8 @@ static module *readModule(FILE *fp, char *filename){
 
     //read code and data starts
     fread(&mod->data_start, sizeof(MYTYPE), 1, fp);
-    fread(&mod->import_start, sizeof(MYTYPE), 1, fp);
     fread(&mod->export_start, sizeof(MYTYPE), 1, fp);
+    fread(&mod->import_start, sizeof(MYTYPE), 1, fp);
   
     //calculate linked size 
     code_size = sizeof(MYTYPE) * (mod->data_start - CODESTART) / CODESIZE;
