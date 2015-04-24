@@ -20,7 +20,6 @@ int buildModule(code_file* file){
     label_node->size = 0;
     label_node->label[0] = '\0';
     label_node->next = NULL;
-    label_node->mode = LOCAL;
 
     for(i = 0; i < file->lines; i++){
         sscanf(code[i], "%s %s", word, val);
@@ -35,7 +34,10 @@ int buildModule(code_file* file){
                 exit(-1);
             } else if (strncmp(ext, "export", MAX)){
                 sscanf(code[i], "%s %s %s", label, word, val);
-                mode = LOCAL;
+                if (!strncmp(label, "main", LABELLENGTH))
+                    mode = EXPORT;
+                else
+                    mode = LOCAL;
             } else {
                 mode = EXPORT;
             }
