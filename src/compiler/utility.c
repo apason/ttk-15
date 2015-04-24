@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <module.h>
 #include "compiler.h"
 
 
@@ -168,14 +169,14 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte) {
         addr = atoi(argument);
         // is it not a hardcoded symbol, but a label?
     } else if ((addr = getHardcodedSymbolValue(argument)) < 0) {
-        *firstByte = 1;
         int16_t index = -1;
         while(temp != NULL) {
             // when label is found it's address is replaced in the instruction
             if (!strncmp(temp->label,argument,strlen(argument))) {
                 addr = temp->address;
                 // make sure equ are not treated as labels
-                if (temp->size < 0) *firstByte = 0;
+                if (temp->size < 0) *firstByte = NO_LABEL;
+                else    *firstByte = temp->mode;
                 break;
             }
             // don't use the same index as the other external labels
@@ -194,6 +195,7 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte) {
             strncpy(temp->label,argument,LABELLENGTH);
             temp->size = 0;
             temp->address = (int16_t)index;
+            temp->mode = IMPORT;
             addr = index;
         }
     }

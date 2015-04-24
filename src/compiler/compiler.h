@@ -13,6 +13,7 @@ typedef struct label_list {
     MYTYPE size;
     // used only with the dc keyword
     MYTYPE value;
+    int mode;
 } label_list;
 // a structure for data from the file
 typedef struct {
@@ -23,6 +24,7 @@ typedef struct {
     struct label_list* symbolList;
     MYTYPE moduleSize;
     MYTYPE codeSize;
+    MYTYPE importSize;
     FILE* fh_out;
     int* code_text;
 } code_file;
