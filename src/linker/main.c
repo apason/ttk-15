@@ -34,6 +34,10 @@ int main(int argc, char **argv){
     printf("creating modules..\n");
     createModules(opts->count, argv +1, modules);
 
+
+    printModule(modules[0
+			]);
+    
     //if there is only 1 object module to link, skip main finding
     if(opts->count > 1) setMain(modules, opts);
 
@@ -121,7 +125,7 @@ static int containsMain(module *mod){
 
 //atm print only export table
 static void printModule(module *mod){
-    printf("size: %d\tlinksize %d\tdstart: %d\tistart %d\nestart %d\tconstant %d\n", mod->size, mod->linked_size, mod->data_start, mod->import_start, mod->address_constant);
+    printf("size: %d\tlinksize %d\tdstart: %d\tistart %d\nestart %d\tconstant %d\n", mod->size, mod->linked_size, mod->data_start, mod->import_start, mod->export_start, mod->address_constant);
     if(!mod->import)
 	printf("import list = NULL\n");
     else

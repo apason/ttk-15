@@ -27,7 +27,7 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
     uint32_t codesize                = -1;
     uint32_t datasize                = -1;
     uint32_t buf                     =  0;
-    int16_t  value                   =  0;
+    //    int16_t  value                   =  0;
     char *label                      = NULL;
     
     module *mod                      = modulestoinit[mi];
@@ -80,11 +80,11 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
     
 
 
-	if(label == NULL){
-	    fprintf(stderr, "ERROR: Incorrect symbol table: nameless label with");
-	    fprintf(stderr, " value %d. Aborting!\n", value);
-	    exit(-1);
-	}
+	/* if(label == NULL){ */
+	/*     fprintf(stderr, "ERROR: Incorrect symbol table: nameless label with"); */
+	/*     fprintf(stderr, " value %d. Aborting!\n", value); */
+	/*     exit(-1); */
+	/* } */
     
 
     fwrite(&buf, sizeof(buf), 1, fp);

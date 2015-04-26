@@ -40,6 +40,7 @@ void createModules(int n, char **argv, module **modules){
 
 //initializes one module
 static module *readModule(FILE *fp, char *filename){
+    printf("readModule"); fflush(NULL);
     int i               = 0;
     uint32_t data_size  = -1;
     uint32_t code_size  = -1;
@@ -75,6 +76,7 @@ static module *readModule(FILE *fp, char *filename){
 
 //constructs code array in module 
 static void readCode(module *mod){
+    printf("readCode"); fflush(NULL);
     int i    = 0;
     int size = (mod->data_start -CODESTART );
   
@@ -89,23 +91,25 @@ static void readCode(module *mod){
 
 //constructs symbol list in module
 static void readImportExport(module *mod){
+    printf("readImportExport"); fflush(NULL);
 
     mod->import = (llist *)malloc(sizeof(llist));
     mod->export = (llist *)malloc(sizeof(llist));
 
-    readSymbols(mod, mod->import, mod->import_start, mod->export_start);
-    readSymbols(mod, mod->export, mod->export_start, mod->size);
+    readSymbols(mod, mod->import, mod->import_start, mod->size);
+    readSymbols(mod, mod->export, mod->export_start, mod->import_start);
 
 }
 
 static void readSymbols(module *mod, llist *list, int start, int end){
+    printf("readSymbols\nstart: %d\nend %d\n",start,end); fflush(NULL);
     int size = (end -start) / SYMBOLSIZE;
     int i    = 0;
 
     //free memory!
     if((end -start) % SYMBOLSIZE != 0){
-	fprintf(stderr, "ERROR: incorrect module header!\n");
-	exit(-1);
+    	fprintf(stderr, "ERROR: incorrect module header!\n");
+    	exit(-1);
     }
 
     //memset would be better?
