@@ -195,7 +195,7 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte) {
             strncpy(temp->label,argument,LABELLENGTH);
             temp->size = 0;
             temp->address = (int16_t)index;
-            temp->mode = IMPORT;
+            temp->mode = *firstByte = IMPORT;
             addr = index;
         }
     }
