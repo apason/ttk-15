@@ -192,7 +192,7 @@ int writeCodeFile(code_file* file) {
     symbols = file->symbolList;
     while (symbols != NULL) {
         if (symbols->mode == EXPORT)
-            file->exportSize += 33;
+            file->exportSize += 34;
         if (symbols->mode == EXPORT || symbols->mode == IMPORT) {
             if (strlen(symbols->label)>32)
                 fprintf(stderr, "Warning: symbol name more than 32 chars, will be cut: %s\n",symbols->label);
