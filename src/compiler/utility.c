@@ -10,15 +10,17 @@ int isInstruction(char *word){
     // make word lowercase
     for (; *p; ++p) *p = tolower(*p);
     int i;
-    static char instructions[38][6] = {"nop", "store", "load", "in", "out",\
+    static char instructions[N_INSTR][6] = {"nop", "store", "load", "in", "out",\
         "add", "sub", "mul", "div", "mod",\
             "and", "or", "xor", "shl", "shr", "not", "shra",\
             "comp", "jump", "jneg", "jzer", "jpos", "jnneg", "jnzer", "jnpos",\
             "jles", "jequ", "jgre", "jnles", "jnequ", "jngre",\
-            "call", "exit", "push", "pop", "pushr", "popr", "svc"};
-    for(i = 0; i < 38; i++)
+            "call", "exit", "push", "pop", "pushr", "popr", "svc",\
+            "fin", "fout", "fadd", "fsub", "fmul", "fdiv", "fcomp",\
+            "fjneg", "fjzer", "fjpos", "fjnneg", "fjnzer", "fjnpos"};
+    for(i = 0; i < N_INSTR; i++)
         if(!strncmp(instructions[i], word, LABELLENGTH))
-            return 1;
+            return i + 1;
     return 0;
 
 }
