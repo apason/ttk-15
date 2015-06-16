@@ -11,7 +11,7 @@
 
 static void readCode(module *mod);
 static void readImportExport(module *mod);
-static void readSymbols(module *mod, llist *list, int start, int end);
+static llist *readSymbols(module *mod, int start, int end);
 static module *readModule(FILE *fp, char *filename);
 
 //create all modules determined by argv
@@ -40,7 +40,6 @@ void createModules(int n, char **argv, module **modules){
 
 //initializes one module
 static module *readModule(FILE *fp, char *filename){
-    printf("readModule"); fflush(NULL);
     int i               = 0;
     uint32_t data_size  = -1;
     uint32_t code_size  = -1;
@@ -62,7 +61,7 @@ static module *readModule(FILE *fp, char *filename){
   
     //calculate linked size 
     code_size = sizeof(MYTYPE) * (mod->data_start - CODESTART) / CODESIZE;
-    data_size = mod->import_start - mod->data_start;
+    data_size = mod->export_start - mod->data_start;
     mod->linked_size = code_size + data_size;
 
     fseek(fp, 0, SEEK_SET);
@@ -76,7 +75,6 @@ static module *readModule(FILE *fp, char *filename){
 
 //constructs code array in module 
 static void readCode(module *mod){
-    printf("readCode"); fflush(NULL);
     int i    = 0;
     int size = (mod->data_start -CODESTART );
   
@@ -91,20 +89,16 @@ static void readCode(module *mod){
 
 //constructs symbol list in module
 static void readImportExport(module *mod){
-    printf("readImportExport"); fflush(NULL);
-
-    mod->import = (llist *)malloc(sizeof(llist));
-    mod->export = (llist *)malloc(sizeof(llist));
-
-    readSymbols(mod, mod->import, mod->import_start, mod->size);
-    readSymbols(mod, mod->export, mod->export_start, mod->import_start);
+    mod->import = readSymbols(mod, mod->import_start, mod->size);
+    mod->export = readSymbols(mod, mod->export_start, mod->import_start);
 
 }
 
-static void readSymbols(module *mod, llist *list, int start, int end){
-    printf("readSymbols\nstart: %d\nend %d\n",start,end); fflush(NULL);
+static llist *readSymbols(module *mod, int start, int end){
     int size = (end -start) / SYMBOLSIZE;
     int i    = 0;
+
+    llist *list = (llist*) malloc(sizeof(llist));
 
     //free memory!
     if((end -start) % SYMBOLSIZE != 0){
@@ -129,6 +123,12 @@ static void readSymbols(module *mod, llist *list, int start, int end){
 	    list->next = NULL;
 	}    
     }
+
+    if(i == 0){
+	free(list);
+	return NULL;
+    }
+    return list;
 }
 
 

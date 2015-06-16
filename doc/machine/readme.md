@@ -167,3 +167,15 @@ other operations
  * POPR      36	  pops all registers from stack pointed by ri
  * SVC       70	  call supervisor function addr. use ri as stack pointer
 
+extended instructions:
+
+ * in
+ * out
+
+ * add
+ * sub
+ * mul
+ * div
+ * comp
+ * jneg - jnpos
+ * total of 13 new instructions 

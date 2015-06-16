@@ -34,10 +34,6 @@ int main(int argc, char **argv){
     printf("creating modules..\n");
     createModules(opts->count, argv +1, modules);
 
-
-    printModule(modules[0
-			]);
-    
     //if there is only 1 object module to link, skip main finding
     if(opts->count > 1) setMain(modules, opts);
 
@@ -60,6 +56,9 @@ int main(int argc, char **argv){
     for(i = 1; i < opts->count; i++)
 	linkModule(opts->output, modules, i, opts->count);
 
+    for(i=0;i<opts->count;i++)
+	printModule(modules[i]);
+    
     freeModules(modules, opts->count);
     fclose(opts->output);
 

@@ -22,7 +22,8 @@ int main(int argc, char *argv[]){
     exit(-1);
   }
 
-  dend = loadFile91(mem, fp);
+  //1024 should be enough for tests
+  dend = loadFile91(mem, fp, 1024);
 
   return writeFile(mem,dend);
 }

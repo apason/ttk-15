@@ -27,7 +27,6 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
     uint32_t codesize                = -1;
     uint32_t datasize                = -1;
     uint32_t buf                     =  0;
-    //    int16_t  value                   =  0;
     char *label                      = NULL;
     
     module *mod                      = modulestoinit[mi];
@@ -40,7 +39,7 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
     printf("linking %s\n", modules[mi]->filename);
 
     codesize = (mod->data_start - CODESTART) / CODESIZE;
-    datasize = (mod->import_start -mod->data_start) / sizeof(MYTYPE);
+    datasize = (mod->export_start -mod->data_start) / sizeof(MYTYPE);
 
     //copy code segment to executable
     for(i = 0; i < codesize; i++){
@@ -99,6 +98,7 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
     //copy data segment to executable ERROR endianess fucked up
     for(i = 0; i < datasize; i++)
 	fwrite(mod->data +mod->data_start +i*sizeof(MYTYPE), sizeof(MYTYPE), 1, fp);
+
 
     freeRedundant(mod);
 
