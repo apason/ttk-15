@@ -99,6 +99,7 @@ static llist *readSymbols(module *mod, int start, int end){
     int i    = 0;
 
     llist *list = (llist*) malloc(sizeof(llist));
+    llist *head = list;
 
     //free memory!
     if((end -start) % SYMBOLSIZE != 0){
@@ -125,10 +126,11 @@ static llist *readSymbols(module *mod, int start, int end){
     }
 
     if(i == 0){
-	free(list);
+	free(head);
 	return NULL;
     }
-    return list;
+    
+    return head;
 }
 
 

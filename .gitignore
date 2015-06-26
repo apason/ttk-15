@@ -5,3 +5,4 @@
 target/*
 test/target
 !target/v*
+structure/*

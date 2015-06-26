@@ -47,6 +47,10 @@ int main(int argc, char **argv){
 	modules[i]->address_constant = modules[i -1]->linked_size \
 	    +modules[i -1]->address_constant;
 
+    /* for(i=0;i<opts->count;i++) */
+    /* 	printModule(modules[i]); */
+
+
     printf("linking modules..\n");
   
     //link main containing module first
@@ -56,8 +60,6 @@ int main(int argc, char **argv){
     for(i = 1; i < opts->count; i++)
 	linkModule(opts->output, modules, i, opts->count);
 
-    for(i=0;i<opts->count;i++)
-	printModule(modules[i]);
     
     freeModules(modules, opts->count);
     fclose(opts->output);
