@@ -7,31 +7,33 @@
 #include <ttk-15.h>
 
 #define CODESIZE 5           //code sub block contains mode-byte and machine instructin
-#define CODESTART 8          //starts from 8:th byte by .o15 module definition
+#define CODESTART 12          //starts from 8:th byte by .o15 module definition
 
 typedef struct LLIST{
-  struct LLIST *next;
-  char          label[33];
-  int16_t       value;
+    struct LLIST *next;
+    char          label[33];
+    int16_t       value;
   
 } llist;
 
 typedef struct MODULE {
-  int16_t address_constant;  //size in bytes!
-  int     size;                 
-  int     linked_size;
-  int     data_start;
-  int     symbol_start;
-  llist  *symbols;
-  char  **codes;
-  char   *data;
-  char   *filename;
+    int16_t address_constant;  //size in bytes!
+    int     size;                 
+    int     linked_size;
+    int     data_start;
+    int     import_start;
+    int     export_start;
+    llist  *import;
+    llist  *export;
+    char  **codes;
+    char   *data;
+    char   *filename;
 
 } module;
 
 typedef struct OPTIONS {
-  FILE    *output;
-  int      count;
+    FILE    *output;
+    int      count;
   
 } options;
 

@@ -47,6 +47,10 @@ int main(int argc, char **argv){
 	modules[i]->address_constant = modules[i -1]->linked_size \
 	    +modules[i -1]->address_constant;
 
+    /* for(i=0;i<opts->count;i++) */
+    /* 	printModule(modules[i]); */
+
+
     printf("linking modules..\n");
   
     //link main containing module first
@@ -56,6 +60,7 @@ int main(int argc, char **argv){
     for(i = 1; i < opts->count; i++)
 	linkModule(opts->output, modules, i, opts->count);
 
+    
     freeModules(modules, opts->count);
     fclose(opts->output);
 
@@ -112,20 +117,24 @@ static int findMain(module **modules, int n){
 static int containsMain(module *mod){
     llist *li;
   
-    for(li = mod->symbols; li != NULL; li = li->next)
+    for(li = mod->export; li != NULL; li = li->next)
 	if(!strncmp(li->label, "main", 32))
 	    return 1;
   
     return 0;  
 }
 
-
+//atm print only export table
 static void printModule(module *mod){
-    printf("size: %d\tlinksize %d\tdstart: %d\tsstart %d\tconstant %d\n", mod->size, mod->linked_size, mod->data_start, mod->symbol_start, mod->address_constant);
-    if(!mod->symbols)
-	printf("symbol list = NULL\n");
+    printf("size: %d\tlinksize %d\tdstart: %d\tistart %d\nestart %d\tconstant %d\n", mod->size, mod->linked_size, mod->data_start, mod->import_start, mod->export_start, mod->address_constant);
+    if(!mod->import)
+	printf("import list = NULL\n");
     else
-	printSymbols(mod->symbols);
+	printSymbols(mod->import);
+    if(!mod->export)
+	printf("export list = NULL\n");
+    else
+	printSymbols(mod->export);
 
 }
 

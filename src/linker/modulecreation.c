@@ -9,107 +9,130 @@
 
 #define SYMBOLSIZE 34  //size of one symbol sub block in .o15 format
 
-static void readSymbols(module *mod);
 static void readCode(module *mod);
+static void readImportExport(module *mod);
+static llist *readSymbols(module *mod, int start, int end);
 static module *readModule(FILE *fp, char *filename);
 
 //create all modules determined by argv
 void createModules(int n, char **argv, module **modules){
-  FILE *fp = NULL;
-  int   i  = 0;
+    FILE *fp = NULL;
+    int   i  = 0;
   
-  for(i = 0; i < n; i++){
+    for(i = 0; i < n; i++){
 
     
-    fp = fopen(argv[i], "rb");
-    if(fp == NULL){
-      perror("opening module");
-      exit(-1);
+	fp = fopen(argv[i], "rb");
+	if(fp == NULL){
+	    perror("opening module");
+	    exit(-1);
+	}
+
+	modules[i] = readModule(fp, argv[i]);
+
+	fclose(fp);
+
+	readCode(modules[i]);
+	readImportExport(modules[i]);
+    
     }
-
-    modules[i] = readModule(fp, argv[i]);
-
-    fclose(fp);
-
-    readCode(modules[i]);
-    readSymbols(modules[i]);
-    
-  }
 }
 
 //initializes one module
 static module *readModule(FILE *fp, char *filename){
-  int i               = 0;
-  uint32_t data_size  = -1;
-  uint32_t code_size  = -1;
-  module *mod         = (module *)malloc(sizeof(module));
+    int i               = 0;
+    uint32_t data_size  = -1;
+    uint32_t code_size  = -1;
+    module *mod         = (module *)malloc(sizeof(module));
 
-  mod->filename = filename;
+    mod->filename = filename;
 
-  //determine size
-  fseek(fp, 0, SEEK_END);
-  mod->size = ftell(fp);
+    //determine size
+    fseek(fp, 0, SEEK_END);
+    mod->size = ftell(fp);
 
-  mod->data = (char *)malloc(mod->size);
-  fseek(fp, 0, SEEK_SET);
+    mod->data = (char *)malloc(mod->size);
+    fseek(fp, 0, SEEK_SET);
 
-  //read code and data starts
-  fread(&mod->symbol_start, 4, 1, fp);
-  fread(&mod->data_start, 4, 1, fp);
-
-  //calculate linked size 
-  code_size = 4 * (mod->data_start - CODESTART) / CODESIZE;
-  data_size = mod->symbol_start - mod->data_start;
-  mod->linked_size = code_size + data_size;
-
-  fseek(fp, 0, SEEK_SET);
+    //read code and data starts
+    fread(&mod->data_start, sizeof(MYTYPE), 1, fp);
+    fread(&mod->export_start, sizeof(MYTYPE), 1, fp);
+    fread(&mod->import_start, sizeof(MYTYPE), 1, fp);
   
-  //copy file to module
-  for(i = 0; i < mod->size; i++)
-    fread(mod->data +i, 1, 1, fp);
+    //calculate linked size 
+    code_size = sizeof(MYTYPE) * (mod->data_start - CODESTART) / CODESIZE;
+    data_size = mod->export_start - mod->data_start;
+    mod->linked_size = code_size + data_size;
 
-  return mod;
+    fseek(fp, 0, SEEK_SET);
+  
+    //copy file to module
+    for(i = 0; i < mod->size; i++)
+	fread(mod->data +i, 1, 1, fp);
+
+    return mod;
 }
 
 //constructs code array in module 
 static void readCode(module *mod){
-  int i    = 0;
-  int size = (mod->data_start -CODESTART );
+    int i    = 0;
+    int size = (mod->data_start -CODESTART );
   
-  mod->codes = (char **)malloc(sizeof(char *) * size);
+    mod->codes = (char **)malloc(sizeof(char *) * size);
   
-  for(i = 0; i < size / CODESIZE; i++){
-    mod->codes[i] = (char *)malloc(sizeof(char) * CODESIZE);
-    memcpy(mod->codes[i], mod->data +(i * CODESIZE) +CODESTART, CODESIZE);
-  }
+    for(i = 0; i < size / CODESIZE; i++){
+	mod->codes[i] = (char *)malloc(sizeof(char) * CODESIZE);
+	memcpy(mod->codes[i], mod->data +(i * CODESIZE) +CODESTART, CODESIZE);
+    }
   
 }
 
 //constructs symbol list in module
-static void readSymbols(module *mod){
-  int size      = (mod->size - mod->symbol_start) / SYMBOLSIZE;
-  int i         = 0;
-  llist *symbol = NULL;
+static void readImportExport(module *mod){
+    mod->import = readSymbols(mod, mod->import_start, mod->size);
+    mod->export = readSymbols(mod, mod->export_start, mod->import_start);
 
-  mod->symbols = (llist *)malloc(sizeof(llist));  
-  symbol = mod->symbols;
-  *(symbol->label +LABELLENGTH) = '\0';           //initialize
-  symbol->next = NULL;                            //initialize
-
-  for(i = 0; i < size; i++){
-    
-    strncpy(symbol->label, (char *)mod->data \
-	    +mod->symbol_start +(i * SYMBOLSIZE), LABELLENGTH);
-    symbol->value = *((int16_t *)(mod->data +mod->symbol_start \
-				  +(i * SYMBOLSIZE) +LABELLENGTH));
-
-    if(i < size -1){
-      symbol->next = (llist *)malloc(sizeof(llist));
-      symbol = symbol->next;
-      symbol->next = NULL;
-    }    
-  }
 }
+
+static llist *readSymbols(module *mod, int start, int end){
+    int size = (end -start) / SYMBOLSIZE;
+    int i    = 0;
+
+    llist *list = (llist*) malloc(sizeof(llist));
+    llist *head = list;
+
+    //free memory!
+    if((end -start) % SYMBOLSIZE != 0){
+    	fprintf(stderr, "ERROR: incorrect module header!\n");
+    	exit(-1);
+    }
+
+    //memset would be better?
+    *(list->label +LABELLENGTH) = '\0';           //initialize
+    list->next = NULL;                            //initialize
+
+    for(i = 0; i < size; i++){
+    
+	strncpy(list->label, (char *)mod->data \
+		+start +(i * SYMBOLSIZE), LABELLENGTH);
+	list->value = *((int16_t *)(mod->data +start \
+				      +(i * SYMBOLSIZE) +LABELLENGTH));
+
+	if(i < size -1){
+	    list->next = (llist *)malloc(sizeof(llist));
+	    list = list->next;
+	    list->next = NULL;
+	}    
+    }
+
+    if(i == 0){
+	free(head);
+	return NULL;
+    }
+    
+    return head;
+}
+
 
 
 

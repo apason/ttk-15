@@ -1,6 +1,10 @@
 #ifndef INSTRUCTIONS
 #define INSTRUCTIONS
 
+/*
+ * ttk-91 compatible instructions
+ */
+
 #define NOP    0x0
 
 #define STORE  0x1
@@ -47,6 +51,29 @@
 #define POPR   0x36
 
 #define SVC    0x70
+
+/*
+ * floating point extension
+ * opcodes are same as ttk-91
+ * instructions with most 
+ * significant bit turned on
+ */
+
+#define FIN    0x83
+#define FOUT   0x84
+
+#define FADD   0x91
+#define FSUB   0x92
+#define FMUL   0x93
+#define FDIV   0x94
+
+#define FCOMP  0x9F
+#define FJNEG  0xA1
+#define FJZER  0xA2
+#define FJPOS  0xA3
+#define FJNNEG 0xA4
+#define FJNZER 0xA5
+#define FJNPOS 0xA6
 
 #endif
 

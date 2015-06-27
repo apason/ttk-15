@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <module.h>
 
 #include "compiler.h"
 
@@ -25,10 +26,22 @@ int buildModule(code_file* file){
         if(isInstruction(word))
             ++size;
         else{
-            if(sscanf(code[i], "%s %s %s", label, word, val) < 2){
-                printf("invalid start of expression: %s\n", label);
+            char ext[MAX];
+            int mode = LOCAL;
+            int nopt = sscanf(code[i], "%s %s %s %s", ext, label, word, val);
+            if(nopt < 2){
+                printf("invalid start of expression: %s\n", ext);
                 exit(-1);
+            } else if (strncmp(ext, "export", MAX)){
+                sscanf(code[i], "%s %s %s", label, word, val);
+                if (!strncmp(label, "main", LABELLENGTH))
+                    mode = EXPORT;
+                else
+                    mode = LOCAL;
+            } else {
+                mode = EXPORT;
             }
+            
 
             if(!isInstruction(label) && isInstruction(word))
                 label_node->address = size++;
@@ -48,6 +61,7 @@ int buildModule(code_file* file){
                 label_node->address = atoi(val);
                 label_node->size = -1;
                 file->code_text[i+1]++;
+                mode = NO_LABEL;
             }
             else{
                 printf("ERROR: invalid instruction %s\n", word);
@@ -56,6 +70,8 @@ int buildModule(code_file* file){
             memset(label_node->label, 0, LABELLENGTH);
             // set label name
             strncpy(label_node->label, label, LABELLENGTH);
+            // set label mode
+            label_node->mode = mode;
             // reserve space for next label
             label_node->next = (label_list*) malloc(sizeof(label_list));
             label_node = label_node->next;
@@ -78,6 +94,7 @@ int buildModule(code_file* file){
         }
         label_node = label_node->next;
     }
+    // free empty entry from the end of the list
     label_node = file->symbolList;
     while(label_node->next && label_node->next->next) {
         label_node = label_node->next;

@@ -25,7 +25,8 @@ static void freeModule(module *mod){
   if(mod->codes) free(mod->codes);
   if(mod->data)  free(mod->data);
   
-  freeSymbolList(mod->symbols);
+  freeSymbolList(mod->import);
+  freeSymbolList(mod->export);
   free(mod);
 }
 

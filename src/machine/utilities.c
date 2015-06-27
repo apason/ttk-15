@@ -52,6 +52,24 @@ void initializeInstructionArray(instructionptr *instructions){
   instructions[PUSHR] = pushr;
   instructions[POPR]  = popr;
   instructions[SVC]   = svc;
+
+  /*
+   * floating point extension
+   */
+
+  instructions[FIN]    = fin;
+  instructions[FOUT]   = fout;
+  instructions[FADD]   = fadd;
+  instructions[FSUB]   = fsub;
+  instructions[FMUL]   = fmul;
+  instructions[FDIV]   = fdiv;
+  instructions[FCOMP]  = fcomp;
+  instructions[FJNEG]  = fjneg;
+  instructions[FJPOS]  = fjzer;
+  instructions[FJNNEG] = fjpos;
+  instructions[FJNZER] = fjnneg;
+  instructions[FJNPOS] = fjnzer;
+  
 }
 
 //mainly for debugging. prints state of machine and first memoryslots

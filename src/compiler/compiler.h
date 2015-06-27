@@ -5,6 +5,7 @@
 #include <ttk-15.h>
 
 #define MAX 128
+#define N_INSTR 51
 // single linked list for the symbol table
 typedef struct label_list {
     struct label_list* next;
@@ -13,6 +14,7 @@ typedef struct label_list {
     MYTYPE size;
     // used only with the dc keyword
     MYTYPE value;
+    int mode;
 } label_list;
 // a structure for data from the file
 typedef struct {
@@ -23,6 +25,7 @@ typedef struct {
     struct label_list* symbolList;
     MYTYPE moduleSize;
     MYTYPE codeSize;
+    MYTYPE exportSize;
     FILE* fh_out;
     int* code_text;
 } code_file;

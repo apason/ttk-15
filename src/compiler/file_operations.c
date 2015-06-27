@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <ttk-15.h>
 #include <instructions.h>
+#include <module.h>
 #include "errorcodes.h"
 #include "compiler.h"
 
@@ -132,12 +133,9 @@ static int nextLine(FILE* fh) {
 int writeCodeFile(code_file* file) {
     int error = 0;
     FILE* fh = file->fh_out;
+    // skip header, we'll write it later
+    fseek(fh, sizeof(MYTYPE) * 3, SEEK_CUR );
 
-    // write header to the object file
-    MYTYPE dataSegmentAddress = file->codeSize*5 + 8;
-    MYTYPE symbolTableAddress =  dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
-    fwrite(&symbolTableAddress,sizeof(MYTYPE),1,fh);
-    fwrite(&dataSegmentAddress, sizeof(MYTYPE),1,fh);
     // start writing data
     int i, cInstructions = 0;
     char word[MAX], label[LABELLENGTH], val[MAX];
@@ -155,10 +153,14 @@ int writeCodeFile(code_file* file) {
             continue;
         }
         val[0] = '\0';
+        char trash[MAX];
         if (sscanf(file->array[i], "%s %s %s", label, word, val) < 2) {
             fprintf(stderr,"Error reading line: %d\n",file->code_text[cInstructions]);//error
             fprintf(stderr,"\t\"%s\"\n",file->array[i]);
         }
+        if (!strncmp(label, "export", LABELLENGTH))
+            sscanf(file->array[i], "%s %s %s %s", trash, label, word, val);
+
         if (!isInstruction(label) && isInstruction(word)) {
             error = writeInstruction(word,val,file->symbolList, fh, file->mode);
             // print error if found
@@ -171,20 +173,27 @@ int writeCodeFile(code_file* file) {
 
     }
     label_list* symbols = file->symbolList;
+    // write the data segment
     while (symbols!=NULL) {
-        if (symbols->size == 1) {
-            fwrite(&(symbols->value),sizeof(MYTYPE),1,fh);
-        } else if (symbols->size > 1) {
-            for (i = 0; i < symbols->size; ++i) {
-                MYTYPE nul = 0;
-                fwrite(&nul, 1, sizeof(MYTYPE),fh);
+        if (symbols->mode != IMPORT) {
+            if (symbols->size == 1) {
+                fwrite(&(symbols->value),sizeof(MYTYPE),1,fh);
+            } else if (symbols->size > 1) {
+                for (i = 0; i < symbols->size; ++i) {
+                    MYTYPE nul = 0;
+                    fwrite(&nul, 1, sizeof(MYTYPE),fh);
+                }
             }
         }
         symbols = symbols->next;	
     }
+    // write the import and export tables
+    file->exportSize = 0;
     symbols = file->symbolList;
     while (symbols != NULL) {
-        if (symbols->size >= 0) {
+        if (symbols->mode == EXPORT)
+            file->exportSize += 34;
+        if (symbols->mode == EXPORT || symbols->mode == IMPORT) {
             if (strlen(symbols->label)>32)
                 fprintf(stderr, "Warning: symbol name more than 32 chars, will be cut: %s\n",symbols->label);
             fwrite(symbols->label,sizeof(char),32,fh);
@@ -192,6 +201,15 @@ int writeCodeFile(code_file* file) {
         }
         symbols = symbols->next;
     }
+    fseek(fh, 0, SEEK_SET);
+    // write header to the object file
+    MYTYPE dataSegmentAddress = file->codeSize*5 + 12;
+    MYTYPE exportTableAddress = dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
+    MYTYPE importTableAddress = exportTableAddress + file->exportSize;
+
+    fwrite(&dataSegmentAddress, sizeof(MYTYPE),1,fh);
+    fwrite(&exportTableAddress, sizeof(MYTYPE),1,fh);
+    fwrite(&importTableAddress, sizeof(MYTYPE),1,fh);
     fclose(fh);
     return 0;
 }
@@ -199,7 +217,7 @@ int writeCodeFile(code_file* file) {
 
 static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, int ttk_mode) {
 
-    uint8_t firstByte = 0;
+    uint8_t firstByte = NO_LABEL;
     uint32_t instruction = 0;
     int ttk_15 = (ttk_mode == TTK15);
 

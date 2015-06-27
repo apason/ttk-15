@@ -51,11 +51,14 @@ int main (int argc, char* argv[]) {
         writeCodeFile(&codeFile);
 
         if (debug) {
+            const char* mode[4] = {
+                "NO_LABEL", "LOCAL",
+                "IMPORT", "EXPORT" };
             // print the symbol table
             printf("Symbols:\n");
             label_list* temp = codeFile.symbolList;
             while (temp != NULL) {
-                printf("%s : %0x : %d : %d\n",temp->label, (uint16_t)temp->address, temp->size, temp->value);
+                printf("%s : %0x : %d : %d : %s\n",temp->label, (uint16_t)temp->address, temp->size, temp->value, mode[temp->mode]);
                 temp = temp->next;
             }
         }

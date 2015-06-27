@@ -16,6 +16,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
 ## backlog ##
 
  * masiinan dokumentointi kusettaa store käskyn!
+ * sefault jos linkkauksessa linkattavaa symbolia ei ole taulussa 
  * testaa titokoneessa nollalla jakaminen ym. keskeytykset
  * "wrapper" skripti tms joka kapseloi linkkerin ja kääntäjän (ehkä masiinan?)
  * konekäskyt state registerin tutkimiseen
