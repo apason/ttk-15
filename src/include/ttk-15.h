@@ -72,3 +72,5 @@ typedef struct MACHINE{
 extern int loadFile(MYTYPE *mem, FILE *file, MYTYPE memsize);
 extern int loadFile91(MYTYPE *mem, FILE *file, MYTYPE memsize);
 #endif
+
+

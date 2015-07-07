@@ -4,7 +4,9 @@
 //project headers
 #include <ttk-15.h>
 #include <instructions.h>
+#include <ncurses.h>
 #include "machine.h"
+
 
 void initializeInstructionArray(instructionptr *instructions){
   int i = 0;
@@ -86,4 +88,4 @@ void printState(machine *m){
   
   printf("\n\n");
 }
-
+			      

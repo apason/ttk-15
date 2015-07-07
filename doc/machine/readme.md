@@ -75,6 +75,7 @@ most significant bit:
  * S - indicates supervisor call
  * p - machine is running in privileged (root) mode
  * D - interrupts disabled
+ * H - halt program
 
 ###instructions###
 

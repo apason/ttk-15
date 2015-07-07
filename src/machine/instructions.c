@@ -332,13 +332,13 @@ FUNCTION(popr){
 
 //could be better
 FUNCTION(svc){
-    if(m->cu->tr == HALT){
+    if(m->cu->tr == HALT)
+	m->cu->sr |= HFLAG;
+    else{
+	fprintf(stderr, "unknown supervisor call %d!\n", m->cu->tr);
 	freeMachine(m);
-	exit(0);
+	exit(-1);
     }
-    fprintf(stderr, "unknown supervisor call %d!\n", m->cu->tr);
-    freeMachine(m);
-    exit(-1);
 }
 
 /*

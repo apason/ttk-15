@@ -17,5 +17,6 @@
 #define SFLAG 0x800000
 #define PFLAG 0x400000
 #define DFLAG 0x200000
+#define HFLAG 0x100000
 
 #endif

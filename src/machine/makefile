@@ -1,6 +1,6 @@
 CC= 	  gcc
 STD=	  _GNU_SOURCE_
-OBJS=	  main.o utilities.o instructions.o machine.o loader.o options.o
+OBJS=	  main.o utilities.o instructions.o machine.o loader.o options.o ncurses.o
 INCLUDE=  -I "../include/"
 CFLAGS=   -Wall -D$(STD) $(INCLUDE) -c -Werror -Wno-unused-function
 TARGET=   ../../target/
@@ -11,7 +11,7 @@ TARGET=   ../../target/
 all:	machine
 
 machine:	$(OBJS)
-		$(CC) $(OBJS) -o $(TARGET)ttk-15 
+		$(CC) $(OBJS) -o $(TARGET)ttk-15 -lncurses
 
 clean:
 	rm -f *.o

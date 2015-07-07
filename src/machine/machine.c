@@ -69,15 +69,18 @@ void startMachine(machine *m, int debug){
     m->mmu->limit = m->memsize;
 
     if(debug){
+	initScreen();
     execution_with_debug:
 	getInstruction(m);
 
-	printState(m);
-	getchar();
+	/* printState(m); */
+	/* getchar(); */
+
+	drawScreen(m);
 
 	increasePC(m);
 	execInstruction(m, instructions);
-	//handleInterrupts(m);
+	handleInterrupts(m);
 	goto execution_with_debug;
     }
     else{
@@ -85,7 +88,7 @@ void startMachine(machine *m, int debug){
 	getInstruction(m);
 	increasePC(m);
 	execInstruction(m, instructions);
-	//handleInterrupts(m);
+	handleInterrupts(m);
 	goto execution_without_debug;
     }
 }
@@ -93,6 +96,12 @@ void startMachine(machine *m, int debug){
 
 static void handleInterrupts(machine *m){
     if(m->cu->sr&IFLAG) ;                         //interrupt detected
+    if(m->cu->sr&HFLAG){                          //program halted
+	killScreen();	
+	freeMachine(m);
+	exit(0);
+    }
+    
 }
 
 

@@ -14,7 +14,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  
 
 ## backlog ##
-
+ * enumeiksi mikä kannattaa
  * masiinan dokumentointi kusettaa store käskyn!
  * sefault jos linkkauksessa linkattavaa symbolia ei ole taulussa 
  * testaa titokoneessa nollalla jakaminen ym. keskeytykset

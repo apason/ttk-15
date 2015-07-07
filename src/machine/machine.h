@@ -34,6 +34,9 @@ extern void mmuSetData(mm_unit *mmu, MYTYPE *mem, MYTYPE addr, MYTYPE data);
 extern void initializeInstructionArray(instructionptr *instructions);
 extern void printState(machine *m);
 extern void freeMachine(machine *m);
+extern void initScreen(void);
+extern void drawScreen(machine *m);
+extern void killScreen(void);
 
 //instructions.c contains all machine instructions
 extern FUNCTION(nop);
