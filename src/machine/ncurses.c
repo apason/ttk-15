@@ -1,3 +1,4 @@
+#include <string.h>
 #include <ncurses.h>
 #include <ttk-15.h>
 #include "machine.h"
@@ -8,10 +9,42 @@
  */
 enum type { BIN = 32, HEX = 8, DEC = 11, EXP = 13 };
 
-static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x);
-static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x);
-static int calculateRow(int x, enum type current, int a);
+static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, char **arr, int size);
+static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, char **arr, int size);
+static int calculateRow(int x, enum type current, int a, int size);
 static int len(MYTYPE x, enum type current);
+
+static char ra0[] = "R0:";
+static char ra1[] = "R1:";
+static char ra2[] = "R2:";
+static char ra3[] = "R3:";
+static char ra4[] = "R4:";
+static char ra5[] = "R5:";
+static char ra6[] = "SP:";
+static char ra7[] = "FP:";
+static char *registers_array[]={ra0, ra1, ra2, ra3, ra4, ra5, ra6, ra7};
+
+static char ma0[] = "limit:";
+static char ma1[] = "base:";
+static char ma2[] = "MBR:";
+static char ma3[] = "MAR:";
+static char *MMU_array[] = {ma0, ma1, ma2, ma3};
+
+static char ca0[] = "TR:";
+static char ca1[] = "IR:";
+static char ca2[] = "PC:";
+static char ca3[] = "SR:";
+static char *CU_array[] = {ca0, ca1, ca2, ca3};
+
+static char aa0[] = "in1:";
+static char aa1[] = "in2:";
+static char aa2[] = "out:";
+static char *ALU_array[] = {aa0, aa1, aa2};
+
+static char fa0[] = "in1:";
+static char fa1[] = "in2:";
+static char fa2[] = "out:";
+static char *FPU_array[] = {fa0, fa1, fa2};
 
 /*
  * main function of ncurses gui. this is executed
@@ -34,11 +67,11 @@ void drawScreen(machine *m){
     getmaxyx(stdscr, y, x);
 
     //create subwindows for every part of cpu
-    registers = drawMYTYPE(m->regs, 8, current, x -2);
-    MMU = drawMYTYPE(&m->mmu->limit, 4, current, x -2);
-    CU = drawMYTYPE(&m->cu->tr, 4, current, x -2);
-    ALU = drawMYTYPE(&m->alu->in1, 3, current, x -2);
-    FPU = drawMYTYPEF(&m->fpu->in1, 3, current, x -2);
+    registers = drawMYTYPE(m->regs, 8, current, x -2, (char**)registers_array, 3);
+    MMU = drawMYTYPE(&m->mmu->limit, 4, current, x -2, (char**)MMU_array, 4);
+    CU = drawMYTYPE(&m->cu->tr, 4, current, x -2, (char**)CU_array, 3);
+    ALU = drawMYTYPE(&m->alu->in1, 3, current, x -2, (char**)ALU_array, 4);
+    FPU = drawMYTYPEF(&m->fpu->in1, 3, current, x -2, (char**)FPU_array, 4);
     
     //title them
     wprintw(registers, "registers");
@@ -90,14 +123,15 @@ void killScreen(void){
  * by C standard that addr +1 is the second object of that struct
  * so this is not necessarily work! bad code :-(
  */
-static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x){
+static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, char *arr[], int size){
     WINDOW *w;
     int row, regsperrow, i, j, currentx, currenty, count, length;
 
     //how many rows we need to dras all elements
-    row = calculateRow(x -2, current, elems); // -2 for window borded
+    // -2 for window borded
+    row = calculateRow(x -2, current +size +2 , elems, size);
     //how many elements could be drawn to one line
-    regsperrow = (x -2) / (current);
+    regsperrow = (x -2) / (current +size +2);
     
     w = newwin(row +2, x, 0, 0);              // +2 for window borded
 
@@ -111,14 +145,14 @@ static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x){
 
 	    //print one item
 	    if(current == DEC)
-		wprintw(w, "%d ", addr[count]);
+		wprintw(w, "%s %d ", arr[count], addr[count]);
 	    else if(current == HEX)
-		wprintw(w, "%x ", addr[count]);
+		wprintw(w, "%s %x ", arr[count], addr[count]);
 
 	    //move cursor to start of second item
 	    length = len(addr[count++], current);
 	    getyx(w, currenty, currentx);
-	    wmove(w, currenty, currentx + current -length);
+	    wmove(w, currenty, currentx +current +size -length -strlen(arr[count -1]));
 	}
 	//move cursor to beginning of second line
 	getyx(w, currenty, currentx);
@@ -129,14 +163,14 @@ static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x){
 
     return w;
 }
-static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x){
+static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, char *arr[], int size){
     WINDOW *w;
     int row, regsperrow, i, j, currentx, currenty, count, length;
 
     if(current == DEC) current = EXP;
 
-    row = calculateRow(x -2, current, elems);
-    regsperrow = (x -2) / (current);
+    row = calculateRow(x -2, current +size +2, elems, size);
+    regsperrow = (x -2) / (current +size +2);
     
     w = newwin(row +2, x, 0, 0);
 
@@ -148,13 +182,13 @@ static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x){
 	for(j = 0; j < regsperrow && count < elems; j++){
 
 	    if(current == EXP)
-		wprintw(w, "%g ", addr[count]);
+		wprintw(w, "%s %g ", arr[count], addr[count]);
 	    else if(current == HEX)
-		wprintw(w, "%x ", addr[count]);
+		wprintw(w, "%s, %x ", arr[count], addr[count]);
 
 	    length = len(addr[count++], current);
 	    getyx(w, currenty, currentx);
-	    wmove(w, currenty, currentx + current -length);
+	    wmove(w, currenty, currentx + current -length -size);
 	}
 	getyx(w, currenty, currentx);
 	wmove(w, currenty +1, 1);
@@ -187,13 +221,15 @@ static int len(MYTYPE x, enum type current){
 
 void initScreen(void){
     initscr();
+    start_color();
+    init_pair(1, COLOR_CYAN, COLOR_BLACK);
 }
 
 //how many rows we need to print all registers
-static int calculateRow(int x, enum type current, int a){
-    int characters = a * (current +1);             //whitespace
+static int calculateRow(int x, enum type current, int a, int size){
+    int characters = a * current;         //whitespaces
     int lines = characters / x;
-    
+
     return characters % x == 0 ? lines : lines +1;
 }
 
