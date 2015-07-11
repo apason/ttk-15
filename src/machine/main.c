@@ -4,11 +4,11 @@
 //project headers
 #include <ttk-15.h>
 #include "machine.h"
+#include "masks.h"
 
 int main(int argc,char *argv[]){
     options *opts = getOptions(argc, argv);
     machine *m    = newMachine(opts->memsize);
-    int      tmp  = 0;
 
     m->cu->pc = 0;
 
@@ -26,12 +26,13 @@ int main(int argc,char *argv[]){
     if(m->regs[6] > 0){
 	m->regs[7] = m->regs[6];
 
-	tmp = opts->debug;
+	if(opts->debug)
+	    m->cu->sr |= TFLAG;
 
 	//options are no longer needed
 	freeOptions(opts);
 	
-	startMachine(m, tmp);
+	startMachine(m);
     }
     
     freeMachine(m);

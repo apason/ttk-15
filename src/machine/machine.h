@@ -23,7 +23,7 @@ extern void freeOptions(options *opts);
 
 //machine.c
 extern machine *newMachine(long memsize);
-extern void startMachine(machine *m, int debug);
+extern void startMachine(machine *m);
 extern FUNCTION(haltMachine);
 
 //mmu.c
@@ -34,8 +34,11 @@ extern void mmuSetData(mm_unit *mmu, MYTYPE *mem, MYTYPE addr, MYTYPE data);
 extern void initializeInstructionArray(instructionptr *instructions);
 extern void printState(machine *m);
 extern void freeMachine(machine *m);
+
+//ncurses.c
 extern void initScreen(void);
 extern void drawScreen(machine *m);
+extern MYTYPE readInput(void);
 extern void killScreen(void);
 
 //instructions.c contains all machine instructions

@@ -59,7 +59,7 @@ machine *newMachine(long memsize){
  * copypaste 2 while(1); one with debug and the other without
  */
 
-void startMachine(machine *m, int debug){
+void startMachine(machine *m){
     //create and initialize instruction array
     instructionptr instructions[255];
     initializeInstructionArray(instructions);
@@ -68,7 +68,7 @@ void startMachine(machine *m, int debug){
     m->mmu->base = 0;
     m->mmu->limit = m->memsize;
 
-    if(debug){
+    if(m->cu->sr & TFLAG){
 	initScreen();
     execution_with_debug:
 	getInstruction(m);

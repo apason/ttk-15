@@ -233,5 +233,36 @@ static int calculateRow(int x, enum type current, int a, int size){
     return characters % x == 0 ? lines : lines +1;
 }
 
+MYTYPE readInput(void){
+    MYTYPE input;
+    int x, y, l, m, len = 40, wid = 8;
+    WINDOW *w;
 
+    getmaxyx(stdscr, y, x);
+
+    if(x > len) l = x/2 - len/2;
+    else l = len;
+
+    if(y > wid) m = y/2 - wid/2;
+    else m = wid;
+
+    w = newwin(wid, len, m, l);
+    echo();
+
+    do{
+	werase(w);
+	box(w, 0, 0);
+	
+	mvwprintw(w, 1, 1, "                 INPUT");
+	wmove(w, 4, 3);
+	refresh();
+	wrefresh(w);
+    }while(wscanw(w, "%d", &input) != 1);
+
+    
+    delwin(w); 
+
+    return input;
+    
+}
 

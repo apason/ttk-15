@@ -27,15 +27,20 @@ FUNCTION(load){
 //simulation
 FUNCTION(in){
     MYTYPE tmp = 0;
-  
+
     if(m->cu->tr == KBD){
-	while(scanf("%d", &tmp) != 1);
-	m->regs[rj] = tmp;
+	if(!(m->cu->sr & TFLAG)){
+	    while(scanf("%d", &tmp) != 1);
+	    m->regs[rj] = tmp;
+	}
+	else{
+	    m->regs[rj] = readInput();
+	}
     }
+
     else{
 	fprintf(stderr, "ERROR: in instruction IN: reference to unknown device\n");
-	freeMachine(m);
-	exit(-1);
+	m->cu->sr &= HFLAG;
     }
 }
 

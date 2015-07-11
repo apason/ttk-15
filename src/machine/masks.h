@@ -17,6 +17,9 @@
 #define SFLAG 0x800000
 #define PFLAG 0x400000
 #define DFLAG 0x200000
-#define HFLAG 0x100000
+
+//ttk-15 extension
+#define HFLAG 0x100000    //halt-flag indicates that program is halted
+#define TFLAG 0x80000     //trap-flag indicates that processor is executing in debug mode
 
 #endif
