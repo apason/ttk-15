@@ -40,6 +40,7 @@ extern void initScreen(void);
 extern void drawScreen(machine *m);
 extern MYTYPE readInput(void);
 extern void killScreen(void);
+extern void printOutput(MYTYPE out);
 
 //instructions.c contains all machine instructions
 extern FUNCTION(nop);

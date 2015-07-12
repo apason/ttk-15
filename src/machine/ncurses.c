@@ -8,11 +8,15 @@
  * the value of MYTYPE(F) in specific representation
  */
 enum type { BIN = 32, HEX = 8, DEC = 11, EXP = 13 };
+enum screentab { CPU, MEM, OUT };
 
 static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, char **arr, int size);
 static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, char **arr, int size);
 static int calculateRow(int x, enum type current, int a, int size);
 static int len(MYTYPE x, enum type current);
+static void drawCPU(machine *m, enum type current);
+static void drawMemory(machine *m, enum type current);
+static void drawCRT(machine *m);
 
 static char ra0[] = "R0:";
 static char ra1[] = "R1:";
@@ -51,8 +55,73 @@ static char *FPU_array[] = {fa0, fa1, fa2};
  * between every instruction in debugging mode
  */
 void drawScreen(machine *m){
-    int y, x, pos = 1;
+    enum screentab scr = CPU;
     enum type current = DEC;
+
+    int ch;
+
+    drawCPU(m, current);
+    noecho();
+    keypad(stdscr, TRUE);
+    curs_set(0);
+    
+    //return only if we are in CPU window and enter is pressed
+    while(!((ch = getch()) == 10 && scr == CPU)){
+	switch (ch){
+	case KEY_F(1):
+	    drawCPU(m, current);
+	    scr = CPU;
+	    break;
+	case KEY_F(2):
+	    drawMemory(m, current);
+	    scr = MEM;
+	    break;
+	case KEY_F(3):
+	    drawCRT(m);
+	    scr = OUT;
+	    break;
+	}
+    }
+}
+
+static void drawMemory(machine *m, enum type current){
+    int x, y, rows, cols, slots_per_row, i;
+    static enum type asd = DEC;
+    
+    werase(stdscr);
+    box(stdscr, 0, 0);
+    mvwprintw(stdscr, 1, 1, "<F1> CPU\t<F2> memory\t<F3> CRT");
+
+    getmaxyx(stdscr, y, x);
+
+    rows = y -3; //borders and guideline
+    cols = (x -2) / (current + 5); //5?
+    (void) cols;
+
+    slots_per_row = (x -2) / (current + 5);
+
+    wmove(stdscr, 1, 1);
+    for(i = 0; i < slots_per_row * rows; i++){
+	if(i % slots_per_row == 0){
+	    getyx(stdscr, y, x);
+	    wmove(stdscr, y +1, 1);
+	}
+	wprintw(stdscr, "%d: %d ", i, m->mem[i]);
+	getyx(stdscr, y, x);
+	wmove(stdscr, y, x +current -len(m->mem[i], current) -len(i, asd));
+    }
+}
+
+static void drawCRT(machine *m){
+    werase(stdscr);
+    box(stdscr, 0, 0);
+    mvwprintw(stdscr, 1, 1, "<F1> CPU\t<F2> memory\t<F3> CRT");
+    
+
+}
+
+static void drawCPU(machine *m, enum type current){
+    int y, x, pos = 2;
     static WINDOW *registers, *MMU, *CU, *ALU, *FPU;
 
     //clear all output from last draw
@@ -96,6 +165,7 @@ void drawScreen(machine *m){
     mvwin(FPU, pos, 1);
 
     box(stdscr, 0, 0);
+    mvwprintw(stdscr, 1, 1, "<F1> CPU\t<F2> memory\t<F3> CRT");
 
     //print subwindows and main window
     refresh();    
@@ -105,8 +175,6 @@ void drawScreen(machine *m){
     wrefresh(ALU);
     wrefresh(FPU);
     
-    noecho();
-    getch();
 }
 
 void killScreen(void){
@@ -248,7 +316,8 @@ MYTYPE readInput(void){
 
     w = newwin(wid, len, m, l);
     echo();
-
+    curs_set(1);
+    
     do{
 	werase(w);
 	box(w, 0, 0);
@@ -260,9 +329,12 @@ MYTYPE readInput(void){
     }while(wscanw(w, "%d", &input) != 1);
 
     
-    delwin(w); 
+    delwin(w);
+    curs_set(0);
 
     return input;
     
 }
 
+ void printOutput(MYTYPE out){
+ }

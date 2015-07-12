@@ -46,12 +46,16 @@ FUNCTION(in){
 
 //simulation
 FUNCTION(out){
-    if(m->cu->tr == CRT)
-	printf("%d\t", m->regs[rj]);
+    if(m->cu->tr == CRT){
+
+	if(m->cu->sr & TFLAG)
+	    printf("%d\t", m->regs[rj]);
+	else
+	    printOutput(m->regs[rj]);
+    }
     else{
 	fprintf(stderr, "in instruction OUT: reference to unknown device\n");
-	freeMachine(m);
-	exit(-1);
+	m->cu->sr |= HFLAG;
     }
 }
 
