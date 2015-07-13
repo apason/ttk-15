@@ -73,9 +73,6 @@ void startMachine(machine *m){
     execution_with_debug:
 	getInstruction(m);
 
-	/* printState(m); */
-	/* getchar(); */
-
 	drawScreen(m);
 
 	increasePC(m);

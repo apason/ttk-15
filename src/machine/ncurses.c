@@ -1,13 +1,20 @@
+#include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
 #include <ttk-15.h>
 #include "machine.h"
+
+struct outputList{
+    MYTYPE output;
+    struct outputList *next;
+};
 
 /* 
  * describes how many characters is needed to present
  * the value of MYTYPE(F) in specific representation
  */
 enum type { BIN = 32, HEX = 8, DEC = 11, EXP = 13 };
+//current screen tab to draw
 enum screentab { CPU, MEM, OUT };
 
 static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, char **arr, int size);
@@ -17,6 +24,7 @@ static int len(MYTYPE x, enum type current);
 static void drawCPU(machine *m, enum type current);
 static void drawMemory(machine *m, enum type current);
 static void drawCRT(machine *m);
+static void drawPanel(void);
 
 static char ra0[] = "R0:";
 static char ra1[] = "R1:";
@@ -50,36 +58,49 @@ static char fa1[] = "in2:";
 static char fa2[] = "out:";
 static char *FPU_array[] = {fa0, fa1, fa2};
 
+static struct outputList *first = NULL;
+static enum screentab scr;
+
 /*
  * main function of ncurses gui. this is executed
  * between every instruction in debugging mode
  */
 void drawScreen(machine *m){
-    enum screentab scr = CPU;
     enum type current = DEC;
-
     int ch;
 
-    drawCPU(m, current);
+    switch (scr){
+    case CPU:
+	drawCPU(m, current);
+	break;
+    case MEM:
+	drawMemory(m, current);
+	break;
+    case OUT:
+	drawCRT(m);
+	break;
+    }
+
     noecho();
     keypad(stdscr, TRUE);
     curs_set(0);
     
     //return only if we are in CPU window and enter is pressed
-    while(!((ch = getch()) == 10 && scr == CPU)){
+    while((ch = getch()) != 10){
 	switch (ch){
 	case KEY_F(1):
+	    scr = CPU;	    
 	    drawCPU(m, current);
-	    scr = CPU;
 	    break;
 	case KEY_F(2):
+	    scr = MEM;	    
 	    drawMemory(m, current);
-	    scr = MEM;
 	    break;
 	case KEY_F(3):
+	    scr = OUT;	    
 	    drawCRT(m);
-	    scr = OUT;
 	    break;
+	    //if resize -> draw again
 	}
     }
 }
@@ -87,10 +108,15 @@ void drawScreen(machine *m){
 static void drawMemory(machine *m, enum type current){
     int x, y, rows, cols, slots_per_row, i;
     static enum type asd = DEC;
+
     
+    wbkgd(stdscr, COLOR_PAIR(1));
+
     werase(stdscr);
+    
     box(stdscr, 0, 0);
-    mvwprintw(stdscr, 1, 1, "<F1> CPU\t<F2> memory\t<F3> CRT");
+
+    drawPanel();
 
     getmaxyx(stdscr, y, x);
 
@@ -101,7 +127,7 @@ static void drawMemory(machine *m, enum type current){
     slots_per_row = (x -2) / (current + 5);
 
     wmove(stdscr, 1, 1);
-    for(i = 0; i < slots_per_row * rows; i++){
+    for(i = 0; i < slots_per_row * rows && i < m->mmu->limit; i++){
 	if(i % slots_per_row == 0){
 	    getyx(stdscr, y, x);
 	    wmove(stdscr, y +1, 1);
@@ -110,19 +136,33 @@ static void drawMemory(machine *m, enum type current){
 	getyx(stdscr, y, x);
 	wmove(stdscr, y, x +current -len(m->mem[i], current) -len(i, asd));
     }
+    refresh();
 }
 
 static void drawCRT(machine *m){
+    int x, y;
+    struct outputList *tmp;
     werase(stdscr);
     box(stdscr, 0, 0);
-    mvwprintw(stdscr, 1, 1, "<F1> CPU\t<F2> memory\t<F3> CRT");
-    
 
+    drawPanel();
+    
+    (void) x;
+
+    wmove(stdscr, 2, 1);
+    for(tmp = first; tmp; tmp = tmp->next){
+	wprintw(stdscr, "%d ", tmp->output);
+	getyx(stdscr, y, x);
+	wmove(stdscr, y +1, 1);
+    }
+    refresh();
 }
 
 static void drawCPU(machine *m, enum type current){
     int y, x, pos = 2;
     static WINDOW *registers, *MMU, *CU, *ALU, *FPU;
+
+    wbkgd(stdscr, COLOR_PAIR(1));
 
     //clear all output from last draw
     clear();
@@ -165,7 +205,8 @@ static void drawCPU(machine *m, enum type current){
     mvwin(FPU, pos, 1);
 
     box(stdscr, 0, 0);
-    mvwprintw(stdscr, 1, 1, "<F1> CPU\t<F2> memory\t<F3> CRT");
+    drawPanel();
+	    
 
     //print subwindows and main window
     refresh();    
@@ -202,6 +243,9 @@ static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, cha
     regsperrow = (x -2) / (current +size +2);
     
     w = newwin(row +2, x, 0, 0);              // +2 for window borded
+    
+    wbkgd(w, COLOR_PAIR(1));
+    wattron(w, COLOR_PAIR(1));
 
     box(w, 0, 0);
 
@@ -229,6 +273,8 @@ static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, cha
     //is this needed?
     wmove(w, 0, 0);
 
+    wattroff(w, COLOR_PAIR(1));
+
     return w;
 }
 static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, char *arr[], int size){
@@ -241,6 +287,9 @@ static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, c
     regsperrow = (x -2) / (current +size +2);
     
     w = newwin(row +2, x, 0, 0);
+
+    wbkgd(w, COLOR_PAIR(1));
+    wattron(w, COLOR_PAIR(1));
 
     box(w, 0, 0);
 
@@ -263,6 +312,7 @@ static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, c
     }
 
     wmove(w, 0, 0);
+    wattroff(w, COLOR_PAIR(1));
 
     return w;
 }
@@ -288,9 +338,13 @@ static int len(MYTYPE x, enum type current){
 }
 
 void initScreen(void){
+    scr = CPU;
     initscr();
     start_color();
-    init_pair(1, COLOR_CYAN, COLOR_BLACK);
+    init_pair(1, COLOR_WHITE, COLOR_BLUE);
+    init_pair(2, COLOR_BLUE, COLOR_WHITE);
+    attron(COLOR_PAIR(1));
+
 }
 
 //how many rows we need to print all registers
@@ -315,6 +369,8 @@ MYTYPE readInput(void){
     else m = wid;
 
     w = newwin(wid, len, m, l);
+    wbkgd(w, COLOR_PAIR(2));
+    wattron(w, COLOR_PAIR(2));
     echo();
     curs_set(1);
     
@@ -336,5 +392,66 @@ MYTYPE readInput(void){
     
 }
 
- void printOutput(MYTYPE out){
- }
+void printOutput(MYTYPE out){
+    struct outputList *tmp, *new;
+    new = (struct outputList *) malloc(sizeof(struct outputList));
+
+    new->output = out;
+    new->next = NULL;
+
+
+    if(first){
+	//find last item
+	for(tmp = first; tmp->next; tmp = tmp->next);
+	tmp->next = new;
+    }
+    
+    else first = new;
+
+}
+
+static void drawPanel(void){
+    int x, y, i;
+
+    (void) y;
+    
+    if(scr != CPU){
+	attroff(COLOR_PAIR(1));
+	attron(COLOR_PAIR(2));
+	mvwprintw(stdscr, 1, 1, "<F1> CPU\t");
+	attroff(COLOR_PAIR(2));
+	attron(COLOR_PAIR(1));
+    }
+    else
+	mvwprintw(stdscr, 1, 1, "<F1> CPU\t");
+
+    if(scr != MEM){
+	attroff(COLOR_PAIR(1));
+	attron(COLOR_PAIR(2));
+	wprintw(stdscr, "<F2> MEM\t");
+	attroff(COLOR_PAIR(2));
+	attron(COLOR_PAIR(1));
+    }
+    else
+	wprintw(stdscr, "<F2> MEM\t");
+
+    if(scr != OUT){
+	attroff(COLOR_PAIR(1));
+	attron(COLOR_PAIR(2));
+	wprintw(stdscr, "<F3> CRT\t");
+	attroff(COLOR_PAIR(2));
+	attron(COLOR_PAIR(1));
+    }
+    else
+	wprintw(stdscr, "<F3> CRT\t");
+
+    getmaxyx(stdscr, y, x);
+
+    attroff(COLOR_PAIR(1));
+    attron(COLOR_PAIR(2));
+    for(i = 0; i < x -50; i++)
+	wprintw(stdscr, " ");
+    attroff(COLOR_PAIR(2));
+    attron(COLOR_PAIR(1));
+
+}

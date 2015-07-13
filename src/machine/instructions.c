@@ -49,9 +49,10 @@ FUNCTION(out){
     if(m->cu->tr == CRT){
 
 	if(m->cu->sr & TFLAG)
-	    printf("%d\t", m->regs[rj]);
-	else
 	    printOutput(m->regs[rj]);
+	else
+	    printf("%d\t", m->regs[rj]);
+
     }
     else{
 	fprintf(stderr, "in instruction OUT: reference to unknown device\n");
