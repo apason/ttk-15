@@ -20,7 +20,7 @@ enum screentab { CPU, MEM, OUT };
 static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, char **arr, int size);
 static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, char **arr, int size);
 static int calculateRow(int x, enum type current, int a, int size);
-static int len(MYTYPE x, enum type current);
+static int len(MYTYPE x);
 static void drawCPU(machine *m, enum type current);
 static void drawMemory(machine *m, enum type current);
 static void drawCRT(machine *m);
@@ -60,13 +60,15 @@ static char *FPU_array[] = {fa0, fa1, fa2};
 
 static struct outputList *first = NULL;
 static enum screentab scr;
+int current_memory_row;
+
 
 /*
  * main function of ncurses gui. this is executed
  * between every instruction in debugging mode
  */
 void drawScreen(machine *m){
-    enum type current = DEC;
+    enum type current = HEX;
     int ch;
 
     switch (scr){
@@ -106,10 +108,10 @@ void drawScreen(machine *m){
 }
 
 static void drawMemory(machine *m, enum type current){
-    int x, y, rows, cols, slots_per_row, i;
-    static enum type asd = DEC;
+    int x, y, rows, cols, slots_per_row, i, j, max_slot, k, l;
 
-    
+    (void) l;
+
     wbkgd(stdscr, COLOR_PAIR(1));
 
     werase(stdscr);
@@ -120,28 +122,46 @@ static void drawMemory(machine *m, enum type current){
 
     getmaxyx(stdscr, y, x);
 
-    rows = y -3; //borders and guideline
-    cols = (x -2) / (current + 5); //5?
+
     (void) cols;
+    rows = y -4; //borders guidline and empty row
+    cols = (x -2) / (current +len(m->mmu->limit) +5);
+    slots_per_row = (x -2) / (current +len(m->mmu->limit) +5);
 
-    slots_per_row = (x -2) / (current + 5);
+    max_slot = slots_per_row * rows < m->mmu->limit ? slots_per_row * rows : m->mmu->limit;
+    
 
-    wmove(stdscr, 1, 1);
+    wmove(stdscr, 2, 1);
     for(i = 0; i < slots_per_row * rows && i < m->mmu->limit; i++){
 	if(i % slots_per_row == 0){
 	    getyx(stdscr, y, x);
 	    wmove(stdscr, y +1, 1);
 	}
-	wprintw(stdscr, "%d: %d ", i, m->mem[i]);
+
+	getyx(stdscr, l, k);
+
+	if(i == 0)
+	    for(j = 0; j < len(max_slot) -1; j++)
+		wprintw(stdscr, " ");
+	else
+	    for(j = i; len(j) < len(max_slot); j *= 10)
+		wprintw(stdscr, " ");
+
+	if(current == DEC)
+	    wprintw(stdscr, " %d: %d  ", i, m->mem[i]);
+	if(current == HEX)
+	    wprintw(stdscr, " %d: %x  ", i, m->mem[i]);
+	
 	getyx(stdscr, y, x);
-	wmove(stdscr, y, x +current -len(m->mem[i], current) -len(i, asd));
+	wmove(stdscr, y, x -(x -k) +current +len(max_slot) +5);
     }
     refresh();
 }
 
 static void drawCRT(machine *m){
-    int x, y;
+    int x, y, max_y, i, items = 0;
     struct outputList *tmp;
+    
     werase(stdscr);
     box(stdscr, 0, 0);
 
@@ -149,9 +169,18 @@ static void drawCRT(machine *m){
     
     (void) x;
 
-    wmove(stdscr, 2, 1);
-    for(tmp = first; tmp; tmp = tmp->next){
-	wprintw(stdscr, "%d ", tmp->output);
+    getmaxyx(stdscr, y, x);
+
+    max_y = y -4;
+
+    for(tmp = first; tmp; tmp = tmp->next) items++;
+    
+    tmp = first;
+    for(i = 0; i < items -max_y; i++) tmp = tmp->next;
+    
+    wmove(stdscr, 3, 1);
+    for(; tmp; tmp = tmp->next){
+	wprintw(stdscr, " %d ", tmp->output);
 	getyx(stdscr, y, x);
 	wmove(stdscr, y +1, 1);
     }
@@ -159,7 +188,7 @@ static void drawCRT(machine *m){
 }
 
 static void drawCPU(machine *m, enum type current){
-    int y, x, pos = 2;
+    int y, x, pos = 3;
     static WINDOW *registers, *MMU, *CU, *ALU, *FPU;
 
     wbkgd(stdscr, COLOR_PAIR(1));
@@ -234,7 +263,9 @@ void killScreen(void){
  */
 static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, char *arr[], int size){
     WINDOW *w;
-    int row, regsperrow, i, j, currentx, currenty, count, length;
+    int row, regsperrow, i, j, currentx, currenty, count, m, n;
+
+    (void) n;
 
     //how many rows we need to dras all elements
     // -2 for window borded
@@ -255,16 +286,19 @@ static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, cha
     for(i = 0; i < row; i++){
 	for(j = 0; j < regsperrow && count < elems; j++){
 
+	    getyx(w, n, m);
+
 	    //print one item
 	    if(current == DEC)
 		wprintw(w, "%s %d ", arr[count], addr[count]);
 	    else if(current == HEX)
 		wprintw(w, "%s %x ", arr[count], addr[count]);
 
+	    count++;
+
 	    //move cursor to start of second item
-	    length = len(addr[count++], current);
 	    getyx(w, currenty, currentx);
-	    wmove(w, currenty, currentx +current +size -length -strlen(arr[count -1]));
+	    wmove(w, currenty, currentx -(currentx -m) +current +size +2);
 	}
 	//move cursor to beginning of second line
 	getyx(w, currenty, currentx);
@@ -279,7 +313,9 @@ static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, cha
 }
 static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, char *arr[], int size){
     WINDOW *w;
-    int row, regsperrow, i, j, currentx, currenty, count, length;
+    int row, regsperrow, i, j, currentx, currenty, count, m, n;
+
+    (void) n;
 
     if(current == DEC) current = EXP;
 
@@ -298,14 +334,18 @@ static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, c
     for(i = 0; i < row; i++){
 	for(j = 0; j < regsperrow && count < elems; j++){
 
+	    getyx(w, n, m);
+
 	    if(current == EXP)
 		wprintw(w, "%s %g ", arr[count], addr[count]);
 	    else if(current == HEX)
-		wprintw(w, "%s, %x ", arr[count], addr[count]);
+		wprintw(w, "%s %x ", arr[count], addr[count]);
 
-	    length = len(addr[count++], current);
+	    count++;
+
 	    getyx(w, currenty, currentx);
-	    wmove(w, currenty, currentx + current -length -size);
+	    
+	    wmove(w, currenty, currentx -(currentx -m) +current +size +2);
 	}
 	getyx(w, currenty, currentx);
 	wmove(w, currenty +1, 1);
@@ -317,21 +357,17 @@ static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, c
     return w;
 }
 
-static int len(MYTYPE x, enum type current){
-    int factor;
+//paska funktio! ei toimi ku desimaaleil! x(
+static int len(MYTYPE x){
     int len = 1;
 
-    if(current == HEX) factor = 16;
-    if(current == DEC) factor = 10;
-    if(current == EXP) factor = 12;
-
-    //possible owerflow!
-    if(x < 0 && (current == DEC || current == EXP)){
+    //possible owerflow! works only with decimals!!!
+    if(x < 0){
 	x = x * (-1);
 	len++;
     }
 
-    for(; x >= factor; x /= factor)
+    for(; x >= 10; x /= 10)
 	len++;
 
     return len;
@@ -344,6 +380,7 @@ void initScreen(void){
     init_pair(1, COLOR_WHITE, COLOR_BLUE);
     init_pair(2, COLOR_BLUE, COLOR_WHITE);
     attron(COLOR_PAIR(1));
+    current_memory_row = 1;
 
 }
 
