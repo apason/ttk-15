@@ -17,6 +17,7 @@ enum type { BIN = 32, HEX = 8, DEC = 11, EXP = 13 };
 //current screen tab to draw
 enum screentab { CPU, MEM, OUT };
 
+static void drawSelected(machine *m);
 static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, char **arr, int size);
 static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, char **arr, int size);
 static int calculateRow(int x, enum type current, int a, int size);
@@ -25,6 +26,12 @@ static void drawCPU(machine *m, enum type current);
 static void drawMemory(machine *m, enum type current);
 static void drawCRT(machine *m);
 static void drawPanel(void);
+static void nextMemoryPage(MYTYPE limit);
+static void prevMemoryPage(MYTYPE limit);
+static void nextMemoryLine(MYTYPE limit);
+static void prevMemoryLine(MYTYPE limit);
+static void endMemory(MYTYPE limit);
+static void homeMemory(void);
 
 static char ra0[] = "R0:";
 static char ra1[] = "R1:";
@@ -58,6 +65,7 @@ static char fa1[] = "in2:";
 static char fa2[] = "out:";
 static char *FPU_array[] = {fa0, fa1, fa2};
 
+static enum type current;
 static struct outputList *first = NULL;
 static enum screentab scr;
 int current_memory_row;
@@ -68,9 +76,132 @@ int current_memory_row;
  * between every instruction in debugging mode
  */
 void drawScreen(machine *m){
-    enum type current = HEX;
     int ch;
 
+    noecho();
+    keypad(stdscr, TRUE);
+    curs_set(0);
+
+    drawSelected(m);
+    
+    //return only if we are in CPU window and enter is pressed
+    while((ch = getch()) != 10){
+	switch (ch){
+	case KEY_F(1):
+	    scr = CPU;	    
+	    break;
+	case KEY_F(2):
+	    scr = MEM;	    
+	    break;
+	case KEY_F(3):
+	    scr = OUT;	    
+	    break;
+	case 'x':
+	    current = HEX;
+	    break;
+	case 'b':
+	    current = BIN;
+	    break;
+	case 'd':
+	    current = DEC;
+	    break;
+	case KEY_NPAGE:
+	    if(scr == MEM)
+		nextMemoryPage(m->mmu->limit);
+
+	    break;
+	case KEY_PPAGE:
+	    if(scr == MEM)
+		prevMemoryPage(m->mmu->limit);
+	    
+	    break;
+	case KEY_DOWN:
+	    if(scr == MEM)
+		nextMemoryLine(m->mmu->limit);
+
+	    break;
+	case KEY_UP:
+	    if(scr == MEM)
+		prevMemoryLine(m->mmu->limit);
+
+	    break;
+	case KEY_HOME:
+	    if(scr == MEM)
+		homeMemory();
+
+	    break;
+	case KEY_END:
+	    if(scr == MEM)
+		endMemory(m->mmu->limit);
+
+	    break;
+	default:
+	    ;
+	}
+	drawSelected(m);
+    }
+}
+
+static void homeMemory(void){
+    current_memory_row = 0;
+}
+
+static void endMemory(MYTYPE limit){
+    int x, y, slots_per_row;
+
+    getmaxyx(stdscr, y, x);
+    slots_per_row = (x -2) / (current +len(limit) +5);
+
+    current_memory_row = limit -(slots_per_row * (y -5));
+}
+
+static void nextMemoryLine(MYTYPE limit){
+    int x, y, slots_per_row;
+
+    getmaxyx(stdscr, y, x);
+    slots_per_row = (x -2) / (current +len(limit) +5);
+
+    current_memory_row += slots_per_row;;
+
+    if(current_memory_row >= limit -(slots_per_row * (y -5)))
+	current_memory_row = limit -(slots_per_row * (y -5));
+}
+
+static void prevMemoryLine(MYTYPE limit){
+    int x, y, slots_per_row;
+
+    (void) y;
+
+    getmaxyx(stdscr, y, x);
+    slots_per_row = (x -2) / (current +len(limit) +5);
+
+    current_memory_row -= slots_per_row;
+
+    if(current_memory_row < 0) current_memory_row = 0;
+}
+
+static void nextMemoryPage(MYTYPE limit){
+    int x, y, slots_per_row;
+
+    getmaxyx(stdscr, y, x);
+    slots_per_row = (x -2) / (current +len(limit) +5);
+
+    current_memory_row += slots_per_row * (y -5);
+
+    if(current_memory_row >= limit -(slots_per_row * (y -5)))
+	current_memory_row = limit -(slots_per_row * (y -5));
+}
+static void prevMemoryPage(MYTYPE limit){
+    int x, y, slots_per_row;
+
+    getmaxyx(stdscr, y, x);
+    slots_per_row = (x -2) / (current +len(limit) +5);
+
+    current_memory_row -= slots_per_row * (y -5);
+
+    if(current_memory_row < 0) current_memory_row = 0;
+}
+static void drawSelected(machine *m){
     switch (scr){
     case CPU:
 	drawCPU(m, current);
@@ -81,29 +212,6 @@ void drawScreen(machine *m){
     case OUT:
 	drawCRT(m);
 	break;
-    }
-
-    noecho();
-    keypad(stdscr, TRUE);
-    curs_set(0);
-    
-    //return only if we are in CPU window and enter is pressed
-    while((ch = getch()) != 10){
-	switch (ch){
-	case KEY_F(1):
-	    scr = CPU;	    
-	    drawCPU(m, current);
-	    break;
-	case KEY_F(2):
-	    scr = MEM;	    
-	    drawMemory(m, current);
-	    break;
-	case KEY_F(3):
-	    scr = OUT;	    
-	    drawCRT(m);
-	    break;
-	    //if resize -> draw again
-	}
     }
 }
 
@@ -132,7 +240,7 @@ static void drawMemory(machine *m, enum type current){
     
 
     wmove(stdscr, 2, 1);
-    for(i = 0; i < slots_per_row * rows && i < m->mmu->limit; i++){
+    for(i = current_memory_row; i < (slots_per_row * rows) +current_memory_row && i < m->mmu->limit; i++){
 	if(i % slots_per_row == 0){
 	    getyx(stdscr, y, x);
 	    wmove(stdscr, y +1, 1);
@@ -380,7 +488,8 @@ void initScreen(void){
     init_pair(1, COLOR_WHITE, COLOR_BLUE);
     init_pair(2, COLOR_BLUE, COLOR_WHITE);
     attron(COLOR_PAIR(1));
-    current_memory_row = 1;
+    current_memory_row = 0;
+    current = DEC;
 
 }
 
@@ -482,11 +591,42 @@ static void drawPanel(void){
     else
 	wprintw(stdscr, "<F3> CRT\t");
 
+    if(current != DEC){
+	attroff(COLOR_PAIR(1));
+	attron(COLOR_PAIR(2));
+	wprintw(stdscr, "<D> DEC\t");
+	attroff(COLOR_PAIR(2));
+	attron(COLOR_PAIR(1));
+    }
+    else
+	wprintw(stdscr, "<D> DEC\t");
+
+    if(current != HEX){
+	attroff(COLOR_PAIR(1));
+	attron(COLOR_PAIR(2));
+	wprintw(stdscr, "<X> HEX\t");
+	attroff(COLOR_PAIR(2));
+	attron(COLOR_PAIR(1));
+    }
+    else
+	wprintw(stdscr, "<X> HEX\t");
+    
+    if(current != BIN){
+	attroff(COLOR_PAIR(1));
+	attron(COLOR_PAIR(2));
+	wprintw(stdscr, "<B> BIN\t");
+	attroff(COLOR_PAIR(2));
+	attron(COLOR_PAIR(1));
+    }
+    else
+	wprintw(stdscr, "<B> BIN\t");
+    
+
     getmaxyx(stdscr, y, x);
 
     attroff(COLOR_PAIR(1));
     attron(COLOR_PAIR(2));
-    for(i = 0; i < x -50; i++)
+    for(i = 0; i < x -75; i++)
 	wprintw(stdscr, " ");
     attroff(COLOR_PAIR(2));
     attron(COLOR_PAIR(1));
