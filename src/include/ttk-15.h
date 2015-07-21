@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define MYTYPE   int32_t
 #define MYTYPEF  float
+#define MYTYPE   int32_t
 
 //hardcoded symbols for machine
 #define CRT    0x0

@@ -237,7 +237,7 @@ FUNCTION(jnneg){
 }
 
 FUNCTION(jnzer){
-    if(!m->regs[rj])
+    if(m->regs[rj])
 	m->cu->pc = m->cu->tr;
 }
 

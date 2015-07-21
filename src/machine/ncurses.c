@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <ncurses.h>
 #include <ttk-15.h>
 #include "machine.h"
@@ -32,6 +33,14 @@ static void nextMemoryLine(MYTYPE limit);
 static void prevMemoryLine(MYTYPE limit);
 static void endMemory(MYTYPE limit);
 static void homeMemory(void);
+static void nextCRTPage(void);
+static void prevCRTPage(void);
+static void nextCRTLine(void);
+static void prevCRTLine(void);
+static void homeCRT(void);
+static void endCRT(void);
+static void printBin(WINDOW *w, MYTYPE a);
+static int listLength(struct outputList *l);
 
 static char ra0[] = "R0:";
 static char ra1[] = "R1:";
@@ -68,8 +77,9 @@ static char *FPU_array[] = {fa0, fa1, fa2};
 static enum type current;
 static struct outputList *first = NULL;
 static enum screentab scr;
-int current_memory_row;
-
+static int current_memory_row;
+static int crt_notification;
+static int current_crt_offset;
 
 /*
  * main function of ncurses gui. this is executed
@@ -78,9 +88,6 @@ int current_memory_row;
 void drawScreen(machine *m){
     int ch;
 
-    noecho();
-    keypad(stdscr, TRUE);
-    curs_set(0);
 
     drawSelected(m);
     
@@ -108,38 +115,96 @@ void drawScreen(machine *m){
 	case KEY_NPAGE:
 	    if(scr == MEM)
 		nextMemoryPage(m->mmu->limit);
-
+	    if(scr == OUT)
+		nextCRTPage();
 	    break;
 	case KEY_PPAGE:
 	    if(scr == MEM)
 		prevMemoryPage(m->mmu->limit);
-	    
+	    if(scr == OUT)
+		prevCRTPage();
 	    break;
 	case KEY_DOWN:
 	    if(scr == MEM)
 		nextMemoryLine(m->mmu->limit);
-
+	    if(scr == OUT)
+		nextCRTLine();
 	    break;
 	case KEY_UP:
 	    if(scr == MEM)
 		prevMemoryLine(m->mmu->limit);
-
+	    if(scr == OUT)
+		prevCRTLine();
 	    break;
 	case KEY_HOME:
 	    if(scr == MEM)
 		homeMemory();
-
+	    if(scr == OUT)
+		homeCRT();
 	    break;
 	case KEY_END:
 	    if(scr == MEM)
 		endMemory(m->mmu->limit);
-
+	    if(scr == OUT)
+		endCRT();
 	    break;
 	default:
 	    ;
 	}
 	drawSelected(m);
     }
+}
+
+static void endCRT(void){
+    current_crt_offset = 0;
+}
+
+static void homeCRT(void){
+    int x, y;
+    (void) x;
+    (void) y;
+    getmaxyx(stdscr, y, x);
+    current_crt_offset = listLength(first) -y +4;
+}
+
+static void prevCRTLine(void){
+    int x, y;
+    (void) x;
+    getmaxyx(stdscr, y, x);
+    current_crt_offset++;
+    if(current_crt_offset > listLength(first) -y +4)
+	current_crt_offset = listLength(first) -y +4;
+}
+
+static void nextCRTLine(void){
+    current_crt_offset--;
+    if(current_crt_offset < 0)
+	current_crt_offset = 0;
+}
+
+static int listLength(struct outputList *l){
+    int i;
+    for(i = 0; l; l = l->next)
+	i++;
+    return i;
+}
+
+static void prevCRTPage(void){
+    int x, y;
+    (void) x;
+    getmaxyx(stdscr, y, x);
+    current_crt_offset += y -4;
+    if(current_crt_offset > listLength(first) -y +4)
+	current_crt_offset = listLength(first) -y +4;
+}
+
+static void nextCRTPage(void){
+    int x, y;
+    (void) x;
+    getmaxyx(stdscr, y, x);
+    current_crt_offset -= y -4;
+    if(current_crt_offset < 0)
+	current_crt_offset = 0;
 }
 
 static void homeMemory(void){
@@ -259,6 +324,11 @@ static void drawMemory(machine *m, enum type current){
 	    wprintw(stdscr, " %d: %d  ", i, m->mem[i]);
 	if(current == HEX)
 	    wprintw(stdscr, " %d: %x  ", i, m->mem[i]);
+	if(current == BIN){
+	    wprintw(stdscr, " %d: ", i);
+	    printBin(stdscr, m->mem[i]);
+	    wprintw(stdscr, "  ");
+	}
 	
 	getyx(stdscr, y, x);
 	wmove(stdscr, y, x -(x -k) +current +len(max_slot) +5);
@@ -269,6 +339,8 @@ static void drawMemory(machine *m, enum type current){
 static void drawCRT(machine *m){
     int x, y, max_y, i, items = 0;
     struct outputList *tmp;
+
+    crt_notification = 0;
     
     werase(stdscr);
     box(stdscr, 0, 0);
@@ -284,13 +356,15 @@ static void drawCRT(machine *m){
     for(tmp = first; tmp; tmp = tmp->next) items++;
     
     tmp = first;
-    for(i = 0; i < items -max_y; i++) tmp = tmp->next;
+    for(i = 0; i < items -max_y -current_crt_offset; i++) tmp = tmp->next;
     
     wmove(stdscr, 3, 1);
-    for(; tmp; tmp = tmp->next){
+
+    for(i = 0; tmp && i < max_y; tmp = tmp->next){
 	wprintw(stdscr, " %d ", tmp->output);
 	getyx(stdscr, y, x);
 	wmove(stdscr, y +1, 1);
+	i++;
     }
     refresh();
 }
@@ -302,7 +376,7 @@ static void drawCPU(machine *m, enum type current){
     wbkgd(stdscr, COLOR_PAIR(1));
 
     //clear all output from last draw
-    clear();
+    werase(stdscr);
     delwin(registers);
     delwin(MMU);
     delwin(CU);
@@ -314,7 +388,7 @@ static void drawCPU(machine *m, enum type current){
 
     //create subwindows for every part of cpu
     registers = drawMYTYPE(m->regs, 8, current, x -2, (char**)registers_array, 3);
-    MMU = drawMYTYPE(&m->mmu->limit, 4, current, x -2, (char**)MMU_array, 4);
+    MMU = drawMYTYPE(&m->mmu->limit, 4, current, x -2, (char**)MMU_array, 6);
     CU = drawMYTYPE(&m->cu->tr, 4, current, x -2, (char**)CU_array, 3);
     ALU = drawMYTYPE(&m->alu->in1, 3, current, x -2, (char**)ALU_array, 4);
     FPU = drawMYTYPEF(&m->fpu->in1, 3, current, x -2, (char**)FPU_array, 4);
@@ -344,7 +418,6 @@ static void drawCPU(machine *m, enum type current){
     box(stdscr, 0, 0);
     drawPanel();
 	    
-
     //print subwindows and main window
     refresh();    
     wrefresh(registers);
@@ -352,6 +425,7 @@ static void drawCPU(machine *m, enum type current){
     wrefresh(CU);
     wrefresh(ALU);
     wrefresh(FPU);
+
     
 }
 
@@ -384,7 +458,6 @@ static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, cha
     w = newwin(row +2, x, 0, 0);              // +2 for window borded
     
     wbkgd(w, COLOR_PAIR(1));
-    wattron(w, COLOR_PAIR(1));
 
     box(w, 0, 0);
 
@@ -401,6 +474,11 @@ static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, cha
 		wprintw(w, "%s %d ", arr[count], addr[count]);
 	    else if(current == HEX)
 		wprintw(w, "%s %x ", arr[count], addr[count]);
+	    else if(current == BIN){
+		wprintw(w, "%s ", arr[count]);
+		printBin(w, addr[count]);
+		wprintw(w, " ");
+	    }
 
 	    count++;
 
@@ -415,15 +493,16 @@ static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, cha
     //is this needed?
     wmove(w, 0, 0);
 
-    wattroff(w, COLOR_PAIR(1));
-
     return w;
 }
+
+//if current was global this function would fuck it up.
 static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, char *arr[], int size){
     WINDOW *w;
     int row, regsperrow, i, j, currentx, currenty, count, m, n;
 
     (void) n;
+
 
     if(current == DEC) current = EXP;
 
@@ -433,7 +512,6 @@ static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, c
     w = newwin(row +2, x, 0, 0);
 
     wbkgd(w, COLOR_PAIR(1));
-    wattron(w, COLOR_PAIR(1));
 
     box(w, 0, 0);
 
@@ -445,9 +523,14 @@ static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, c
 	    getyx(w, n, m);
 
 	    if(current == EXP)
-		wprintw(w, "%s %g ", arr[count], addr[count]);
-	    else if(current == HEX)
-		wprintw(w, "%s %x ", arr[count], addr[count]);
+		wprintw(w, "%s %g", arr[count], *(addr +count));
+	    else if(current == HEX)  //will not work on real floats!
+		wprintw(w, "%s %x ", arr[count], *((MYTYPE*)(addr + count)));
+	    else if(current == BIN){
+		wprintw(w, "%s ", arr[count]);
+		printBin(w, *(MYTYPE*)&addr[count]);
+		wprintw(w, " ");
+	    }
 
 	    count++;
 
@@ -460,7 +543,6 @@ static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, c
     }
 
     wmove(w, 0, 0);
-    wattroff(w, COLOR_PAIR(1));
 
     return w;
 }
@@ -489,7 +571,13 @@ void initScreen(void){
     init_pair(2, COLOR_BLUE, COLOR_WHITE);
     attron(COLOR_PAIR(1));
     current_memory_row = 0;
+    current_crt_offset = 0;
     current = DEC;
+    crt_notification = 0;
+    noecho();
+    keypad(stdscr, TRUE);
+    curs_set(0);
+
 
 }
 
@@ -545,7 +633,6 @@ void printOutput(MYTYPE out){
     new->output = out;
     new->next = NULL;
 
-
     if(first){
 	//find last item
 	for(tmp = first; tmp->next; tmp = tmp->next);
@@ -553,6 +640,8 @@ void printOutput(MYTYPE out){
     }
     
     else first = new;
+
+    if(scr != OUT) crt_notification = 1;
 
 }
 
@@ -582,11 +671,13 @@ static void drawPanel(void){
 	wprintw(stdscr, "<F2> MEM\t");
 
     if(scr != OUT){
+	if(crt_notification) attron(A_BLINK);
 	attroff(COLOR_PAIR(1));
 	attron(COLOR_PAIR(2));
 	wprintw(stdscr, "<F3> CRT\t");
 	attroff(COLOR_PAIR(2));
 	attron(COLOR_PAIR(1));
+	attroff(A_BLINK);
     }
     else
 	wprintw(stdscr, "<F3> CRT\t");
@@ -631,4 +722,11 @@ static void drawPanel(void){
     attroff(COLOR_PAIR(2));
     attron(COLOR_PAIR(1));
 
+}
+
+static void printBin(WINDOW *w, MYTYPE a){
+    int i;
+    for(i = 0; i < sizeof(MYTYPE)*8; i++)
+	if(a >> (sizeof(MYTYPE)*8 -i -1) & 1) wprintw(w, "1");
+	else wprintw(w, "0");
 }
