@@ -642,6 +642,7 @@ void printOutput(MYTYPE out){
     else first = new;
 
     if(scr != OUT) crt_notification = 1;
+    if(current_crt_offset != 0) current_crt_offset++;
 
 }
 
