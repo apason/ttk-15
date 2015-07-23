@@ -128,7 +128,7 @@ static void execInstruction(machine *m, instructionptr *instructions){
     m->alu->in1 = m->regs[rj];
     m->alu->in2 = m->cu->tr;
 
-    //set FPU operands
+    //set FPU operands. not compatible with strict aliasing rule.
     m->fpu->in1 = *(MYTYPEF*) &m->regs[rj];
     m->fpu->in2 = *(MYTYPEF*) &m->cu->tr;
 

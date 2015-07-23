@@ -22,10 +22,8 @@ filename suffix! (see examples)
 -f file , where file is name of executable file. If -f flag is not used,
 ttk-15 will use first non-option argument as binary file
 
--g causes ttk-15 to run in interactive (debugging) mode. It prints whole CPU
-state and first dozens memory slots between every instruction and holds
-execution until user prompts enter. (make sure your terminal is big enough
-to see output correctly)
+-g causes ttk-15 to run in interactive (debugging) mode. see doc/machine/debugger
+for more information.
 
 -M memsize , where memsize is memory size reserved for machine. Size is
 declared in machine words (32bits) default value is 512

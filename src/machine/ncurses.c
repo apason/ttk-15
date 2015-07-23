@@ -18,14 +18,14 @@ enum type { BIN = 32, HEX = 8, DEC = 11, EXP = 13 };
 //current screen tab to draw
 enum screentab { CPU, MEM, OUT };
 
-static void drawSelected(machine *m);
-static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, char **arr, int size);
+static void drawSelected(const machine *m);
+static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, int x, char **arr, int size);
 static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, char **arr, int size);
 static int calculateRow(int x, enum type current, int a, int size);
 static int len(MYTYPE x);
-static void drawCPU(machine *m, enum type current);
-static void drawMemory(machine *m, enum type current);
-static void drawCRT(machine *m);
+static void drawCPU(const machine *m);
+static void drawMemory(const mm_unit *mmu, const MYTYPE *mem);
+static void drawCRT(void);
 static void drawPanel(void);
 static void nextMemoryPage(MYTYPE limit);
 static void prevMemoryPage(MYTYPE limit);
@@ -40,7 +40,7 @@ static void prevCRTLine(void);
 static void homeCRT(void);
 static void endCRT(void);
 static void printBin(WINDOW *w, MYTYPE a);
-static int listLength(struct outputList *l);
+static int listLength(const struct outputList *l);
 
 static char ra0[] = "R0:";
 static char ra1[] = "R1:";
@@ -79,7 +79,7 @@ static struct outputList *first = NULL;
 static enum screentab scr;
 static int current_memory_row;
 static int crt_notification;
-static int current_crt_offset;
+static int crt_offset;
 
 /*
  * main function of ncurses gui. this is executed
@@ -156,7 +156,7 @@ void drawScreen(machine *m){
 }
 
 static void endCRT(void){
-    current_crt_offset = 0;
+    crt_offset = 0;
 }
 
 static void homeCRT(void){
@@ -164,25 +164,25 @@ static void homeCRT(void){
     (void) x;
     (void) y;
     getmaxyx(stdscr, y, x);
-    current_crt_offset = listLength(first) -y +4;
+    crt_offset = listLength(first) -y +4;
 }
 
 static void prevCRTLine(void){
     int x, y;
     (void) x;
     getmaxyx(stdscr, y, x);
-    current_crt_offset++;
-    if(current_crt_offset > listLength(first) -y +4)
-	current_crt_offset = listLength(first) -y +4;
+    crt_offset++;
+    if(crt_offset > listLength(first) -y +4)
+	crt_offset = listLength(first) -y +4;
 }
 
 static void nextCRTLine(void){
-    current_crt_offset--;
-    if(current_crt_offset < 0)
-	current_crt_offset = 0;
+    crt_offset--;
+    if(crt_offset < 0)
+	crt_offset = 0;
 }
 
-static int listLength(struct outputList *l){
+static int listLength(const struct outputList *l){
     int i;
     for(i = 0; l; l = l->next)
 	i++;
@@ -193,18 +193,18 @@ static void prevCRTPage(void){
     int x, y;
     (void) x;
     getmaxyx(stdscr, y, x);
-    current_crt_offset += y -4;
-    if(current_crt_offset > listLength(first) -y +4)
-	current_crt_offset = listLength(first) -y +4;
+    crt_offset += y -4;
+    if(crt_offset > listLength(first) -y +4)
+	crt_offset = listLength(first) -y +4;
 }
 
 static void nextCRTPage(void){
     int x, y;
     (void) x;
     getmaxyx(stdscr, y, x);
-    current_crt_offset -= y -4;
-    if(current_crt_offset < 0)
-	current_crt_offset = 0;
+    crt_offset -= y -4;
+    if(crt_offset < 0)
+	crt_offset = 0;
 }
 
 static void homeMemory(void){
@@ -266,21 +266,21 @@ static void prevMemoryPage(MYTYPE limit){
 
     if(current_memory_row < 0) current_memory_row = 0;
 }
-static void drawSelected(machine *m){
+static void drawSelected(const machine *m){
     switch (scr){
     case CPU:
-	drawCPU(m, current);
+	drawCPU(m);
 	break;
     case MEM:
-	drawMemory(m, current);
+	drawMemory(m->mmu, m->mem);
 	break;
     case OUT:
-	drawCRT(m);
+	drawCRT();
 	break;
     }
 }
 
-static void drawMemory(machine *m, enum type current){
+static void drawMemory(const mm_unit *mmu, const MYTYPE *mem){
     int x, y, rows, cols, slots_per_row, i, j, max_slot, k, l;
 
     (void) l;
@@ -298,14 +298,14 @@ static void drawMemory(machine *m, enum type current){
 
     (void) cols;
     rows = y -4; //borders guidline and empty row
-    cols = (x -2) / (current +len(m->mmu->limit) +5);
-    slots_per_row = (x -2) / (current +len(m->mmu->limit) +5);
+    cols = (x -2) / (current +len(mmu->limit) +5);
+    slots_per_row = (x -2) / (current +len(mmu->limit) +5);
 
-    max_slot = slots_per_row * rows < m->mmu->limit ? slots_per_row * rows : m->mmu->limit;
+    max_slot = slots_per_row * rows < mmu->limit ? slots_per_row * rows : mmu->limit;
     
 
     wmove(stdscr, 2, 1);
-    for(i = current_memory_row; i < (slots_per_row * rows) +current_memory_row && i < m->mmu->limit; i++){
+    for(i = current_memory_row; i < (slots_per_row * rows) +current_memory_row && i < mmu->limit; i++){
 	if(i % slots_per_row == 0){
 	    getyx(stdscr, y, x);
 	    wmove(stdscr, y +1, 1);
@@ -321,12 +321,12 @@ static void drawMemory(machine *m, enum type current){
 		wprintw(stdscr, " ");
 
 	if(current == DEC)
-	    wprintw(stdscr, " %d: %d  ", i, m->mem[i]);
+	    wprintw(stdscr, " %d: %d  ", i, mem[i]);
 	if(current == HEX)
-	    wprintw(stdscr, " %d: %x  ", i, m->mem[i]);
+	    wprintw(stdscr, " %d: %x  ", i, mem[i]);
 	if(current == BIN){
 	    wprintw(stdscr, " %d: ", i);
-	    printBin(stdscr, m->mem[i]);
+	    printBin(stdscr, mem[i]);
 	    wprintw(stdscr, "  ");
 	}
 	
@@ -336,7 +336,7 @@ static void drawMemory(machine *m, enum type current){
     refresh();
 }
 
-static void drawCRT(machine *m){
+static void drawCRT(void){
     int x, y, max_y, i, items = 0;
     struct outputList *tmp;
 
@@ -356,7 +356,7 @@ static void drawCRT(machine *m){
     for(tmp = first; tmp; tmp = tmp->next) items++;
     
     tmp = first;
-    for(i = 0; i < items -max_y -current_crt_offset; i++) tmp = tmp->next;
+    for(i = 0; i < items -max_y -crt_offset; i++) tmp = tmp->next;
     
     wmove(stdscr, 3, 1);
 
@@ -369,7 +369,7 @@ static void drawCRT(machine *m){
     refresh();
 }
 
-static void drawCPU(machine *m, enum type current){
+static void drawCPU(const machine *m){
     int y, x, pos = 3;
     static WINDOW *registers, *MMU, *CU, *ALU, *FPU;
 
@@ -387,10 +387,10 @@ static void drawCPU(machine *m, enum type current){
     getmaxyx(stdscr, y, x);
 
     //create subwindows for every part of cpu
-    registers = drawMYTYPE(m->regs, 8, current, x -2, (char**)registers_array, 3);
-    MMU = drawMYTYPE(&m->mmu->limit, 4, current, x -2, (char**)MMU_array, 6);
-    CU = drawMYTYPE(&m->cu->tr, 4, current, x -2, (char**)CU_array, 3);
-    ALU = drawMYTYPE(&m->alu->in1, 3, current, x -2, (char**)ALU_array, 4);
+    registers = drawMYTYPE(m->regs, 8, x -2, (char**)registers_array, 3);
+    MMU = drawMYTYPE(&m->mmu->limit, 4, x -2, (char**)MMU_array, 6);
+    CU = drawMYTYPE(&m->cu->tr, 4, x -2, (char**)CU_array, 3);
+    ALU = drawMYTYPE(&m->alu->in1, 3, x -2, (char**)ALU_array, 4);
     FPU = drawMYTYPEF(&m->fpu->in1, 3, current, x -2, (char**)FPU_array, 4);
     
     //title them
@@ -443,7 +443,7 @@ void killScreen(void){
  * by C standard that addr +1 is the second object of that struct
  * so this is not necessarily work! bad code :-(
  */
-static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, enum type current, int x, char *arr[], int size){
+static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, int x, char *arr[], int size){
     WINDOW *w;
     int row, regsperrow, i, j, currentx, currenty, count, m, n;
 
@@ -571,7 +571,7 @@ void initScreen(void){
     init_pair(2, COLOR_BLUE, COLOR_WHITE);
     attron(COLOR_PAIR(1));
     current_memory_row = 0;
-    current_crt_offset = 0;
+    crt_offset = 0;
     current = DEC;
     crt_notification = 0;
     noecho();
@@ -582,7 +582,7 @@ void initScreen(void){
 }
 
 //how many rows we need to print all registers
-static int calculateRow(int x, enum type current, int a, int size){
+static int calculateRow(int x,enum type current, int a, int size){
     int characters = a * current;         //whitespaces
     int lines = characters / x;
 
@@ -642,7 +642,7 @@ void printOutput(MYTYPE out){
     else first = new;
 
     if(scr != OUT) crt_notification = 1;
-    if(current_crt_offset != 0) current_crt_offset++;
+    if(crt_offset != 0) crt_offset++;
 
 }
 
