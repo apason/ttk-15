@@ -34,7 +34,7 @@ FUNCTION(in){
 	    m->regs[rj] = tmp;
 	}
 	else{
-	    m->regs[rj] = readInput();
+	    m->regs[rj] = readInput(MYTYPE_PARAM);
 	}
     }
 

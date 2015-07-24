@@ -14,6 +14,8 @@ typedef struct OPTIONS{
 
 } options;
 
+typedef enum { MYTYPE_PARAM, MYTYPEF_PARAM } type_param;
+
 //prototype for machine instruction
 typedef void(*instructionptr)(machine*, uint8_t, uint8_t, uint8_t, uint16_t);
 
@@ -38,7 +40,7 @@ extern void freeMachine(machine *m);
 //ncurses.c
 extern void initScreen(void);
 extern void drawScreen(machine *m);
-extern MYTYPE readInput(void);
+extern MYTYPE readInput(type_param tpar);
 extern void killScreen(void);
 extern void printOutput(MYTYPE out);
 

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdint.h>
 #include <ncurses.h>
@@ -41,6 +42,7 @@ static void homeCRT(void);
 static void endCRT(void);
 static void printBin(WINDOW *w, MYTYPE a);
 static int listLength(const struct outputList *l);
+static int notCorrectInput(const char *buffer);
 
 static char ra0[] = "R0:";
 static char ra1[] = "R1:";
@@ -361,7 +363,14 @@ static void drawCRT(void){
     wmove(stdscr, 3, 1);
 
     for(i = 0; tmp && i < max_y; tmp = tmp->next){
-	wprintw(stdscr, " %d ", tmp->output);
+	if(current == DEC)
+	    wprintw(stdscr, " %d ", tmp->output);
+	else if(current == HEX)
+	    wprintw(stdscr, " %x ", tmp->output);
+	else if(current == BIN){
+	    wprintw(stdscr, " ");
+	    printBin(stdscr, tmp->output);
+	}
 	getyx(stdscr, y, x);
 	wmove(stdscr, y +1, 1);
 	i++;
@@ -589,9 +598,10 @@ static int calculateRow(int x,enum type current, int a, int size){
     return characters % x == 0 ? lines : lines +1;
 }
 
-MYTYPE readInput(void){
+MYTYPE readInput(type_param tpar){
     MYTYPE input;
     int x, y, l, m, len = 40, wid = 8;
+    char buffer[11];
     WINDOW *w;
 
     getmaxyx(stdscr, y, x);
@@ -607,20 +617,31 @@ MYTYPE readInput(void){
     wattron(w, COLOR_PAIR(2));
     echo();
     curs_set(1);
+
     
     do{
 	werase(w);
 	box(w, 0, 0);
 	
-	mvwprintw(w, 1, 1, "                 INPUT");
+	mvwprintw(w, 0, 17, "INPUT");
+	wmove(w, 1, 1);
+	if(tpar == MYTYPE_PARAM)
+	    wprintw(w,"Input requested as integer");
+	else if(tpar == MYTYPEF_PARAM)
+	    wprintw(w, "Input requested as float");
+	
 	wmove(w, 4, 3);
 	refresh();
 	wrefresh(w);
-    }while(wscanw(w, "%d", &input) != 1);
+
+	wgetnstr(w, buffer, 11);
+
+    }while(sscanf(buffer, "%d", &input) != 1 || notCorrectInput(buffer));
 
     
     delwin(w);
     curs_set(0);
+
 
     return input;
     
@@ -730,4 +751,21 @@ static void printBin(WINDOW *w, MYTYPE a){
     for(i = 0; i < sizeof(MYTYPE)*8; i++)
 	if(a >> (sizeof(MYTYPE)*8 -i -1) & 1) wprintw(w, "1");
 	else wprintw(w, "0");
+}
+
+//tänne säännöt joilla output on ok
+static int notCorrectInput(const char *buffer){
+    int negative = 0, length = strlen(buffer), i;
+
+    if(buffer[0] == '-')
+	negative = 1;
+
+    if(length > 10 && !negative)
+	return -1;
+
+    for(i = 1; i < length; i++)
+	if(!isdigit(buffer[i]))
+	    return -1;
+
+    return 0;
 }
