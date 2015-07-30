@@ -399,7 +399,7 @@ FUNCTION(fdiv){
     m->regs[rj] = m->fpu->out;
 }
 
-//what to do if out is nan?
+//what to do if out is nan or inf?
 FUNCTION(fcomp){
     m->cu->sr &= ~(GFLAG | EFLAG | LFLAG);
 
