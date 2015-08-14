@@ -182,7 +182,14 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte) {
     int addr;
     // is it a number?
     if (isdigit(argument[0]) || (isdigit(argument[1]) && argument[0] == '-')) {
-        addr = atoi(argument);
+
+        char * s = argument;
+        while (*++s) if (!isdigit(*s)) break;
+        if (!*s)
+            addr = atoi(argument);
+        else
+            addr = atof(argument);
+            
         // is it not a hardcoded symbol, but a label?
     } else if ((addr = getHardcodedSymbolValue(argument)) < 0) {
         int16_t index = -1;

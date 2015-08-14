@@ -47,8 +47,13 @@ int buildModule(code_file* file){
                 label_node->address = size++;
             else if(!strncmp(word, "dc", MAX)) {
                 label_node->size = 1;
+                char * s = val;
+                while (*++s) if (!isdigit(*s)) break;
                 // store the value to be inserted later
-                sscanf(val, "%u", &(label_node->value));
+                if (!*s)
+                    sscanf(val, "%u", &(label_node->value));
+                else
+                    sscanf(val, "%f", (float*)&(label_node->value));
                 file->code_text[i+1]++;
             }
             else if(!strncmp(word, "ds", MAX)) {
