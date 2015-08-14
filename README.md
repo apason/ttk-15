@@ -4,14 +4,14 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
 ##v0.3 valmiina##
  * jumpit ignoraa moden???? not cool
  * aliakset jumpille ja callille ja exitille 
+ * moduuleille uusi rakenne. import ja export taulut!
+ * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)       5,6 : 5.5
 
 ##v0.3 baglog##
- * kaikki mytypeks mikä kannattaa
- * virhetilanteessa muistinvapautus ennen lopetusta
- * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)       5,6 : 5.5
+ * valgrindin memleakit
  * testit floateille                                                        4
- * moduuleille uusi rakenne. import ja export taulut!
- 
+ * 16b floatit kääntäjään
+ * float fix volatile pointterit
 
 ## backlog ##
  * enumeiksi mikä kannattaa
