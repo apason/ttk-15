@@ -6,6 +6,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * aliakset jumpille ja callille ja exitille 
 
 ##v0.3 baglog##
+ * float hyppykäskyissä ei saa olla floattia osoitteena
  * kaikki mytypeks mikä kannattaa
  * virhetilanteessa muistinvapautus ennen lopetusta
  * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)       5,6 : 5.5
