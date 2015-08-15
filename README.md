@@ -12,7 +12,6 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * kaikki mytypeks mikä kannattaa
  * virhetilanteessa muistinvapautus ennen lopetusta
  * floating point unit + konekäskyt    (vaatii yhteistä suunnittelua)       5,6 : 5.5
-=======
  * valgrindin memleakit
  * testit floateille                                                        4
  * 16b floatit kääntäjään
