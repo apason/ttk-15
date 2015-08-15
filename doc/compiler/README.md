@@ -63,3 +63,15 @@ add r1,@r2 will become add r1,0(r2)
 
  - using the '=' indexing mode with a register is not allowed in the compiler as
 there is no instruction for it
+
+##floating point extension##
+
+ * Now there is support for floating point variables in ttk-15,
+    they are available by reserving memory for a variable using dc keyword.
+    For example:
+    - x dc 10.13
+    - y dc 10^13
+
+ * Whenever you use any non digit characters ['.', '^'] the compiler assumes the value to be a float
+
+ * Floating point variables like other variables reserved with dc take up 32 bits in memory.
