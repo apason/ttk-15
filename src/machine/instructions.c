@@ -360,7 +360,7 @@ FUNCTION(fin){
   
     if(m->cu->tr == KBD){
 	while(scanf("%f", &tmp) != 1);
-	m->regs[rj] = (MYTYPE) tmp;
+	m->regs[rj] = *(volatile MYTYPE*) &tmp;
     }
     else{
 	fprintf(stderr, "ERROR: in instruction IN: reference to unknown device\n");
@@ -371,7 +371,7 @@ FUNCTION(fin){
 
 FUNCTION(fout){
     if(m->cu->tr == CRT)
-	printf("%f\t", (MYTYPEF) m->regs[rj]);
+	printf("%g\t", *(volatile MYTYPEF*) (m->regs +rj));
     else{
 	fprintf(stderr, "in instruction OUT: reference to unknown device\n");
 	freeMachine(m);
@@ -381,63 +381,63 @@ FUNCTION(fout){
 
 FUNCTION(fadd){
     m->fpu->out = m->fpu->in1 + m->fpu->in2;
-    m->regs[rj] = (MYTYPE) m->fpu->out;
+    m->regs[rj] = *(volatile MYTYPE*) &m->fpu->out;
 }
 
 FUNCTION(fsub){
     m->fpu->out = m->fpu->in1 + m->fpu->in2;
-    m->regs[rj] = (MYTYPE) m->fpu->out;
+    m->regs[rj] = *(volatile MYTYPE*) &m->fpu->out;
 }
 
 FUNCTION(fmul){
     m->fpu->out = m->fpu->in1 * m->fpu->in2;
-    m->regs[rj] = (MYTYPE) m->fpu->out;
+    m->regs[rj] = *(volatile MYTYPE*) &m->fpu->out;
 }
 
 FUNCTION(fdiv){
     m->fpu->out = m->fpu->in1 / m->fpu->in2;
-    m->regs[rj] = m->fpu->out;
+    m->regs[rj] = *(volatile MYTYPE*) &m->fpu->out;
 }
 
 //what to do if out is nan or inf?
 FUNCTION(fcomp){
     m->cu->sr &= ~(GFLAG | EFLAG | LFLAG);
 
-    if(m->regs[rj] > m->cu->tr)
+    if(*(volatile MYTYPEF*) (m->regs +rj) > *(volatile MYTYPEF*) &m->cu->tr)
 	m->cu->sr |= GFLAG;
-    else if(m->regs[rj] == m->cu->tr)
+    else if(*(volatile MYTYPEF*) (m->regs +rj) == *(volatile MYTYPEF*) &m->cu->tr)
 	m->cu->sr |= EFLAG;
     else
 	m->cu->sr |= LFLAG;
 }
 
 FUNCTION(fjneg){
-    if(m->regs[rj] < 0)
+    if(*(volatile MYTYPEF*) (m->regs +rj) < 0)
 	m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(fjzer){
-    if(m->regs[rj] == 0)
+    if(*(volatile MYTYPEF*) (m->regs +rj) == 0)
 	m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(fjpos){
-    if(m->regs[rj] > 0)
+    if(*(volatile MYTYPEF*) (m->regs +rj) > 0)
 	m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(fjnneg){
-    if(m->regs[rj] >= 0)
+    if(*(volatile MYTYPEF*) (m->regs +rj) >= 0)
 	m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(fjnzer){
-    if(m->regs[rj] != 0)
+    if(*(volatile MYTYPEF*) (m->regs +rj) != 0)
 	m->cu->pc = m->cu->tr;
 }
 
 FUNCTION(fjnpos){
-    if(m->regs[rj] <= 0)
+    if(*(volatile MYTYPEF*) (m->regs +rj) <= 0)
 	m->cu->pc = m->cu->tr;
 }
        

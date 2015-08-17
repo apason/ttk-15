@@ -27,6 +27,8 @@
 #define ON         1
 #define OFF        0
 
+typedef uint16_t f16;
+
 typedef struct ALU_UNIT{
     MYTYPE in1;
     MYTYPE in2;
@@ -71,6 +73,11 @@ typedef struct MACHINE{
 //loader.c
 extern int loadFile(MYTYPE *mem, FILE *file, MYTYPE memsize);
 extern int loadFile91(MYTYPE *mem, FILE *file, MYTYPE memsize);
+
+//float.h
+extern f16 f16Encode(float f);
+extern float f16Decode(f16 f);
+
 #endif
 
 

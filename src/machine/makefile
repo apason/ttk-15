@@ -1,8 +1,8 @@
-CC= 	  gcc
+CC=	  gcc
 STD=	  _GNU_SOURCE_
 OBJS=	  main.o utilities.o instructions.o machine.o loader.o options.o ncurses.o
 INCLUDE=  -I "../include/"
-CFLAGS=   -Wall -D$(STD) $(INCLUDE) -c -Werror -Wno-unused-function
+CFLAGS=   -Wall -D$(STD) $(INCLUDE) -c -Werror -Wno-unused-function -g
 TARGET=   ../../target/
 
 .c.o:

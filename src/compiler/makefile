@@ -2,7 +2,7 @@ CC= 	  gcc
 STD=	  _GNU_SOURCE_
 OBJS=	  compiler.o module.o file_operations.o utility.o options.o
 INCLUDE=  -I "../include/"
-CFLAGS=   -Wall -D$(STD) $(INCLUDE) -c
+CFLAGS=   -Wall -D$(STD) $(INCLUDE) -c -g
 TARGET=   ../../target/
 
 .c.o:

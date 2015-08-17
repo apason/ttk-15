@@ -11,6 +11,7 @@
   if(MMU->mar > MMU->limit || MMU->mar < 0){                          \
     m->cu->sr |= MFLAG;                                               \
     fprintf(stderr, "ERROR: memory reference not permitted %X\n", X); \
+    freeMachine(m);  /* can only be used when m is defined! */	      \
     exit(-1);                                                         \
   }                                                                   \
 
