@@ -8,6 +8,7 @@
 
 struct outputList{
     MYTYPE output;
+    type_param tpar;
     struct outputList *next;
 };
 
@@ -363,8 +364,12 @@ static void drawCRT(void){
     wmove(stdscr, 3, 1);
 
     for(i = 0; tmp && i < max_y; tmp = tmp->next){
-	if(current == DEC)
-	    wprintw(stdscr, " %d ", tmp->output);
+	if(current == DEC){
+	    if(tmp->tpar == MYTYPE_PARAM)
+		wprintw(stdscr, " %d ", tmp->output);
+	    else if(tmp->tpar == MYTYPEF_PARAM)
+		wprintw(stdscr, " %g ", tmp->output);
+	}
 	else if(current == HEX)
 	    wprintw(stdscr, " %x ", tmp->output);
 	else if(current == BIN){
@@ -636,7 +641,8 @@ MYTYPE readInput(type_param tpar){
 
 	wgetnstr(w, buffer, 11);
 
-    }while(sscanf(buffer, "%d", &input) != 1 || notCorrectInput(buffer));
+    }while(tpar == MYTYPE_PARAM ? sscanf(buffer, "%d", &input) != 1 || \
+	   notCorrectInput(buffer) : sscanf(buffer, "%f",(volatile MYTYPEF*) &input) != 1 );
 
     
     delwin(w);
@@ -647,11 +653,12 @@ MYTYPE readInput(type_param tpar){
     
 }
 
-void printOutput(MYTYPE out){
+void printOutput(MYTYPE out, type_param tpar){
     struct outputList *tmp, *new;
     new = (struct outputList *) malloc(sizeof(struct outputList));
 
     new->output = out;
+    new->tpar = tpar;
     new->next = NULL;
 
     if(first){

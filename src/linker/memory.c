@@ -51,7 +51,8 @@ void freeModules(module **modules, int n){
 
   for(i = 0; i < n; i++)
     freeModule(modules[i]);
-  
+
+  free(modules);
 }
 
 void freeOptions(options *opts){

@@ -63,6 +63,7 @@ int main(int argc, char **argv){
     
     freeModules(modules, opts->count);
     fclose(opts->output);
+    free(opts);
 
     return 0;
 }

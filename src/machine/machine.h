@@ -42,7 +42,7 @@ extern void initScreen(void);
 extern void drawScreen(machine *m);
 extern MYTYPE readInput(type_param tpar);
 extern void killScreen(void);
-extern void printOutput(MYTYPE out);
+extern void printOutput(MYTYPE out, type_param tpar);
 
 //instructions.c contains all machine instructions
 extern FUNCTION(nop);

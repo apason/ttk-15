@@ -1,10 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef uint16_t f16;
-
-void printBin32(int32_t);
-
 f16 f16Encode(float f){
 
     int32_t n = *(volatile int32_t*) &f;
@@ -31,8 +27,3 @@ float f16Decode(f16 f){
     return *(volatile float*) &ret;
 }
 
-void main (void){
-    float f;
-    scanf("%f", &f);
-    printf("\n%g\n%g\n", f, f16Decode(f16Encode(f)));
-}

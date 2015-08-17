@@ -49,10 +49,9 @@ FUNCTION(out){
     if(m->cu->tr == CRT){
 
 	if(m->cu->sr & TFLAG)
-	    printOutput(m->regs[rj]);
+	    printOutput(m->regs[rj], MYTYPE_PARAM);
 	else
 	    printf("%d\t", m->regs[rj]);
-
     }
     else{
 	fprintf(stderr, "in instruction OUT: reference to unknown device\n");
@@ -359,23 +358,31 @@ FUNCTION(fin){
     MYTYPEF tmp = 0;
   
     if(m->cu->tr == KBD){
-	while(scanf("%f", &tmp) != 1);
-	m->regs[rj] = *(volatile MYTYPE*) &tmp;
+	if(!(m->cu->sr & TFLAG)){
+	    while(scanf("%f", &tmp) != 1);
+	    m->regs[rj] = *(volatile MYTYPE*) &tmp;
+	}
+	else{
+	    m->regs[rj] = readInput(MYTYPEF_PARAM);
+	}
     }
     else{
 	fprintf(stderr, "ERROR: in instruction IN: reference to unknown device\n");
-	freeMachine(m);
-	exit(-1);
+	m->cu->sr &= HFLAG;
     }
 }
 
 FUNCTION(fout){
-    if(m->cu->tr == CRT)
-	printf("%g\t", *(volatile MYTYPEF*) (m->regs +rj));
+    if(m->cu->tr == CRT){
+
+	if(m->cu->sr & TFLAG)
+	    printOutput(m->regs[rj], MYTYPEF_PARAM);
+	else
+	    printf("%g\t", *(volatile MYTYPEF*) (m->regs +rj));
+    }
     else{
 	fprintf(stderr, "in instruction OUT: reference to unknown device\n");
-	freeMachine(m);
-	exit(-1);
+	m->cu->sr |= HFLAG;
     }
 }
 
