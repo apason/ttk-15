@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <module.h>
+#include <ttk-15.h>
 #include "compiler.h"
 
 
@@ -187,8 +188,11 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte) {
         while (*++s) if (!isdigit(*s)) break;
         if (!*s)
             addr = atoi(argument);
-        else
-            addr = atof(argument);
+        else {
+            float f = atof(argument);
+            f16 converted = f16Encode(f);
+            addr = (int) converted;
+        }
             
         // is it not a hardcoded symbol, but a label?
     } else if ((addr = getHardcodedSymbolValue(argument)) < 0) {

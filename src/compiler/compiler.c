@@ -64,6 +64,7 @@ int main (int argc, char* argv[]) {
         }
         // free the space reserved for dynamic data in codeFile
         freeCodeFile(&codeFile);
+        freeOptions(opts);
     }
 
     return 0;

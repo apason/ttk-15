@@ -94,3 +94,8 @@ static void openFile(FILE **outputs, char *filename){
 	  
   outputs[i++] = fp;
 }
+
+void freeOptions(options *opts) {
+    free(opts->outputs);
+    free(opts);
+}
