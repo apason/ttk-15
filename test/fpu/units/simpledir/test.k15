@@ -1,0 +1,3 @@
+load r1, =0
+out r1, =crt
+svc sp, =halt
