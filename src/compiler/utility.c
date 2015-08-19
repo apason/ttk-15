@@ -5,9 +5,10 @@
 #include <module.h>
 #include <ttk-15.h>
 #include "compiler.h"
+#include "errorcodes.h"
 
 
-f16 f16Encode(float f){
+f16 f16Encode(float f, int *error){
 
     int32_t n = *(volatile int32_t*) &f;
     
@@ -15,8 +16,14 @@ f16 f16Encode(float f){
     int32_t exp  = (n & 0x7f800000) >> 23;
     int32_t man  = (n & 0x7fffff);
 
-    if(exp -127 > 16 || exp -127 < -16) printf("exponent too big!\n");
-    if(man & 0x1fff)  printf("mantissa too big!\n");
+    if(exp -127 > 16 || exp -127 < -16) {
+       printf("exponent too big!\n");
+       *error = BIGFLOATEXP;
+       
+    }
+    if(man & 0x1fff) {
+        printf("mantissa too big!\n");
+    }
 
     return (f16) ((((sign >> 16) | ( (exp -127 +15) << 10)) & ~0x3ff) | (man >> 13));
 }
@@ -104,7 +111,6 @@ int getOpCode(char* word) {
             "popr\0\0\0\x36",\
             "svc\0\0\0\0\x70",\
             "fload\0\0\x82",\
-            "fin\0\0\0\0\x83",\
             "fout\0\0\0\x84",\
             "fadd\0\0\0\x91",\
             "fsub\0\0\0\x92",\
@@ -200,11 +206,17 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, int *isI
     if (isdigit(argument[0]) || (isdigit(argument[1]) && argument[0] == '-')) {
 
         char * s = argument;
-        while (*++s) if (!isdigit(*s)) break;
+        if (*s == '-') ++s;
+        while (*s) if (!isdigit(*s++)) break;
         if (!*s)
             addr = atoi(argument);
         else {
-            f16 converted = f16Encode(atof(argument));
+            int error = 0;
+            f16 converted = f16Encode(atof(argument), &error);
+            if (error < 0) {
+                *isItFloat = error;
+                return 0;
+            }
             uint16_t *temporary = &converted;
             addr = (int) *temporary;
             *isItFloat = 1;

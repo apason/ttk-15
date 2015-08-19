@@ -50,7 +50,7 @@ int main (int argc, char* argv[]) {
 
         // write the code file
         if (writeCodeFile(&codeFile) < 0) {
-            unlink(codeFile.fh_out);
+        //    unlink(codeFile.fh_out);
         }
 
         if (debug) {

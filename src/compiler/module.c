@@ -48,7 +48,8 @@ int buildModule(code_file* file){
             else if(!strncmp(word, "dc", MAX)) {
                 label_node->size = 1;
                 char * s = val;
-                while (*++s) if (!isdigit(*s)) break;
+                if (*s == '-') ++s;
+                while (*s) if (!isdigit(*s++)) break;
                 // store the value to be inserted later
                 if (!*s)
                     sscanf(val, "%u", &(label_node->value));

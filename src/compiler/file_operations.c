@@ -296,18 +296,21 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
             } else
                 reg = temp;
         } else {
+            // this variable also stores error in getAddress
             int isItFloat = 0;
             addr = getAddress(argument, symbols, &firstByte, &isItFloat);
+            if (isItFloat < 0)
+                return isItFloat;
             // If the argument is a float we have to use fload instead of just load
             if (isItFloat) {
                 if (opCode == LOAD)
                     opCode = FLOAD;
                 // float arguments should not be found in other commands
-                 else
+                 else if (opCode < FLOAD)
                      return FLOATARGUMENT;
             }
         }
-
+    
     }
 
 
@@ -363,6 +366,9 @@ static void print_error(int error, int line) {
             break;
         case INVALIDREG:
             fprintf(stderr,"ERROR: Invalid register on line: %d\n",line);
+            break;
+        case BIGFLOATEXP:
+            fprintf(stderr,"ERROR: Too big exponent on line: %d\n",line);
             break;
         default:
             fprintf(stderr,"ERROR: Unknown syntax error on line: %d\n",line);

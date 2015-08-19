@@ -4,6 +4,7 @@
 #define INVALIDMODE -2
 #define INVALIDIREG -3
 #define INVALIDREG -4
+#define BIGFLOATEXP -5
 #define FLOATARGUMENT -10
 
 

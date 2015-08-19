@@ -75,7 +75,7 @@ extern int loadFile(MYTYPE *mem, FILE *file, MYTYPE memsize);
 extern int loadFile91(MYTYPE *mem, FILE *file, MYTYPE memsize);
 
 //float.h
-extern f16 f16Encode(float f);
+extern f16 f16Encode(float f, int* error);
 extern float f16Decode(f16 f);
 
 #endif
