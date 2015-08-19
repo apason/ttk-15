@@ -1,3 +1,0 @@
-fload r1, =0.5
-fout r1, =crt
-svc sp, =halt
