@@ -35,6 +35,7 @@ typedef struct OPTIONS {
     int    count;
     int    debug;
     FILE **outputs;
+    char **filenames;
 
 } options;
 // reads the code file into the array in the struct and puts lenght in lines member

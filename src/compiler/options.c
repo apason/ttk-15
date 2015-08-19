@@ -25,6 +25,9 @@ options *getOptions(int argc, char *argv[]){
     if(optch == 'o'){
       opts->count = 1;
       opts->outputs = (FILE **) malloc(sizeof(FILE *));
+      opts->filenames = (char **) malloc(sizeof(char*));
+      opts->filenames[0] = (char *) malloc((strlen(optarg) +1) * sizeof(char));
+      strncpy(opts->filenames[0], optarg, strlen(optarg) +1);
       openFile(opts->outputs, optarg);
     }
 
@@ -50,9 +53,14 @@ options *getOptions(int argc, char *argv[]){
   //flag -o not used. there may be numerous of source files
   if(opts->outputs == NULL){
     opts->outputs = (FILE **) malloc(opts->count * sizeof(FILE *));
+    opts->filenames = (char **) malloc(opts->count * sizeof(char *));
 
-    for(i = 0; i < opts->count; i++)
+    for(i = 0; i < opts->count; i++){
       openFile(opts->outputs, argv[optind + i]);
+      opts->filenames[i] = (char*) malloc((strlen(argv[optind +i]) +1) * sizeof(char));
+      strncpy(opts->filenames[i], argv[optind +i], strlen(argv[optind +i]) +1);
+      
+    }
   }
 
   return opts;
@@ -61,10 +69,11 @@ options *getOptions(int argc, char *argv[]){
 static options *newOptions(void){
   options *opts = (options *) malloc(sizeof(options));
 
-  opts->outputs = NULL;
-  opts->mode    = UNDEFINED;
-  opts->count   = 0;
-  opts->debug   = OFF;
+  opts->outputs   = NULL;
+  opts->mode      = UNDEFINED;
+  opts->count     = 0;
+  opts->debug     = OFF;
+  opts->filenames = NULL;
 
   return opts;
 }
