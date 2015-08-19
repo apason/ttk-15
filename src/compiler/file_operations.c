@@ -17,8 +17,6 @@ static void freeSymbols(code_file*);
 static void freeCodeArray(code_file*);
 static void print_error(int error, int line);
 
-// CHECK todo
-
 // this is a function to be used outside this file
 int readCodeFile(code_file* file, int debug) {
     FILE* fh = fopen(file->name,"r");
@@ -149,6 +147,11 @@ int writeCodeFile(code_file* file) {
             if (error < 0) {
                 print_error(error, file->code_text[cInstructions]);
                 fprintf(stderr,"\t\"%s\"\n",file->array[i]);
+                // if error is not a warning ( > -10 ) end
+                if (error > -10) {
+                    fclose(fh);
+                    return error;
+                }
             }
             ++cInstructions;
             continue;
@@ -168,6 +171,11 @@ int writeCodeFile(code_file* file) {
             if (error < 0) {
                 print_error(error, file->code_text[cInstructions]);
                 fprintf(stderr,"\t\"%s\"\n",file->array[i]);
+                // if error is not a warning ( > -10 ) end
+                if (error > -10) {
+                    fclose(fh);
+                    return error;
+                }
             }
             ++cInstructions;
         }
@@ -293,10 +301,10 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
             // If the argument is a float we have to use fload instead of just load
             if (isItFloat) {
                 if (opCode == LOAD)
-                    // TODO: define FLOAD
-                    opCode = 0x82;
+                    opCode = FLOAD;
                 // float arguments should not be found in other commands
-                 else;
+                 else
+                     return FLOATARGUMENT;
             }
         }
 
@@ -341,19 +349,22 @@ static void freeCodeArray(code_file* file) {
 
 static void print_error(int error, int line) {
     switch(error) {
+        case FLOATARGUMENT:
+            fprintf(stderr,"WARNING: Using float argument on line: %d\n",line);
+            break;
         case INVALIDOPCODE:
-            fprintf(stderr,"Invalid operation code on line: %d\n",line);
+            fprintf(stderr,"ERROR: Invalid operation code on line: %d\n",line);
             break;
         case INVALIDMODE:
-            fprintf(stderr,"Invalid mode on line: %d\n",line);
+            fprintf(stderr,"ERROR: Invalid mode on line: %d\n",line);
             break;
         case INVALIDIREG:
-            fprintf(stderr,"Invalid index register on line: %d\n",line);
+            fprintf(stderr,"ERROR: Invalid index register on line: %d\n",line);
             break;
         case INVALIDREG:
-            fprintf(stderr,"Invalid register on line: %d\n",line);
+            fprintf(stderr,"ERROR: Invalid register on line: %d\n",line);
             break;
         default:
-            fprintf(stderr,"Unknown syntax error on line: %d\n",line);
+            fprintf(stderr,"ERROR: Unknown syntax error on line: %d\n",line);
     }
 }

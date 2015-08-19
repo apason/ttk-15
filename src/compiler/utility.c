@@ -34,7 +34,7 @@ int isInstruction(char *word){
             "comp", "jump", "jneg", "jzer", "jpos", "jnneg", "jnzer", "jnpos",\
             "jles", "jequ", "jgre", "jnles", "jnequ", "jngre",\
             "call", "exit", "push", "pop", "pushr", "popr", "svc",\
-            "fin", "fout", "fadd", "fsub", "fmul", "fdiv", "fcomp",\
+            "fload", "fin", "fout", "fadd", "fsub", "fmul", "fdiv", "fcomp",\
             "fjneg", "fjzer", "fjpos", "fjnneg", "fjnzer", "fjnpos"};
     for(i = 0; i < N_INSTR; i++)
         if(!strncmp(instructions[i], word, LABELLENGTH))
@@ -105,6 +105,7 @@ int getOpCode(char* word) {
             "pushr\0\0\x35",\
             "popr\0\0\0\x36",\
             "svc\0\0\0\0\x70",\
+            "fload\0\0\x82",\
             "fin\0\0\0\0\x83",\
             "fout\0\0\0\x84",\
             "fadd\0\0\0\x91",\
