@@ -10,6 +10,8 @@
 
 f16 f16Encode(float f, int *error){
 
+    if(f == 0)	return 0;
+
     int32_t n = *(volatile int32_t*) &f;
     
     int32_t sign = (n & 0x80000000);

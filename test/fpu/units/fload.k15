@@ -1,0 +1,3 @@
+load r1, =0.0625
+fout r1, =crt
+svc sp, =halt

@@ -1,0 +1,5 @@
+f dc 5.0
+load r1, =10.0
+fsub r1, f
+fout r1, =crt
+svc sp, =halt

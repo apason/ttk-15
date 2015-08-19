@@ -1,0 +1,4 @@
+load r1, =1.0
+fsub r1, =0.125
+fout r1, =crt
+svc sp, =halt

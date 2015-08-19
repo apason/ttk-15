@@ -437,6 +437,7 @@ FUNCTION(fdiv){
     m->regs[rj] = *(volatile MYTYPE*) &m->fpu->out;
 }
 
+//here should be fix for mod == 0 type instructions!
 FUNCTION(fcomp){
     m->cu->sr &= ~(GFLAG | EFLAG | LFLAG);
 
