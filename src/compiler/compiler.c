@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "compiler.h"
 
@@ -48,7 +49,9 @@ int main (int argc, char* argv[]) {
         }
 
         // write the code file
-        writeCodeFile(&codeFile);
+        if (writeCodeFile(&codeFile) < 0) {
+            unlink(codeFile.fh_out);
+        }
 
         if (debug) {
             const char* mode[4] = {
