@@ -387,26 +387,45 @@ FUNCTION(fout){
 }
 
 FUNCTION(fadd){
-    m->fpu->out = m->fpu->in1 + m->fpu->in2;
+    
+    if(mod == 0)
+	m->fpu->out = m->fpu->in1 + f16Decode(*(volatile f16*) &m->fpu->in2);
+    else
+	m->fpu->out = m->fpu->in1 + m->fpu->in2;
+    
     m->regs[rj] = *(volatile MYTYPE*) &m->fpu->out;
 }
 
 FUNCTION(fsub){
-    m->fpu->out = m->fpu->in1 + m->fpu->in2;
+    
+    if(mod == 0)
+	m->fpu->out = m->fpu->in1 - f16Decode(*(volatile f16*) &m->fpu->in2);
+    else
+	m->fpu->out = m->fpu->in1 - m->fpu->in2;
+    
     m->regs[rj] = *(volatile MYTYPE*) &m->fpu->out;
 }
 
 FUNCTION(fmul){
-    m->fpu->out = m->fpu->in1 * m->fpu->in2;
+
+    if(mod == 0)
+	m->fpu->out = m->fpu->in1 * f16Decode(*(volatile f16*) &m->fpu->in2);
+    else
+	m->fpu->out = m->fpu->in1 * m->fpu->in2;
+    
     m->regs[rj] = *(volatile MYTYPE*) &m->fpu->out;
 }
 
 FUNCTION(fdiv){
-    m->fpu->out = m->fpu->in1 / m->fpu->in2;
+
+    if(mod == 0)
+	m->fpu->out = m->fpu->in1 / f16Decode(*(volatile f16*) &m->fpu->in2);
+    else
+	m->fpu->out = m->fpu->in1 / m->fpu->in2;
+
     m->regs[rj] = *(volatile MYTYPE*) &m->fpu->out;
 }
 
-//what to do if out is nan or inf?
 FUNCTION(fcomp){
     m->cu->sr &= ~(GFLAG | EFLAG | LFLAG);
 

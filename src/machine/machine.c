@@ -133,7 +133,7 @@ static void execInstruction(machine *m, instructionptr *instructions){
     m->fpu->in2 = *(volatile MYTYPEF*) &m->cu->tr;
 
     instruction = instructions[opc];
-    instruction(m, rj, mode, ri, addr);  //macro
+    instruction(m, rj, mode, ri, addr);
 }
 
 //free all memory allocated to machine
@@ -147,6 +147,7 @@ void freeMachine(machine *m){
     free(m);
 }
 
+//this is for halting in error situation
 FUNCTION (haltMachine){
     uint8_t opc = 0;
 

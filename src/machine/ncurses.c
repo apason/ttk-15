@@ -368,7 +368,7 @@ static void drawCRT(void){
 	    if(tmp->tpar == MYTYPE_PARAM)
 		wprintw(stdscr, " %d ", tmp->output);
 	    else if(tmp->tpar == MYTYPEF_PARAM)
-		wprintw(stdscr, " %g ", tmp->output);
+		wprintw(stdscr, " %g ", *(volatile MYTYPEF*) &tmp->output);
 	}
 	else if(current == HEX)
 	    wprintw(stdscr, " %x ", tmp->output);
