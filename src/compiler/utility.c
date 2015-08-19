@@ -192,10 +192,10 @@ int getIndexRegister(char* argument) {
     return 0;
 }
 
-int getAddress(char* argument, label_list* symbols, uint8_t *firstByte) {
+int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, int *isItFloat) {
     label_list* temp = symbols;
     int addr;
-    // is it a number?
+    // is the address a number?
     if (isdigit(argument[0]) || (isdigit(argument[1]) && argument[0] == '-')) {
 
         char * s = argument;
@@ -203,9 +203,10 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte) {
         if (!*s)
             addr = atoi(argument);
         else {
-            float f = atof(argument);
-            f16 converted = f16Encode(f);
-            addr = (int) converted;
+            f16 converted = f16Encode(atof(argument));
+            uint16_t *temporary = &converted;
+            addr = (int) *temporary;
+            *isItFloat = 1;
         }
             
         // is it not a hardcoded symbol, but a label?

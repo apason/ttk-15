@@ -17,6 +17,7 @@ static void freeSymbols(code_file*);
 static void freeCodeArray(code_file*);
 static void print_error(int error, int line);
 
+// CHECK todo
 
 // this is a function to be used outside this file
 int readCodeFile(code_file* file, int debug) {
@@ -265,25 +266,39 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
         // get index register
         if ((ireg = getIndexRegister(argument)) < 0)
             return INVALIDIREG;
-        // two arguments, first one has to be a register
+        // if we have two arguments, first one has to be a register
         if (nargs == 2) {
+            // Get first argument which is a register
             if ((reg = getRegister(val, 1)) < 0)
                 return INVALIDREG;
-            // check if opcode is store
+            // check if opcode is STORE and make it compatible if we use ttk-91
             if (( opCode == STORE || (opCode >= JUMP && opCode <= CALL)) && !ttk_15) {
                 if (--mode < 0)
                     return INVALIDMODE;
             }
         }
-        if (( temp = getRegister(argument, 0)) >= 0)
+        // If the second argument is also a register it's used as an index register
+        // otherwise it actually is the first argument
+        // If it's not a register it's supposed to be the address part of the command
+        if (( temp = getRegister(argument, 0)) >= 0) {
             if (nargs == 2) {
                 ireg = temp;
                 if (--mode < 0)
                     return INVALIDMODE;
             } else
                 reg = temp;
-            else
-                addr = getAddress(argument, symbols, &firstByte);
+        } else {
+            int isItFloat = 0;
+            addr = getAddress(argument, symbols, &firstByte, &isItFloat);
+            // If the argument is a float we have to use fload instead of just load
+            if (isItFloat) {
+                if (mode == LOAD)
+                    // TODO: define FLOAD
+                    mode = 0x82;
+                // float arguments should not be found in other commands
+                 else;
+            }
+        }
 
     }
 
@@ -292,6 +307,7 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
     instruction |= (reg << 21);
     instruction |= (mode << 19);
     instruction |= (ireg << 16);
+    // only use 16 bits for the address
     instruction |= (addr & 0xffff);
 
     // write 1, if address is a label, 0, if not
