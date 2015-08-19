@@ -47,6 +47,7 @@ int buildModule(code_file*);
 int writeCodeFile(code_file*);
 //options
 options *getOptions(int argc, char *argv[]);
+void freeOptions(options*);
 //from utility.h
 // check's if word is a valid instruction
 extern int isInstruction(char *word);
