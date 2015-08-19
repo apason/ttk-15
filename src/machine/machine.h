@@ -88,6 +88,7 @@ extern FUNCTION(svc);
  * floating point extension
  */
 
+extern FUNCTION(fload);
 extern FUNCTION(fin);
 extern FUNCTION(fout);
 extern FUNCTION(fadd);
