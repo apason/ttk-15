@@ -59,6 +59,7 @@ void initializeInstructionArray(instructionptr *instructions){
    * floating point extension
    */
 
+  instruction[FLOAD]   = fload;
   instructions[FIN]    = fin;
   instructions[FOUT]   = fout;
   instructions[FADD]   = fadd;

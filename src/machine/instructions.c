@@ -352,7 +352,14 @@ FUNCTION(svc){
 
 /*
  * floating point extension
- */   
+ */
+
+FUNCTION(fload){
+    if(mod == 0)
+	m->regs[rj] = f16Decode(*(volatile f16*) &m->cu->tr);
+    else
+	m->regs[rj] = m->cu->tr;
+}
 
 FUNCTION(fin){
     MYTYPEF tmp = 0;

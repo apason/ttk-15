@@ -75,6 +75,16 @@
 #define FJNZER 0xA5
 #define FJNPOS 0xA6
 
+/*
+ * special case for loading
+ * 16 bit floating points to
+ * registers. equivalent with
+ * load in addressing modes
+ * 1 and 2
+ */
+
+#define FLOAD  0x82
+
 #endif
 
 
