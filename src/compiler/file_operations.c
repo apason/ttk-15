@@ -292,9 +292,9 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
             addr = getAddress(argument, symbols, &firstByte, &isItFloat);
             // If the argument is a float we have to use fload instead of just load
             if (isItFloat) {
-                if (mode == LOAD)
+                if (opCode == LOAD)
                     // TODO: define FLOAD
-                    mode = 0x82;
+                    opCode = 0x82;
                 // float arguments should not be found in other commands
                  else;
             }
