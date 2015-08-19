@@ -1,0 +1,4 @@
+load r1, =1.0
+fadd r1, =0.5
+fout r1, =crt
+svc sp, =halt

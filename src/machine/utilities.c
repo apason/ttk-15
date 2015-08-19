@@ -91,6 +91,8 @@ void printState(machine *m){
 }
 			      
 float f16Decode(f16 f){
+
+    if(f == 0) return 0;
     
     int32_t ret;
     int32_t sign = (f & 0x8000);

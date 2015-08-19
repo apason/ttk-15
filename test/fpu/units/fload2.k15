@@ -1,0 +1,6 @@
+x dc 4
+f dc 5.0
+
+load r5, @x
+fout r5, =crt
+svc sp, =halt

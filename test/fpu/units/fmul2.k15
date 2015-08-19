@@ -1,0 +1,7 @@
+x dc 5
+f dc 10.0
+
+load r1, =10.0
+fmul r1, @x
+fout r1, =crt
+svc sp, =halt

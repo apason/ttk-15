@@ -1,0 +1,7 @@
+f dc 0.75
+
+load r1, f
+
+fout r1, =crt
+
+svc sp, =halt

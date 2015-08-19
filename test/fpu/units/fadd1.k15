@@ -1,0 +1,5 @@
+f dc 0.125
+load r1, =0.0
+fadd r1, f
+fout r1, =crt
+svc sp, =halt
