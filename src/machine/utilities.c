@@ -89,3 +89,14 @@ void printState(machine *m){
   printf("\n\n");
 }
 			      
+float f16Decode(f16 f){
+    
+    int32_t ret;
+    int32_t sign = (f & 0x8000);
+    int32_t exp  = (f & 0x7c00) >> 10;
+    int32_t man  = (f & 0x3ff );
+
+    ret = ((sign << 16) & 0x80000000) | (((exp -15 +127) << 23) & 0xff800000) | ((man << 13) & 0xffffe000);
+
+    return *(volatile float*) &ret;
+}
