@@ -355,8 +355,12 @@ FUNCTION(svc){
  */
 
 FUNCTION(fload){
-    if(mod == 0)
-	m->regs[rj] = f16Decode(*(volatile f16*) &m->cu->tr);
+    float tmp;
+    
+    if(mod == 0){
+	tmp = f16Decode(*(volatile f16*) &m->cu->tr);
+	m->regs[rj] = *(volatile MYTYPE*) &tmp;
+    }
     else
 	m->regs[rj] = m->cu->tr;
 }

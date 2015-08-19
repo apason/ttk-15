@@ -1,6 +1,6 @@
 ## makefile for testing ##
 
-.PHONY: alu general converter bitwise
+.PHONY: alu general converter bitwise fpu
 all:	converter alu general bitwise fpu
 
 alu:
