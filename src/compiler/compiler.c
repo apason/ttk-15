@@ -18,10 +18,12 @@ int main (int argc, char* argv[]) {
     if (argc < 2) return 0;
     int n;
     FILE** output_list = opts->outputs;
+    FILE** output_name_list = opts->filenames; 
     for ( n = argc - opts->count; n < argc; ++n ) {
 
 
         FILE* output = *output_list++;
+        char* output_name = *output_name_list++;
         // we take the first argument to be name of a .ttk91 file
         code_file codeFile;
         codeFile.name = argv[n];
@@ -50,7 +52,7 @@ int main (int argc, char* argv[]) {
 
         // write the code file
         if (writeCodeFile(&codeFile) < 0) {
-        //    unlink(codeFile.fh_out);
+            unlink(output_name);
         }
 
         if (debug) {
