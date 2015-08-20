@@ -226,6 +226,8 @@ int writeCodeFile(code_file* file) {
 
 static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, int ttk_mode) {
 
+    int warning = 0;
+
     uint8_t firstByte = NO_LABEL;
     uint32_t instruction = 0;
     int ttk_15 = (ttk_mode == TTK15);
@@ -307,7 +309,7 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
                     opCode = FLOAD;
                 // float arguments should not be found in other commands
                  else if (opCode < FLOAD)
-                     return FLOATARGUMENT;
+                     warning = FLOATARGUMENT;
             }
         }
     
@@ -325,7 +327,7 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
     fwrite(&firstByte,sizeof(firstByte),1,fh);
     // write the compiled instruction
     fwrite(&instruction,sizeof(instruction),1,fh);
-    return 0;
+    return warning;
 }
 
 void freeCodeFile(code_file* file) {

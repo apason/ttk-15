@@ -18,7 +18,7 @@ int main (int argc, char* argv[]) {
     if (argc < 2) return 0;
     int n;
     FILE** output_list = opts->outputs;
-    FILE** output_name_list = opts->filenames; 
+    char** output_name_list = opts->filenames; 
     for ( n = argc - opts->count; n < argc; ++n ) {
 
 
