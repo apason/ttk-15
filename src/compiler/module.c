@@ -23,8 +23,10 @@ int buildModule(code_file* file){
 
     for(i = 0; i < file->lines; i++){
         sscanf(code[i], "%s %s", word, val);
-        if(isInstruction(word))
+        if(isInstruction(word)) {
             ++size;
+            continue;
+        }
         else{
             char ext[MAX];
             int mode = LOCAL;
