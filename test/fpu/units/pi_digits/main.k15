@@ -1,0 +1,10 @@
+;; Program for calculating digits for pi use floats 
+main nop
+load r1,=1.0
+mainloop nop
+    call sp,piloop
+    fout r1,=crt
+    fadd r1,=1
+    fcomp r1,=5.0
+    jles mainloop
+svc sp,=halt
