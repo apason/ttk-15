@@ -35,7 +35,7 @@ int isInstruction(char *word){
     // make word lowercase
     for (; *p; ++p) *p = tolower(*p);
     int i;
-    static char instructions[N_INSTR][6] = {"nop", "store", "load", "in", "out",\
+    static char instructions[N_INSTR][7] = {"nop", "store", "load", "in", "out",\
         "add", "sub", "mul", "div", "mod",\
             "and", "or", "xor", "shl", "shr", "not", "shra",\
             "comp", "jump", "jneg", "jzer", "jpos", "jnneg", "jnzer", "jnpos",\
@@ -44,7 +44,7 @@ int isInstruction(char *word){
             "fload", "fin", "fout", "fadd", "fsub", "fmul", "fdiv", "fcomp",\
             "fjneg", "fjzer", "fjpos", "fjnneg", "fjnzer", "fjnpos"};
     for(i = 0; i < N_INSTR; i++)
-        if(!strncmp(instructions[i], word, LABELLENGTH))
+        if(!strncmp(instructions[i], word, 7))
             return i + 1;
     return 0;
 
@@ -124,11 +124,11 @@ int getOpCode(char* word) {
             "fjpos\0\0\xA3",\
             "fjnneg\0\xA4",\
             "fjnzer\0\xA5",\
-            "fjnpos\0\xA6"
+            "fjnpos\0\xA6"\
     };
     int i;
     for (i = 0; i < N_INSTR; ++i) {
-        if (strncmp(opcodes[i],word,6) == 0) {
+        if (strncmp(opcodes[i],word,7) == 0) {
             return (unsigned char)opcodes[i][7];
         }
     }
