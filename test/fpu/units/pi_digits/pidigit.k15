@@ -1,12 +1,12 @@
 ;; This function calculates the r1:th digit of pi
 n dc 1.0
 limit dc 0
-current cd 0.0
+current dc 0.0
 
-pidigit store r1,limit
+export pidigit store r1,=limit
 
 piloop load r1,=16.0
-    road r2,=-21.0
+    load r2,=-21.0
     load r3,n
 
     load r4,=89.0
@@ -47,16 +47,14 @@ piloop load r1,=16.0
     load r3,current
     fmul r2,r3
     fadd r1,r2
-
-    ;; now we need the fraction part of r1
-    ; call frac
-    
+;; now we need the fraction part of r1
+; call frac
     load r3,n
     fadd r3,=1.0
-    store r3,n
-    store r1,current
+    store r3,=n
+    store r1,=current
     fcomp r3,limit
-    jngre piloop
+    jngre =piloop
 
 
 ;; and then the floor of 16 times that to r1

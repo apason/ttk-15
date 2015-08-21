@@ -2,9 +2,9 @@
 main nop
 load r1,=1.0
 mainloop nop
-    call sp,piloop
+    call sp,=pidigit
     fout r1,=crt
     fadd r1,=1
     fcomp r1,=5.0
-    jles mainloop
+    jles =mainloop
 svc sp,=halt
