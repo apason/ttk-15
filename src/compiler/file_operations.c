@@ -298,7 +298,7 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
             } else
                 reg = temp;
         } else {
-            // this variable also stores error in getAddress
+            // this variable also stores possible error in getAddress
             int isItFloat = 0;
             addr = getAddress(argument, symbols, &firstByte, &isItFloat);
             if (isItFloat < 0)
@@ -308,8 +308,10 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
                 if (opCode == LOAD)
                     opCode = FLOAD;
                 // float arguments should not be found in other commands
-                 else if (opCode < FLOAD)
+                 else if (opCode < FLOAD) {
+                     printf("FLOAD = %x, opCode = %x\n", FLOAD, opCode);
                      warning = FLOATARGUMENT;
+                 }
             }
         }
     
