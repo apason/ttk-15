@@ -73,7 +73,7 @@ int getHardcodedSymbolValue(char* arg) {
 }
 
 int getOpCode(char* word) {
-    static const char opcodes[N_INSTR][8] = {\
+    static const unsigned char opcodes[N_INSTR][8] = {\
         "nop\0\0\0\0\0",\
             "store\0\0\x1",\
             "load\0\0\0\x2",\
