@@ -129,7 +129,7 @@ static int nextLine(FILE* fh) {
 
 
 // this is also a function to be used outside of this file
-unsigned int writeCodeFile(code_file* file) {
+int writeCodeFile(code_file* file) {
     unsigned int error = 0;
     FILE* fh = file->fh_out;
     // skip header, we'll write it later
