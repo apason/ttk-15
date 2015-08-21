@@ -68,6 +68,7 @@
 #define FDIV   0x94
 
 #define FCOMP  0x9F
+
 #define FJNEG  0xA1
 #define FJZER  0xA2
 #define FJPOS  0xA3

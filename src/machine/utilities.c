@@ -67,11 +67,14 @@ void initializeInstructionArray(instructionptr *instructions){
   instructions[FMUL]   = fmul;
   instructions[FDIV]   = fdiv;
   instructions[FCOMP]  = fcomp;
+  
   instructions[FJNEG]  = fjneg;
-  instructions[FJPOS]  = fjzer;
-  instructions[FJNNEG] = fjpos;
-  instructions[FJNZER] = fjnneg;
-  instructions[FJNPOS] = fjnzer;
+  instructions[FJPOS]  = fjpos;
+  instructions[FJZER]  = fjzer;
+  instructions[FJNNEG] = fjnneg;
+  instructions[FJNZER] = fjnzer;
+  instructions[FJNPOS] = fjnpos;
+
   
 }
 
