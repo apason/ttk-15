@@ -35,7 +35,7 @@ int isInstruction(char *word){
     // make word lowercase
     for (; *p; ++p) *p = tolower(*p);
     int i;
-    static char instructions[N_INSTR][6] = {"nop", "store", "load", "in", "out",\
+    static char instructions[N_INSTR][7] = {"nop", "store", "load", "in", "out",\
         "add", "sub", "mul", "div", "mod",\
             "and", "or", "xor", "shl", "shr", "not", "shra",\
             "comp", "jump", "jneg", "jzer", "jpos", "jnneg", "jnzer", "jnpos",\
