@@ -1,0 +1,4 @@
+load r1, =4.0
+fdiv r1, =2.0
+fout r1, =crt
+svc sp, =halt

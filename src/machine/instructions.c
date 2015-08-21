@@ -439,13 +439,21 @@ FUNCTION(fdiv){
 
 //here should be fix for mod == 0 type instructions!
 FUNCTION(fcomp){
+    MYTYPEF tr_float;
+    MYTYPEF reg_float;
+    
     m->cu->sr &= ~(GFLAG | EFLAG | LFLAG);
 
-    if(*(volatile MYTYPEF*) (m->regs +rj) > *(volatile MYTYPEF*) &m->cu->tr)
+    if(mod == 0) tr_float = f16Decode(*(volatile f16*) &m->cu->tr);
+    else         tr_float = *(volatile MYTYPEF*) &m->cu->tr;
+
+    reg_float = *(volatile MYTYPEF*) (m->regs +rj);
+
+    if(reg_float > tr_float)
 	m->cu->sr |= GFLAG;
-    else if(*(volatile MYTYPEF*) (m->regs +rj) == *(volatile MYTYPEF*) &m->cu->tr)
+    else if(reg_float == tr_float)
 	m->cu->sr |= EFLAG;
-    else
+    else if(reg_float < tr_float)
 	m->cu->sr |= LFLAG;
 }
 

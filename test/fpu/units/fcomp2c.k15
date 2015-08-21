@@ -1,0 +1,15 @@
+x dc 10
+f dc 120.0
+f2 dc 300.25
+
+load r1, f2
+fcomp r1, @x
+jgre =succ
+
+load r1, =-1
+out r1, =crt
+svc sp, =halt
+
+succ load r1, =0
+out r1, =crt
+svc sp, =halt

@@ -1,0 +1,10 @@
+f dc 1.75
+load r1, =1.0
+fcomp r1, f
+jles =succ
+load r1, =-1
+out r1, =crt
+svc sp, =halt
+succ load r1, =0
+out r1, =crt
+svc sp, =halt
