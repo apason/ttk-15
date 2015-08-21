@@ -129,7 +129,7 @@ int getOpCode(char* word) {
     int i;
     for (i = 0; i < N_INSTR; ++i) {
         if (strncmp(opcodes[i],word,6) == 0) {
-            return opcodes[i][7];
+            return (int)opcodes[i][7];
         }
     }
     fprintf(stderr,"Unknown opcode: %s\n",word);
