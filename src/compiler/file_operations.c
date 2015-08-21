@@ -129,8 +129,8 @@ static int nextLine(FILE* fh) {
 
 
 // this is also a function to be used outside of this file
-int writeCodeFile(code_file* file) {
-    int error = 0;
+unsigned int writeCodeFile(code_file* file) {
+    unsigned int error = 0;
     FILE* fh = file->fh_out;
     // skip header, we'll write it later
     fseek(fh, sizeof(MYTYPE) * 3, SEEK_CUR );

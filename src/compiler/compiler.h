@@ -45,7 +45,7 @@ void freeCodeFile(code_file*);
 // counts the size of the code and creates the symbol table
 int buildModule(code_file*);
 // writes the binary file
-int writeCodeFile(code_file*);
+unsigned int writeCodeFile(code_file*);
 //options
 options *getOptions(int argc, char *argv[]);
 void freeOptions(options*);
@@ -57,5 +57,5 @@ extern int getOpCode(char* operation);
 extern int getRegister(char* argument, int errors);
 extern int getIndexingMode(char* argument);
 extern int getIndexRegister(char* argument);
-extern int getAddress(char* argument, label_list* symbols, uint8_t* firstByte, int* isItFloat);
+extern unsigned int getAddress(char* argument, label_list* symbols, uint8_t* firstByte, int* isItFloat);
 #endif 

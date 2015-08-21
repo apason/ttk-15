@@ -201,7 +201,7 @@ int getIndexRegister(char* argument) {
     return 0;
 }
 
-int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, int *isItFloat) {
+int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, unsigned int *isItFloat) {
     label_list* temp = symbols;
     int addr;
     // is the address a number?
@@ -213,7 +213,7 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, int *isI
         if (!*s)
             addr = atoi(argument);
         else {
-            int error = 0;
+            unsigned int error = 0;
             f16 converted = f16Encode(atof(argument), &error);
             if (error < 0) {
                 *isItFloat = error;
