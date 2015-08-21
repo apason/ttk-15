@@ -309,7 +309,6 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
                     opCode = FLOAD;
                 // float arguments should not be found in other commands
                  else if (opCode < FLOAD) {
-                     printf("FLOAD = %x, opCode = %x\n", FLOAD, opCode);
                      warning = FLOATARGUMENT;
                  }
             }

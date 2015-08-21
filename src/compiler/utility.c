@@ -73,7 +73,7 @@ int getHardcodedSymbolValue(char* arg) {
 }
 
 int getOpCode(char* word) {
-    static const unsigned char opcodes[N_INSTR][8] = {\
+    static const char opcodes[N_INSTR][8] = {\
         "nop\0\0\0\0\0",\
             "store\0\0\x1",\
             "load\0\0\0\x2",\
@@ -129,7 +129,7 @@ int getOpCode(char* word) {
     int i;
     for (i = 0; i < N_INSTR; ++i) {
         if (strncmp(opcodes[i],word,6) == 0) {
-            return (int)opcodes[i][7];
+            return (unsigned char)opcodes[i][7];
         }
     }
     fprintf(stderr,"Unknown opcode: %s\n",word);
@@ -201,7 +201,7 @@ int getIndexRegister(char* argument) {
     return 0;
 }
 
-int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, unsigned int *isItFloat) {
+int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, int *isItFloat) {
     label_list* temp = symbols;
     int addr;
     // is the address a number?
@@ -213,7 +213,7 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, unsigned
         if (!*s)
             addr = atoi(argument);
         else {
-            unsigned int error = 0;
+            int error = 0;
             f16 converted = f16Encode(atof(argument), &error);
             if (error < 0) {
                 *isItFloat = error;
