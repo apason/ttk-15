@@ -1,0 +1,32 @@
+; test fjumps. each section
+; adds 0.0p625 to counter.
+; expected result: 0.25
+
+fc dc 0.0
+
+main load r1, =5.5
+     load r3, =0.0
+sec1 fjneg r1, =end
+     call sp, =addcount
+     fjzer r1, =end
+     fjnzer r3, =section3
+     fjnzer r1, =section2
+
+end load r1, fc
+    fout r1, =crt
+    svc sp, =halt
+
+addcount fload r2, fc
+         fadd r2, =0.0625
+         store r2, =fc
+         exit sp, =0
+
+section2 call sp, =addcount
+         load r3, fc
+         fjnpos r3, =end
+         fjpos r3, =sec1
+
+section3 call sp, =addcount
+         fjnneg r3, =end
+         call sp, =addcount
+         jump =end
