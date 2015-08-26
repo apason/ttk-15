@@ -8,14 +8,12 @@
 
 int main(int argc,char *argv[]){
     options *opts = getOptions(argc, argv);
-    machine *m    = newMachine(opts->memsize);
+    machine *m;
 
+    if(opts == NULL) return -1;
+
+    m = newMachine(opts->memsize);
     m->cu->pc = 0;
-
-    if(opts == NULL){
-	freeMachine(m);
-	return -1;
-    }
 
     if(opts->mode == TTK91)
 	m->regs[6] = (MYTYPE) loadFile91(m->mem, opts->file, opts->memsize);
