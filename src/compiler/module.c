@@ -33,7 +33,7 @@ int buildModule(code_file* file){
             int nopt = sscanf(code[i], "%s %s %s %s", ext, label, word, val);
             if(nopt < 2){
                 printf("invalid start of expression: %s\n", ext);
-                exit(-1);
+                return -1;
             } else if (strncmp(ext, "export", MAX)){
                 sscanf(code[i], "%s %s %s", label, word, val);
                 if (!strncmp(label, "main", LABELLENGTH))
@@ -73,7 +73,7 @@ int buildModule(code_file* file){
             }
             else{
                 printf("ERROR: invalid instruction %s\n", word);
-                exit(-1);
+                return -1;
             }
             memset(label_node->label, 0, LABELLENGTH);
             // set label name

@@ -23,15 +23,23 @@ int main (int argc, char* argv[]) {
 
 
         FILE* output = *output_list++;
-        char* output_name = *output_name_list++;
-        // we take the first argument to be name of a .ttk91 file
+        // we need this to delete the output file if there is an error
+        char output_name[MAX];
+        strncpy(output_name, *output_name_list++, MAX-4);
+        strncat(output_name, ".o15", 4);
+
+        // assume at first that it's a ttk91 file instead of ttk15
+        // and set the code_file struct to hold the filehandle and output name
         code_file codeFile;
         codeFile.name = argv[n];
         codeFile.mode = TTK91;
         codeFile.fh_out = output++;
 
-        // read the codeFile
-        if (readCodeFile(&codeFile, debug) < 0) return -1;
+        // read the file into the struct
+        if (readCodeFile(&codeFile, debug) < 0) {
+            unlink(output_name);
+            continue;
+        }
 
         // find the suffix of the file
         char* suffix = strrchr(argv[n], '.');
@@ -43,7 +51,11 @@ int main (int argc, char* argv[]) {
 
 
         // calculate code size and create the symbol table
-        buildModule(&codeFile);
+        if (buildModule(&codeFile) < 0) {
+            freeCodeFile(&codeFile);
+            unlink(output_name);
+            continue;
+        }
 
         if (debug) {
             // print module size
@@ -69,8 +81,9 @@ int main (int argc, char* argv[]) {
         }
         // free the space reserved for dynamic data in codeFile
         freeCodeFile(&codeFile);
-        freeOptions(opts);
     }
+    // free the options struct
+    freeOptions(opts);
 
     return 0;
 }
