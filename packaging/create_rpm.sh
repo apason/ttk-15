@@ -16,9 +16,9 @@ echo "- nothing" >> ~/rpmbuild/SPECS/ttk.spec
 
 mkdir -p ~/rpmbuild/BUILDROOT/ttk-$1-1.$(uname -m)/usr/local/bin
 
-cp target/linker ~/rpmbuild/BUILDROOT/ttk-$1-1.$(uname -m)/usr/local/bin
-cp target/ttk-15 ~/rpmbuild/BUILDROOT/ttk-$1-1.$(uname -m)/usr/local/bin
-cp target/ttc ~/rpmbuild/BUILDROOT/ttk-$1-1.$(uname -m)/usr/local/bin
+cp ../target/linker ~/rpmbuild/BUILDROOT/ttk-$1-1.$(uname -m)/usr/local/bin
+cp ../target/ttk-15 ~/rpmbuild/BUILDROOT/ttk-$1-1.$(uname -m)/usr/local/bin
+cp ../target/ttc ~/rpmbuild/BUILDROOT/ttk-$1-1.$(uname -m)/usr/local/bin
 
 rpmbuild -bb ~/rpmbuild/SPECS/ttk.spec
 

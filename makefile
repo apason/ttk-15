@@ -43,11 +43,13 @@ remove:
 package: package_rpm package_deb
 
 package_deb:	build
-	./create_deb.sh $(version)
-	./install_deb.sh $(version)
+	cd packaging ; \
+	./create_deb.sh $(version) ; \
+	./install_deb.sh $(version) ;
 
 #this assumes one have ~/rpmbuild and ~/.rpmmacros set up so building occurs in ones home direcrory
 package_rpm:	build
-	./create_rpm.sh $(version) 
-	./install_rpm.sh $(version)
+	cd packaging ; \
+	./create_rpm.sh $(version) ; \
+	./install_rpm.sh $(version) ;
 
