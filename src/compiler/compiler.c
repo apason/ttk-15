@@ -35,7 +35,7 @@ int main (int argc, char* argv[]) {
 
         // find the suffix of the file
         char* suffix = strrchr(argv[n], '.');
-        if (opts->mode == UNDEFINED) {
+        if (opts->mode == UNDEFINED && suffix != NULL) {
             if (!strncmp(suffix,".k15",5))
                 codeFile.mode = TTK15;
         } else
