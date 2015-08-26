@@ -139,7 +139,9 @@ int writeCodeFile(code_file* file) {
     int i, cInstructions = 0;
     char word[MAX], label[LABELLENGTH], val[MAX];
     for (i = 0; i < file->lines; ++i) {
+        // make sure no previous data is bothering us
         val[0] = '\0';
+
         sscanf(file->array[i], "%s %s", word, val);
         if (isInstruction(word)) {
             error = writeInstruction(word,val,file->symbolList, fh, file->mode);
@@ -156,6 +158,7 @@ int writeCodeFile(code_file* file) {
             ++cInstructions;
             continue;
         }
+
         val[0] = '\0';
         char trash[MAX];
         if (sscanf(file->array[i], "%s %s %s", label, word, val) < 2) {
@@ -196,6 +199,7 @@ int writeCodeFile(code_file* file) {
         }
         symbols = symbols->next;	
     }
+    
     // write the import and export tables
     file->exportSize = 0;
     symbols = file->symbolList;
@@ -211,6 +215,7 @@ int writeCodeFile(code_file* file) {
         symbols = symbols->next;
     }
     fseek(fh, 0, SEEK_SET);
+
     // write header to the object file
     MYTYPE dataSegmentAddress = file->codeSize*5 + 12;
     MYTYPE exportTableAddress = dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
@@ -246,12 +251,14 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
 
     // find number of arguments
     char* argument = NULL;
+
     if (val[0]) {
         // make the arguments lowercase
         {
             char* p = val;
             for (; *p; ++p) *p = tolower(*p);
         }
+
         // split val into two if there's a comma
         argument = strchr(val, ',');
         if (argument != NULL && strlen(argument) > 1) {
@@ -261,6 +268,7 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
             nargs = 1;
             argument = val;
         }
+
     } else
         nargs = 0;
 
