@@ -7,6 +7,13 @@ mkdir -p $debian_root/DEBIAN
 #insert version number and construct control file
 cat control_head >> $debian_root/DEBIAN/control
 echo Version: "$1"-1 >> $debian_root/DEBIAN/control
+cat control_mid >> $debian_root/DEBIAN/control
+if [ $(uname -m) == "x86_64" ] ; then
+    echo Architecture: amd64 >> $debian_root/DEBIAN/control
+else
+    echo Architecture: $(uname -m) >> $debian_root/DEBIAN/control
+fi
+
 cat control_tail >> $debian_root/DEBIAN/control
 
 
