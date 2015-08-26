@@ -106,5 +106,9 @@ static void openFile(FILE **outputs, char *filename){
 
 void freeOptions(options *opts) {
     free(opts->outputs);
+    int i;
+    for (i = 0; i < opts->count; i++)
+        free(opts->filenames[i]);
+    free(opts->filenames);
     free(opts);
 }
