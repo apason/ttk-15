@@ -1,0 +1,21 @@
+Release:	1%{?dist}
+Summary:	ttk-15 is ttk-91 compatible virtual machine with its own extensions 
+Group:		Applications/Emulators
+URL:		http://github.com/apason/ttk-15
+License:        not_decided
+
+Requires:	ncurses,ncurses-libs
+
+%description
+ttk-15 also has linker and global/local variables.
+there is also instruction set for floating point
+arithmetics and 16bit floats can be used in
+instructions. overflow- etc flags are set when
+exception happens.
+
+%files
+/usr/local/bin/ttk-15
+/usr/local/bin/ttc
+/usr/local/bin/linker
+
+%changelog

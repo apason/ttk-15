@@ -25,3 +25,29 @@ clobber:	clean
 	$(MAKE) -C $(MACHINE) clobber
 	$(MAKE) -C $(COMPILER) clobber
 	$(MAKE) -C $(LINKER) clobber
+
+install:	build
+	cp target/ttk-15 /usr/local/bin/ttk-15
+	cp target/linker /usr/local/bin/linker
+	cp target/ttc /usr/local/bin/ttc
+
+remove:
+	rm -f /usr/local/bin/ttk-15
+	rm -f /usr/local/bin/linker
+	rm -f /usr/local/bin/ttc
+
+
+
+#this section is only for main developers and does not (propably) work with others
+
+package: package_rpm package_deb
+
+package_deb:	build
+	./create_deb.sh $(version)
+	./install_deb.sh $(version)
+
+#this assumes one have ~/rpmbuild and ~/.rpmmacros set up so building occurs in ones home direcrory
+package_rpm:	build
+	./create_rpm.sh $(version) 
+	./install_rpm.sh $(version)
+

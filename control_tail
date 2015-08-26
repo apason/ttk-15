@@ -1,0 +1,6 @@
+Priority: optional
+Architecture: amd64
+Depends: libncurses5
+Maintainer: Arttu Kilpinen <arttu.kilpinen@helsinki.fi>
+Description: ttk-15
+ more info in github.com/apason/ttk-15
