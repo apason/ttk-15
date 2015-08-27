@@ -10,7 +10,7 @@ There is also .deb and .rpm x86_64 packages for users who only needs a binaries 
 ##with red hat based systems##
 In rpm based distros one can install this project from target/<version>/x86_64/ttk-<version>.x86_64.rpm with yum:
 
-yum -i package.rpm
+rpm -i package.rpm
 
 ##with debian based systems##
 There is also .deb packages for x86_64. installation with dpkg is simple:
@@ -23,5 +23,6 @@ In the target/<version>/ directory one can find all binaries that are precompile
 In the version 0.3 and later there is at least following linux binaries:
 
  * armv7
+ * armv6
  * i386
  * x86_64 (including .deb and .rpm)
