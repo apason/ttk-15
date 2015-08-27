@@ -169,9 +169,9 @@ other operations
  * POPR      36	  pops all registers from stack pointed by ri
  * SVC       70	  call supervisor function addr. use ri as stack pointer
 
-extended instructions:
+extended instructions: does same as original ones but with floating points
 
- * FIN       83
+ * FIN       83   
  * FOUT      84
  * FADD      91
  * FSUB      92
@@ -185,4 +185,7 @@ extended instructions:
  * FJNZER    A5 
  * FJNPOS    A6
 
+FLOAD differs from LOAD only when using immediate addressing mode (mode 0)
+when there is 16bit float in instruction. Otherwise it functions just as LOAD.
+ * FLOAD     82
 
