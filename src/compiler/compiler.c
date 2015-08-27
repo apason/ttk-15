@@ -40,9 +40,12 @@ int main (int argc, char* argv[]) {
             unlink(output_name);
             continue;
         }
-
-        // set the mode, either k91 or k15
-        codeFile.mode = opts->mode;
+        char* suffix = strrchr(argv[n], '.');
+        if (opts->mode == UNDEFINED && suffix != NULL) {
+            if (!strncmp(suffix,".k15",5))
+            codeFile.mode = TTK15;
+        } else
+            codeFile.mode = opts->mode;
 
 
         // calculate code size and create the symbol table
