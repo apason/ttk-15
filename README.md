@@ -56,7 +56,9 @@ ttk-15 is still in under development. We are planned at least following things t
  In next versions there will be instruction for it so state register would have a real utility.
  * Implementation of hardware clock and real support for interrupts. This allows one to
  write strings or even operating system to ttk-15
-
+ * Full windows support. We have not tested ttk-15 in windows but it might compile well
+ under cygwin or mingw. Actually there is very little OS dependent code so porting would
+ be very simple and fast.
 
 
 
