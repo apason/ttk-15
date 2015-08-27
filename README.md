@@ -59,6 +59,8 @@ ttk-15 is still in under development. We are planned at least following things t
  * Full windows support. We have not tested ttk-15 in windows but it might compile well
  under cygwin or mingw. Actually there is very little OS dependent code so porting would
  be very simple and fast.
+ * linux man pages
+ * pdf formatted users guide
 
 
 
