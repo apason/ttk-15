@@ -9,13 +9,10 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * float hyppykäskyissä ei saa olla floattia osoitteena
  * valgrindin memleakit
  * 16b floatit kääntäjään
-
-##v0.3 baglog##
  * testit floateille                                                        4
 
+
 ## backlog ##
- * enumeiksi mikä kannattaa
- * masiinan dokumentointi kusettaa store käskyn!
  * testaa titokoneessa nollalla jakaminen ym. keskeytykset
  * "wrapper" skripti tms joka kapseloi linkkerin ja kääntäjän (ehkä masiinan?)
  * konekäskyt state registerin tutkimiseen
@@ -23,11 +20,9 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * keskeytykset!
  * overflow tarkistus tehokkaammaksi xor menetelmällä
  * testit overflow yms flageille!
- * state registerin nollaus?
  * GUI 
  * pienin osoitettava muistiyksikkö keskusmuistissa MYTYPE:stä yhteen tavuun
  * konekäskyt 16 ja 8 bitin käsittelyyn?
- * n ydintä
 
 ##known issues##
- * sefault jos linkkauksessa linkattavaa symbolia ei ole taulussa 
+
