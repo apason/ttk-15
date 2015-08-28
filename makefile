@@ -5,7 +5,7 @@ TEST=     ./test
 
 build:	machine compiler linker
 
-all:	machine compiler linker tests 
+all:	machine compiler linker tests build 
 
 tests:	machine compiler linker src/include/*
 	$(MAKE) -C $(TEST) all
