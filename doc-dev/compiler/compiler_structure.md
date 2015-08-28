@@ -1,0 +1,22 @@
+|— 00 getOptions
+    |— 00 newOptions
+    |— 01 openFile
+|— 01 readCodeFile
+    |— 00 countLines
+        |— 00 nextLine
+    |— 01 readCode
+|— 02 buildModule
+    |— 00 isInstruction
+|– 03 writeCodeFile
+    |– 00 isInstruction
+    |– 01 writeInstruction
+        |– 00 getOpCode
+        |– 01 getIndexingMode
+        |– 02 getIndexRegister
+        |– 03 getRegister
+        |– 04 getAddress
+|– 04 freeCodeFile
+    |– 00 freeSymbols
+    |– 01 freeCodeArray
+|– 05 freeOptions
+    
