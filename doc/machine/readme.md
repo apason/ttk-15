@@ -6,9 +6,10 @@ ttk-15 machine is for running ttk-15 or ttk-91(titokones format) binaries
 
 To run .b15 or .b91 binary file start the machin from CLI with following syntax:
 
-./ttk-15 [options] [file]
+./ttk-15 [options] [file] [options]
 
 NOTE! File and options can be in any order!
+
 NOTE! All options are optional so ./ttk-15 tito.b91 works just fine
 
 ###options###
@@ -16,8 +17,9 @@ NOTE! All options are optional so ./ttk-15 tito.b91 works just fine
 -m mode , where mode is either "b91" or "b15" specifies mode of binary.
 if there is no mode option, ttk-15 will define mode from file suffix.
 if file suffix is not .b91 or .b15 and -m is not used, then machine
-will use b15 as default. NOTE! mode option has higher priority than
-filename suffix! (see examples)
+will use b15 as default.
+
+NOTE! mode option has higher priority than filename suffix! (see examples)
 
 -f file , where file is name of executable file. If -f flag is not used,
 ttk-15 will use first non-option argument as binary file
@@ -44,10 +46,11 @@ NOTE! this can be confusing. the program.b15 should be really b91 program!
 ./ttk-15 -M 1024 program.b91 -g
 execute program.b91 in debugging mode with 1024 words of memory
 
-
-
 At this point the machine has no graphical user interface. It prints its
 output to stdout and reads (instruction IN) from stdin.
+
+NOTE! When using -g with ncurses enabled, machine does print and read
+from that ncurses window and stdio and stdout is not used
 
 ##specifications##
 ttk-15 is 32bit general register machine. File src/include/ttk-15.h gives
@@ -74,6 +77,7 @@ most significant bit:
  * p - machine is running in privileged (root) mode
  * D - interrupts disabled
  * H - halt program
+ * T - debugging (trap) mode enabled
 
 ###instructions###
 
@@ -115,7 +119,6 @@ See notes in compilers readme!
 instructions are: (second column is value in hexadecimal)
 
  * NOP       00	  No Operation. Ignores all the rest instruction fields
-
  * STORE     01	  stores value in rj to mem[addr] See Notes in compilers readme!
  * LOAD      02	  loads value of addr to rj
  * IN        03	  reads value from addr to rj
@@ -166,15 +169,23 @@ other operations
  * POPR      36	  pops all registers from stack pointed by ri
  * SVC       70	  call supervisor function addr. use ri as stack pointer
 
-extended instructions:
+extended instructions: does same as original ones but with floating points
 
- * in
- * out
+ * FIN       83   
+ * FOUT      84
+ * FADD      91
+ * FSUB      92
+ * FMUL      93
+ * FDIV      94
+ * FCOMP     9F
+ * FJNEG     A1
+ * FJZER     A2 
+ * FJPOS     A3
+ * FJNNEG    A4
+ * FJNZER    A5 
+ * FJNPOS    A6
 
- * add
- * sub
- * mul
- * div
- * comp
- * jneg - jnpos
- * total of 13 new instructions 
+FLOAD differs from LOAD only when using immediate addressing mode (mode 0)
+when there is 16bit float in instruction. Otherwise it functions just as LOAD.
+ * FLOAD     82
+

@@ -1,0 +1,21 @@
+├── 00_getOptions
+│   ├── 00_newOptions
+│   └── 01_openFile
+├── 01_createModules
+│   ├── 00_readModule
+│   ├── 01_readCode
+│   └── 02_readImportExport
+│       └── 02_readSymbols
+├── 02_setMain
+│   ├── 00_findMain
+│   └── 01_freeModules-freeOptions-ONERROR
+├── 03_linkModule
+│   ├── 00_getLabelName
+│   ├── 01_handleExternalLabel
+│   │   ├── 00_findLabelAddressConstant
+│   │   └── 01_findLabelValue
+│   └── 02_freeRedundant
+└── 04_freeModules
+    └── 00_freeModule
+        └── 00_freeSymbolList
+

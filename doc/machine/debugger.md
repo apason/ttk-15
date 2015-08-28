@@ -19,9 +19,9 @@ subunit and register. To enter this page press F1.
 MEM page shows the content of machines memory. If all memory (512 words by default) does
 not fit into one screen it only shows first memory slots. However one can investigate other
 memory slots moving in the window:
-home and end buttons: move to the first or last slots of the memory
-page up and page down: move to fixed amount of lines to up/down
-arrow keys up and down: move one line
+home and end buttons: move to the first or last slots of the memory.
+page up and page down: move to fixed amount of lines to up/down.
+arrow keys up and down: move one line.
 To enter this page press F2.
 
 ###CRT###
@@ -37,4 +37,4 @@ Which page we are on and which output format is in use. It also gives instructio
 When the machine is waiting for input (IN instruction is executed) the debugger pops up a new input window.
 The input window closes only when it is successfully read the input.
 Input is always treated as a decimal number.
-NOTE! As the machine is 32 bit, the input must also be at least 32 bit (signed)
+NOTE! As the machine is 32 bit, the input must also be at most 32 bit
