@@ -74,4 +74,4 @@ Arttu Kilpinen - apason
 arttu.kilpinen@helsinki.fi
 
 Hiski Ruhanen  - praetoria
-hiski.rauhanen@helsinki.fi
+hiski.ruhanen@helsinki.fi
