@@ -32,7 +32,7 @@ void createModules(int n, char **argv, module **modules){
 	modules[i] = readModule(fp, argv[i]);
 
 	if(modules[i] == NULL){
-	    printError(NULL,argv[i]);
+	    printError(NULL, argv[i]);
 	    exit(-1);
 	}
 

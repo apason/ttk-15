@@ -11,7 +11,7 @@
 static char *getLabelName(llist *s, uint32_t instruction);
 static int16_t findLabelValue(char *label);
 static int findLabelAddressConstant(char *label);
-static int handleExternalLabel(uint32_t *buf,  char *label, module *mod);
+static int handleExternalLabel(uint32_t *buf,  char *label);
 static int16_t findLocalLabel(char *label, llist *list);
 
 //used in every function. initialized in linkmodule
@@ -20,6 +20,7 @@ static int      n;
 
 
 void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
+    int tmp                          =  0;
     int i                            =  0;
     uint32_t codesize                = -1;
     uint32_t datasize                = -1;
@@ -42,9 +43,21 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
 	memcpy(&buf, mod->codes[i] +1, sizeof(buf));
 
 	switch(*(mod->codes[i])){
-	//label from local module, without symboltable	    
-	case LOCAL:
+	//label from local module, without symboltable
 	case EXPORT:
+	    label = getLabelName(mod->export, buf);
+	    if(label == NULL){
+		errno_linker = EINVALID_EXPORT;
+		printError(NULL, mod->filename);
+		exit(-1);
+	    }
+	    if((tmp = findLabelAddressConstant(label)) < 0){
+		errno_linker = tmp;
+		printError(NULL, mod->filename, label);
+		exit(-1);
+	    }
+	//no break here!
+	case LOCAL:
 	    buf += mod->address_constant / sizeof(MYTYPE);
 	    break;
 
@@ -53,10 +66,14 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
 	    label = getLabelName(mod->import, buf);
 	    if(label == NULL){
 		errno_linker = EINVALID_IMPORT;
-		printError(NULL,mod->filename);
+		printError(NULL, mod->filename);
 		exit(-1);
 	    }
-	    if(handleExternalLabel(&buf, label, mod) != 0) exit(-1); //error. message already sent
+	    if((tmp = handleExternalLabel(&buf, label)) != 0){
+		errno_linker = tmp;
+		printError(NULL, mod->filename, label);
+		exit(-1);
+	    }
 
 	    break;
 	    
@@ -67,19 +84,10 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
         //this should not happen!
 	default:
 	    errno_linker = EINVALID_LABEL_TYPE;
-	    printError(NULL,mod->filename);
+	    printError(NULL, mod->filename);
 	}
     
-
-
-	/* if(label == NULL){ */
-	/*     fprintf(stderr, "ERROR: Incorrect symbol table: nameless label with"); */
-	/*     fprintf(stderr, " value %d. Aborting!\n", value); */
-	/*     exit(-1); */
-	/* } */
-    
-
-    fwrite(&buf, sizeof(buf), 1, fp);
+	fwrite(&buf, sizeof(buf), 1, fp);
     
 	if(ferror(fp)){
 	    fprintf(stderr, "Cant write to destination file.\n aborting!\n");
@@ -96,19 +104,16 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
 
 }
 
-static int handleExternalLabel(uint32_t *buf, char *label, module *m){
+static int handleExternalLabel(uint32_t *buf, char *label){
     int16_t label_address_constant  = -1;
     
     *buf &= 0xFFFF0000;
-    label_address_constant = findLabelAddressConstant( label);
+    label_address_constant = findLabelAddressConstant(label);
 
     if(label_address_constant >= 0)
 	*buf += label_address_constant +findLabelValue(label);
-    else{
-	errno_linker = label_address_constant;
-	printError(NULL,m->filename, label);
-	return -1;
-    }
+    else
+	return label_address_constant;
 
     return 0;
 }
@@ -156,11 +161,6 @@ static int16_t findLocalLabel(char *label, llist *list){
 static int16_t findLabelValue(char *label){
     int  i   = 0;
     int  res = 0;
-
-    if(label == NULL){
-	printf("label name null! aborting..\n");
-	exit(-1);
-    }
 
     //no need to check multiple module definition
     for(i = 0; i < n; i++){

@@ -44,6 +44,7 @@ be run in machine.
  and ttk-91. Nevertheless ttk-15 has functionality to slightly modify ttk-91 binaries
  so it is fully compatible with ttk-91s binaries (b91 can be run in ttk-15 but not
  vice versa) and source code (so any ttk-91 source will have the same end result with ttk-15)
+ * ttk-15 does not support READ, WRITE, TIME, and DATE svc:s yet. 
 
 
 ##coming up##
