@@ -1,7 +1,6 @@
 #linker#
 
 linker is for linking ttk-15 object modules (.o15) to ttk-15 executable (.b15)
-See compilers doc folder for .o15 file format!
 
 ##usage##
 

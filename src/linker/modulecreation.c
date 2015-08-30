@@ -6,6 +6,7 @@
 
 //project header
 #include "linker.h"
+#include "error.h"
 
 #define SYMBOLSIZE 34  //size of one symbol sub block in .o15 format
 
@@ -31,7 +32,7 @@ void createModules(int n, char **argv, module **modules){
 	modules[i] = readModule(fp, argv[i]);
 
 	if(modules[i] == NULL){
-	    printf("ERROR: incorrect module %s\n", argv[i]);
+	    printError(NULL,argv[i]);
 	    exit(-1);
 	}
 
@@ -45,7 +46,6 @@ void createModules(int n, char **argv, module **modules){
 
 //initializes one module. returns NULL if any block is wrong size
 static module *readModule(FILE *fp, char *filename){
-    int tmp             = 0;
     int i               = 0;
     uint32_t data_size  = -1;
     uint32_t code_size  = -1;
@@ -72,27 +72,30 @@ static module *readModule(FILE *fp, char *filename){
      *
      * x_start < size must be valid
      *
-     * import and export table sizes should be a factor of labellength +2
+     * import and export table sizes should be a factor of labellength +2 = SYMBOLSIZE
+     * code block should be factor of 5 and data block factor of 4
      */
         
-    if(mod->data_start > mod->export_start)        return NULL;
-    if(mod->export_start > mod->import_start)      return NULL;
-    if(mod->import_start > mod->size)              return NULL;
+    if((mod->data_start > mod->export_start)                           | \
+       (mod->export_start > mod->import_start)                         | \
+       (mod->import_start > mod->size )                                | \
+       ((mod->import_start -mod->export_start) % SYMBOLSIZE != 0)      | \
+       ((mod->size -mod->import_start) % SYMBOLSIZE != 0)              | \
+       ((mod->data_start -CODESTART) % CODESIZE != 0)                  | \
+       ((mod->export_start -mod->data_start) % sizeof(MYTYPE) != 0)){
+
+	errno_linker = EINVALID_HEADER;
+	return NULL;
+    }
+
+    if(mod->size < 16){
+	errno_linker = ELITTLE_OBJECT;
+	return NULL;
+    }
     
-    tmp = mod->import_start -mod->export_start;
-    if(tmp % SYMBOLSIZE != 0)                      return NULL;
-    tmp = mod->size -mod->import_start;
-    if(tmp % SYMBOLSIZE != 0)                      return NULL;
-    if(mod->size < 16)                             return NULL;
-    if(mod->import_start < mod->size -LABELLENGTH) return NULL;
-    
-    //calculate linked size      /* should be factor of 5 */
-    tmp = (mod->data_start - CODESTART);
-    if(tmp % CODESIZE != 0) return NULL;
-    code_size = sizeof(MYTYPE) * tmp / CODESIZE;
-    tmp = mod->export_start - mod->data_start;
-    if(tmp % 4 != 0) return NULL;
-    data_size = tmp;
+    //calculate linked size
+    code_size = sizeof(MYTYPE) * (mod->data_start - CODESTART) / CODESIZE;
+    data_size = (mod->export_start -mod->data_start);
     mod->linked_size = code_size + data_size;
 
     fseek(fp, 0, SEEK_SET);
@@ -157,7 +160,3 @@ static llist *readSymbols(module *mod, int start, int end){
     
     return head;
 }
-
-
-
-

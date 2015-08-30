@@ -6,16 +6,13 @@
 
 //project headers
 #include "linker.h"
-
-//used as return value of findMain
-#define NO_MAIN       -2
-#define SEVERAL_MAINS -1
+#include "error.h"
 
 static int findMain(module **modules, int n);
 static int containsMain(module *mod);
 static void printModule(module *mod);
 static void printSymbols(llist *l);
-static void setMain(module **mods, options *opts);
+static int setMain(module **mods, options *opts);
 
 int main(int argc, char **argv){
     int      i        = 0;
@@ -26,19 +23,22 @@ int main(int argc, char **argv){
     modules = (module **) malloc(sizeof(module *) * (opts->count));
 
     if(opts->count < 1){
-	printf("no modules specified!\n");
+	errno_linker = ENO_MODULES;
+	printError(NULL,NULL);
+	//memory?
 	exit(-1);
     }
 
     //create module structs for each module
-    printf("creating modules..\n");
     createModules(opts->count, argv +1, modules);
 
     //if there is only 1 object module to link, skip main finding
-    if(opts->count > 1) setMain(modules, opts);
+    if(opts->count > 1)
+	if(setMain(modules, opts) != 0){
+	    printError(NULL,NULL);
+	    //memoryfree + exit
+	}
 
-    printf("ok!\n");
-  
     //main module
     modules[0]->address_constant = 0;
 
@@ -51,8 +51,6 @@ int main(int argc, char **argv){
     /* 	printModule(modules[i]); */
 
 
-    printf("linking modules..\n");
-  
     //link main containing module first
     linkModule(opts->output, modules, 0, opts->count);
 
@@ -68,25 +66,23 @@ int main(int argc, char **argv){
     return 0;
 }
 
-static void setMain(module **modules, options *opts){
+static int setMain(module **modules, options *opts){
 
     module *tmp     = NULL;
     int     mainnbr = 0;
 
     //determine which module contains main
-    printf("finding main module..\t");
-    if((mainnbr = findMain(modules, opts->count)) == NO_MAIN){
-	fprintf(stderr, "error: no main module found!\n");
-	freeModules(modules, opts->count);
-	freeOptions(opts);
-	exit(-1);
+    mainnbr = findMain(modules, opts->count);
+
+    if(mainnbr == ENO_MAIN){
+	errno_linker = ENO_MAIN;
+	return -1;
     }
 
-    if(mainnbr == SEVERAL_MAINS){
-	fprintf(stderr, "error: several main modules!\n");
-	freeModules(modules, opts->count);
-	freeOptions(opts);
-	exit(-1);
+    if(mainnbr == ESEVERAL_MAINS){
+	errno_linker = ESEVERAL_MAINS;
+	return -1;
+
     }
   
     //swap main to first position
@@ -94,21 +90,22 @@ static void setMain(module **modules, options *opts){
 	tmp = modules[0];
 	modules[0] = modules[mainnbr];
 	modules[mainnbr] = tmp;
-    }   
-  
+    }
+    
+    return 0;
 }
 
 //determine main module
 static int findMain(module **modules, int n){
     int i = 0;
-    int mainnbr = NO_MAIN;
+    int mainnbr = ENO_MAIN;
 
     for(i = 0; i < n; i++)
 	if(containsMain(modules[i])){
-	    if(mainnbr == NO_MAIN)
+	    if(mainnbr == ENO_MAIN)
 		mainnbr = i;
 	    else
-		return SEVERAL_MAINS;
+		return ESEVERAL_MAINS;
 	}
   
     return mainnbr;

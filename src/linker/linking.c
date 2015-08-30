@@ -2,18 +2,16 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "linker.h"
 #include <module.h>
 #include <ttk-15.h>
+#include "linker.h"
+#include "error.h"
 
-#define LABEL                   1
-#define LABEL_NOT_FOUND        -2
-#define MULTIPLE_DECLARATIONS  -1
 
 static char *getLabelName(llist *s, uint32_t instruction);
 static int16_t findLabelValue(char *label);
 static int findLabelAddressConstant(char *label);
-static void handleExternalLabel(uint32_t *buf,  char *label);
+static int handleExternalLabel(uint32_t *buf,  char *label, module *mod);
 static int16_t findLocalLabel(char *label, llist *list);
 
 //used in every function. initialized in linkmodule
@@ -22,7 +20,6 @@ static int      n;
 
 
 void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
-    int tmp                          =  0;
     int i                            =  0;
     uint32_t codesize                = -1;
     uint32_t datasize                = -1;
@@ -34,9 +31,6 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
     //initialize global functions
     modules = modulestoinit;
     n = m;
-
-    //filename to link
-    printf("linking %s\n", modules[mi]->filename);
 
     codesize = (mod->data_start - CODESTART) / CODESIZE;
     datasize = (mod->export_start -mod->data_start) / sizeof(MYTYPE);
@@ -50,31 +44,30 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
 	switch(*(mod->codes[i])){
 	//label from local module, without symboltable	    
 	case LOCAL:
+	case EXPORT:
 	    buf += mod->address_constant / sizeof(MYTYPE);
 	    break;
 
 	//label from other module
 	case IMPORT:
 	    label = getLabelName(mod->import, buf);
-	    handleExternalLabel(&buf, label);
+	    if(label == NULL){
+		errno_linker = EINVALID_IMPORT;
+		printError(NULL,mod->filename);
+		exit(-1);
+	    }
+	    if(handleExternalLabel(&buf, label, mod) != 0) exit(-1); //error. message already sent
+
 	    break;
 	    
-	//label from local symoltable
-	case EXPORT:
-	    label = getLabelName(mod->export, buf);
-	    tmp = findLocalLabel(label, mod->export);
-	    if(tmp < 0) ;//fatal error
-	    buf += tmp +mod->address_constant / sizeof(MYTYPE);
-	    break;
-
 	//addressing mode 0
 	case NO_LABEL:
 	    break;
 
         //this should not happen!
 	default:
-	    fprintf(stderr, "ERROR: incorrect module: unknown label type\n");
-	    //error
+	    errno_linker = EINVALID_LABEL_TYPE;
+	    printError(NULL,mod->filename);
 	}
     
 
@@ -99,43 +92,40 @@ void linkModule(FILE *fp, module **modulestoinit, int mi, int m ){
     for(i = 0; i < datasize; i++)
 	fwrite(mod->data +mod->data_start +i*sizeof(MYTYPE), sizeof(MYTYPE), 1, fp);
 
-
     freeRedundant(mod);
 
 }
 
-static void handleExternalLabel(uint32_t *buf, char *label){
+static int handleExternalLabel(uint32_t *buf, char *label, module *m){
     int16_t label_address_constant  = -1;
     
     *buf &= 0xFFFF0000;
     label_address_constant = findLabelAddressConstant( label);
 
-    if(label_address_constant == LABEL_NOT_FOUND){
-	fprintf(stderr, "ERROR: Undefined label %s. Aborting!\n", label);
-	exit(-1);
+    if(label_address_constant >= 0)
+	*buf += label_address_constant +findLabelValue(label);
+    else{
+	errno_linker = label_address_constant;
+	printError(NULL,m->filename, label);
+	return -1;
     }
 
-    if(label_address_constant == MULTIPLE_DECLARATIONS){
-	fprintf(stderr, "ERROR: ambiguous label name %s. Aborting!\n", label);
-	exit(-1);
-    }
-	
-    *buf += label_address_constant +findLabelValue(label);
+    return 0;
 }
 
 //find label address among all modules
 static int findLabelAddressConstant(char *label){
     int    i  = 0;
-    int    ac = LABEL_NOT_FOUND;
+    int    ac = ELABEL_NOT_FOUND;
     llist *s  = NULL;
   
     for(i = 0; i < n; i++)
 	for(s = modules[i]->export; s; s = s->next)
 	    if(!strncmp(s->label, label, LABELLENGTH)){
-		if(ac == LABEL_NOT_FOUND)
+		if(ac == ELABEL_NOT_FOUND)
 		    ac = modules[i]->address_constant / sizeof(MYTYPE);
 		else
-		    return MULTIPLE_DECLARATIONS;
+		    return EMULTIPLE_DECLARATIONS;
 	    }
   
     return ac; 
@@ -144,8 +134,6 @@ static int findLabelAddressConstant(char *label){
 //gets label name from modules own table
 static char *getLabelName(llist *s, uint32_t instruction){
     int16_t label = 0;
-
-    if(s == NULL) printf("llist is null\n");
 
     label = (int16_t) instruction;
 

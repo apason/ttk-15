@@ -17,7 +17,7 @@ It can run ttk-91 (titokones format) or ttk-15 binary files.
 compiler is for compiling ttk-91 and ttk-15 source code to ttk-15 binary.
 That means object modules compiled with our compiler can not be run in other
 ttk-91 machines! (e.g. titokone) It creates .o15 object modules that contains
-compiled instructions, data area and symbol table.
+compiled instructions, data area and symbol tables (import and export).
 
 ##linker##
 
@@ -43,7 +43,7 @@ be run in machine.
  * Some machine instructions (e.g. STORE and JUMP) does not work in same way in ttk-15
  and ttk-91. Nevertheless ttk-15 has functionality to slightly modify ttk-91 binaries
  so it is fully compatible with ttk-91s binaries (b91 can be run in ttk-15 but not
- vice versa) and source code (so any ttk-91 source will have the same end result in ttk-15)
+ vice versa) and source code (so any ttk-91 source will have the same end result with ttk-15)
 
 
 ##coming up##
