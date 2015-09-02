@@ -113,6 +113,7 @@ int getOpCode(char* word) {
             "popr\0\0\0\x36",\
             "svc\0\0\0\0\x70",\
             "fload\0\0\x82",\
+            "fin\0\0\0\0\x83",\
             "fout\0\0\0\x84",\
             "fadd\0\0\0\x91",\
             "fsub\0\0\0\x92",\
