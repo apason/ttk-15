@@ -1,0 +1,20 @@
+in r1,=kbd
+push sp,=0
+push sp,r1
+call sp,addten
+pop sp,r1
+out r1,=crt
+svc sp,=halt
+
+
+ten equ 1
+input equ -2
+ret equ -3
+
+addTen push sp,=10
+	load r1,input(fp);
+	load r2,ten(fp);
+	add r1,r2
+	store r1,ret(fp);
+	pop sp,r1
+	exit sp,=1
