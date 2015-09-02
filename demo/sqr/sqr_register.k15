@@ -1,0 +1,15 @@
+in r1, =kbd
+call sp, =sqr
+out r2, =crt
+svc sp, =halt
+
+ret equ -3
+param equ -2
+
+; r1 contains input value
+; put return to r2
+
+sqr mul r1, r1
+load r2, r1
+
+exit sp, =0

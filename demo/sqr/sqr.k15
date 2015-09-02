@@ -1,0 +1,17 @@
+
+in r1, =kbd
+push sp, =0 ; for return value
+push sp, r1 ; push parameter to function
+call sp, =sqr
+pop sp, r1
+out r1, =crt
+svc sp, =halt
+
+ret equ -3
+param equ -2
+
+sqr load r2, param(fp)
+mul r2, param(fp)
+store r2, =ret(fp)
+
+exit sp, =1

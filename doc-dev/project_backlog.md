@@ -26,3 +26,4 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
 
 ##known issues##
 
+machine brokes up if one tries string input to fread

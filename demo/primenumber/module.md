@@ -47,6 +47,3 @@ labels are valued from -1 to down.
 | symbol table | -> | 32 char label | 16bit integer |
 
 +--------------+    +-------------------------------+
-
-there ^ is two symboltables like this: import and export.
-export is the first one

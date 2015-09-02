@@ -1,6 +1,0 @@
-export y dc 1230
-export change_y load r1,=20
-load r2,x
-add r1,r2
-store r1,=y
-exit sp,=0
