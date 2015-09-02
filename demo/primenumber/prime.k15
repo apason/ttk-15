@@ -1,0 +1,10 @@
+; this is the main module
+main nop
+in r5,=kbd
+load r1,=1
+	loop nop
+	call sp,=nextprime
+	out r1,=crt
+	comp r1,r5
+	jles =loop
+svc sp,=halt
