@@ -23,6 +23,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * GUI 
  * pienin osoitettava muistiyksikkö keskusmuistissa MYTYPE:stä yhteen tavuun
  * konekäskyt 16 ja 8 bitin käsittelyyn?
+ * Windows compatibility
 
 ##known issues##
 
