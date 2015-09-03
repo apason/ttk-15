@@ -30,7 +30,7 @@ FUNCTION(in){
 
     if(m->cu->tr == KBD){
 	if(!(m->cu->sr & TFLAG)){
-	    while(scanf("%d", &tmp) != 1);
+	    while(scanf("%d", &tmp) != 1) while(getchar() != '\n');
 	    m->regs[rj] = tmp;
 	}
 	else{
@@ -370,7 +370,7 @@ FUNCTION(fin){
   
     if(m->cu->tr == KBD){
 	if(!(m->cu->sr & TFLAG)){
-	    while(scanf("%f", &tmp) != 1);
+	    while(scanf("%f", &tmp) != 1)  while(getchar() != '\n');
 	    m->regs[rj] = *(volatile MYTYPE*) &tmp;
 	}
 	else{

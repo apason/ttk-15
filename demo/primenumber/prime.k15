@@ -1,0 +1,18 @@
+; this is the main module
+main nop
+in r5,=kbd
+comp r5, =3
+jgre =printstart
+prev nop
+
+load r1,=1
+	loop nop
+	call sp,=nextprime
+	out r1,=crt
+	comp r1,r5
+	jles =loop
+svc sp,=halt
+
+printstart load r1, =2
+out r1, =crt
+jump =prev

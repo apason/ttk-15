@@ -1,0 +1,9 @@
+x dc 1337
+y dc 65536
+main load r1,x
+out r1,=crt
+load r2,y
+out r1,=crt
+load r2,=1
+out r1,x(r2)
+svc sp,=halt

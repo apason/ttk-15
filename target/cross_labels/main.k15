@@ -1,5 +1,0 @@
-export x dc 200
-main call =change_y
-load r1,y
-out r1,=crt
-svc sp,=HALT
