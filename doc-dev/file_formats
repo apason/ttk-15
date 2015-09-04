@@ -8,11 +8,11 @@
   * import
 
 ##binary header##
-header contains 3 integers 32 bit each. first integer defines starting point of data block. second 
+Header contains 3 integers 32 bit each. first integer defines starting point of data block. Second
 integer defines starting point of export table and third integer defines start of import table
 
 ##code block##
-code block locates right after header (8 bytes from beginning).
+Code block locates right after header (8 bytes from beginning).
 It consists of 5 byte sub blocks. first byte of sub block defines mode for linker to operate 
 instructions address. Value 0 means there is no label in instruction. linker will just copy this kind 
 of instructions to executable. Value 1 means there is internal label. linker will copy particular 
@@ -20,12 +20,22 @@ label to address field. value 2 means label that must be imported from other mod
 of 3 are global (export) labels. last 4 bytes of each subblock is instruction to 
 copy (operated with labels as above)
 
+###data block marker byte###
+Marker byte indicates whether there is an exported, imported, local or a direct address used in the instruction.
+This is needed for correctly linking multiple modules.
+
+Byte values: #TODO textual descriptions
+    * No label (0)
+    * Local label (1)
+    * Imported label (2)
+    * Exported label (3)
+
 ##data block##
 data block contains data of that module; Integers coded to 32 bit.
 
 ##symbol table##
-symbol table consists of 34 byte sub blocks. each sub block contains 32 bytes reserved to label name 
-and value of that label (16 bit integer ). label values are ralative to start of that block. external 
+Symbol table consists of 34 byte sub blocks. each sub block contains 32 bytes reserved to label name 
+and value of that label (16 bit integer ). Label values are ralative to start of that block. External 
 labels are valued from -1 to down.
 
 ##structure##
@@ -46,3 +56,27 @@ labels are valued from -1 to down.
 | label usage  | -> | 32bit integer | 32 char label |
 +--------------+    +---------------+---------------+
 
+#binary file#
+
+#TODO binary file structure
+
+##binary header##
+Length of the header is always present, but data block starts for modules is only present if the file is linked with the debug flag.
+
+                   |                  optional                       |
++------------------+---------------+-------------+-----+-------------+
+| length of header | data[1] start | data[1] end | ... | data[n] end |
++------------------+---------------+-------------+-----+-------------+
+Every field in the header is one machine word (32bit integer)
+
+##compiling in debug mode##
+    * every label position is stored in a table and placed in the end of a created object file
+
+##debug label table##
++---------------------------+------------+
+| address of the used label | label name |
++---------------------------+------------+
+
+##linking in debug mode##
+    * the debug label tables in the object files are updated with module constants and placed all together in the end of the finished binary file
+    * in debug mode starts and ends of the data area in modules are also placed in the header of the binary file
