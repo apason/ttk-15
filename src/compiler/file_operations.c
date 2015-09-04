@@ -12,7 +12,7 @@
 static int countLines(FILE*);
 static int nextLine(FILE*);
 static char** readCode(FILE*, int, int**, int);
-static int writeInstruction(char* instr,char* val,label_list* symbols, FILE*,int);
+static int writeInstruction(char* instr,char* val,code_file* file, int line);
 static void freeSymbols(code_file*);
 static void freeCodeArray(code_file*);
 static void print_error(int error, int line);
@@ -144,7 +144,7 @@ int writeCodeFile(code_file* file) {
 
         sscanf(file->array[i], "%s %s", word, val);
         if (isInstruction(word)) {
-            error = writeInstruction(word,val,file->symbolList, fh, file->mode);
+            error = writeInstruction(word,val,file, cInstructions);
             // print error if found
             if (error < 0) {
                 print_error(error, file->code_text[cInstructions]);
@@ -169,7 +169,7 @@ int writeCodeFile(code_file* file) {
             sscanf(file->array[i], "%s %s %s %s", trash, label, word, val);
 
         if (!isInstruction(label) && isInstruction(word)) {
-            error = writeInstruction(word,val,file->symbolList, fh, file->mode);
+            error = writeInstruction(word,val,file, cInstructions);
             // print error if found
             if (error < 0) {
                 print_error(error, file->code_text[cInstructions]);
@@ -229,13 +229,14 @@ int writeCodeFile(code_file* file) {
 }
 
 
-static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, int ttk_mode) {
-
+static int writeInstruction(char* word,char* val,code_file* file, int line) {
+    FILE* fh = file->fh_out;
+    
     int warning = 0;
 
     uint8_t firstByte = NO_LABEL;
     uint32_t instruction = 0;
-    int ttk_15 = (ttk_mode == TTK15);
+    int ttk_15 = (file->mode == TTK15);
 
     int opCode = 0;
     int reg = 0;
@@ -308,7 +309,7 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
         } else {
             // this variable also stores possible error in getAddress
             int isItFloat = 0;
-            addr = getAddress(argument, symbols, &firstByte, &isItFloat);
+            addr = getAddress(argument, file, &firstByte, &isItFloat, line);
             if (isItFloat < 0)
                 return isItFloat;
             // If the argument is a float we have to use fload instead of just load

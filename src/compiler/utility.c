@@ -202,8 +202,8 @@ int getIndexRegister(char* argument) {
     return 0;
 }
 
-int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, int *isItFloat) {
-    label_list* temp = symbols;
+int getAddress(char* argument, code_file* file, uint8_t *firstByte, int *isItFloat, int line) {
+    label_list* temp = file->symbolList;
     int addr;
     // is the address a number?
     if (isdigit(argument[0]) || (isdigit(argument[1]) && argument[0] == '-')) {
@@ -229,6 +229,7 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, int *isI
     } else if ((addr = getHardcodedSymbolValue(argument)) < 0) {
         int16_t index = -1;
         while(temp != NULL) {
+            // TODO: add entrys to the label usage table
             // when label is found it's address is replaced in the instruction
             if (!strncmp(temp->label,argument,strlen(argument))) {
                 addr = temp->address;
@@ -243,7 +244,7 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, int *isI
         }
         if (temp == NULL) {
             // Didn't find label so added to the list of external symbols
-            temp = symbols;
+            temp = file->symbolList;
             while (temp->next != NULL) temp = temp->next;
             temp->next = (label_list*)malloc(sizeof(label_list));
             temp = temp->next;
