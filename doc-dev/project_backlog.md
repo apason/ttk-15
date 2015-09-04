@@ -4,7 +4,8 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
 ##v0.4 valmiina##
 
 ##v0.4 backlog##
- * breakpointit compileriin ja debuggeriin HUOM! lokaalit labelit objektiin VAIN -g (debug) vivun kanssa!
+ * breakpointit compileriin ja debuggeriin.
+  * objekti- ja ajomoduuleille uusi rakenne.
  * "wrapper" skripti tms joka kapseloi linkkerin ja kääntäjän (ehkä masiinan?)
  * GUI 
 
