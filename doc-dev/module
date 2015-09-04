@@ -7,11 +7,11 @@
   * export
   * import
 
-#binary header#
+##binary header##
 header contains 3 integers 32 bit each. first integer defines starting point of data block. second 
 integer defines starting point of export table and third integer defines start of import table
 
-#code block#
+##code block##
 code block locates right after header (8 bytes from beginning).
 It consists of 5 byte sub blocks. first byte of sub block defines mode for linker to operate 
 instructions address. Value 0 means there is no label in instruction. linker will just copy this kind 
@@ -20,34 +20,29 @@ label to address field. value 2 means label that must be imported from other mod
 of 3 are global (export) labels. last 4 bytes of each subblock is instruction to 
 copy (operated with labels as above)
 
-#data block#
+##data block##
 data block contains data of that module; Integers coded to 32 bit.
 
-#symbol table#
+##symbol table##
 symbol table consists of 34 byte sub blocks. each sub block contains 32 bytes reserved to label name 
 and value of that label (16 bit integer ). label values are ralative to start of that block. external 
 labels are valued from -1 to down.
 
-##summary##
-                    | start of code |  data start   | import start  |
+##structure##
 
-+--------------+    +-------------------------------+---------------+
+                    | start of code |  data start   | import start  | label usage start
+                    +---------------+---------------+---------------+---------------+
++--------------+    | 32bit integer | 32bit integer | 32bit integer | 32bit integer |
+| header       | -> +---------------+---------------+---------------+---------------+
++--------------+    +-------------+-------------------+
+| code block   | -> | 8bit marker | 32bit instruction | <--- n times marker and isntruction
++--------------+    +-------------+-------------------+
+| data block   | -> variables reserved with dc and ds pseudo commands
++--------------+    +---------------+---------------+
+| import table | -> | 32 char label | 16bit integer |
++--------------+    +---------------+---------------+
+| export table | -> | 32 char label | 16bit integer |
++--------------+    +---------------+---------------+
+| label usage  | -> | 32bit integer | 32 char label |
++--------------+    +---------------+---------------+
 
-| header       | -> | 32bit integer | 32bit integer | 32bit integer |
-
-+--------------+    +-------------------------------+---------------+
-
-| code block   | -> +---------------------------------+
-
-+--------------+    | 8bit marker | 32bit instruction | <--- n times
-
-| data block   |    +---------------------------------+
-
-+--------------+    +-------------------------------+
-
-| symbol table | -> | 32 char label | 16bit integer |
-
-+--------------+    +-------------------------------+
-
-there ^ is two symboltables like this: import and export.
-export is the first one
