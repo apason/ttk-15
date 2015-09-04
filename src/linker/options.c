@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include "linker.h"
+#include "error.h"
 
 static options *newOptions(void);
 static void openFile(options *opts, char *filename);
@@ -11,14 +12,24 @@ static void openFile(options *opts, char *filename);
 options *getOptions(int argc, char *argv[]){
   int          optch       = 0;
   int          noflags     = 1;         //bubble gum!
-  static char  optstring[] = "o:";
+  static char  optstring[] = "o:g";
   options     *opts        = newOptions();
 
   while((optch = getopt(argc, argv, optstring)) != -1)
     if(optch == 'o'){
-      openFile(opts, optarg);
-      opts->count = argc -3;
-      noflags = 0;
+	switch(optch){
+	case 'o':
+	    openFile(opts, optarg);
+	    opts->count = argc -3;
+	    noflags = 0;
+	    break;
+
+	case 'g':
+	    opts->debug = 1;
+	    break;
+
+	default:
+	    //erro	    
     }
 
   //use default, if filename is not given
@@ -41,6 +52,7 @@ static options *newOptions(void){
 
   opts->output = NULL;
   opts->count  = 0;
+  opts->debug  = 0;
 
   return opts;
 }

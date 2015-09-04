@@ -34,6 +34,7 @@ typedef struct MODULE {
 typedef struct OPTIONS {
     FILE    *output;
     int      count;
+    int      debug;
   
 } options;
 
