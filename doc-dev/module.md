@@ -7,7 +7,7 @@
   * export
   * import
 
-#header#
+#binary header#
 header contains 3 integers 32 bit each. first integer defines starting point of data block. second 
 integer defines starting point of export table and third integer defines start of import table
 
