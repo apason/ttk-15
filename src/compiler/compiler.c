@@ -24,9 +24,8 @@ int main (int argc, char* argv[]) {
 
         FILE* output = *output_list++;
         // we need this to delete the output file if there is an error
-        char output_name[MAX];
-        strncpy(output_name, *output_name_list++, MAX-4);
-        strncat(output_name, ".o15", 4);
+        char *output_name = *output_name_list++;
+        strcpy(strrchr(output_name,'.'),".o15");
 
         // assume at first that it's a ttk91 file instead of ttk15
         // and set the code_file struct to hold the filehandle and output name
@@ -80,6 +79,31 @@ int main (int argc, char* argv[]) {
         // free the space reserved for dynamic data in codeFile
         freeCodeFile(&codeFile);
     }
+    
+    // invoke linker now
+    output_name_list = opts->filenames;
+    int currentsize = 40;
+    char *linkercall = (char*)malloc(sizeof(char) * currentsize);
+    strcpy(linkercall, "linker\0");
+    int spaceleft = 40 - strlen(linkercall);
+    for ( n = argc - opts->count; n < argc; ++n ) {
+        char *currentobject = *output_name_list++;
+        if (strlen(currentobject) + 1 > spaceleft) {
+            currentsize <<= 1;
+            char *temp = (char*)malloc(sizeof(char) * currentsize);
+            strcpy(temp, linkercall);
+            free(linkercall);
+            linkercall = temp;
+        }
+        strcat(linkercall, " ");
+        strcat(linkercall, currentobject);
+    }
+    system(linkercall);
+    free(linkercall);
+    
+    output_name_list = opts->filenames;
+    for ( n = argc - opts->count; n < argc; ++n ) unlink(*output_name_list++);
+
     // free the options struct
     freeOptions(opts);
 
