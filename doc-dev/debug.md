@@ -2,16 +2,20 @@
 
 # binary header #
 +----------------------------------------------------------+
-|length of header|data[1] start|data[1] end|...|data[n] end|
+
+| length of header | data[1] start | data[1] end | ... | data[n] end |
+
 +----------------------------------------------------------+
 
 # compiling in debug mode #
     * every label position is stored in a table and placed in the end of a created object file
 
 # debug label table #
-+------------------------------------+
-|address of the used label|label name|
-+------------------------------------+
++----------------------------------------+
+
+| address of the used label | label name |
+
++----------------------------------------+
 
 # linking in debug mode #
     * the debug label tables in the object files are updated with module constants and placed all together in the end of the finished binary file
