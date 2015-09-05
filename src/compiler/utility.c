@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <module.h>
 #include <ttk-15.h>
+#include <module.h>
 #include "compiler.h"
 #include "errorcodes.h"
 
@@ -229,13 +230,25 @@ int getAddress(char* argument, code_file* file, uint8_t *firstByte, int *isItFlo
     } else if ((addr = getHardcodedSymbolValue(argument)) < 0) {
         int16_t index = -1;
         while(temp != NULL) {
-            // TODO: add entrys to the label usage table
             // when label is found it's address is replaced in the instruction
             if (!strncmp(temp->label,argument,strlen(argument))) {
                 addr = temp->address;
                 // make sure equ are not treated as labels
                 if (temp->size < 0) *firstByte = NO_LABEL;
                 else    *firstByte = temp->mode;
+                // add entry to the usage table
+                if (file->usageList != NULL) {
+                    USAGE_LIST* newFirst = (USAGE_LIST*)malloc(sizeof(USAGE_LIST));
+                    newFirst->next = file->usageList;
+                    strncpy(newFirst->label, temp->label, 32);
+                    newFirst->value = line;
+                    file->usageList = newFirst;
+                } else {
+                    file->usageList = (USAGE_LIST*)malloc(sizeof(USAGE_LIST));
+                    file->usageList->next = NULL;
+                    strncpy(file->usageList->label, temp->label, 32);
+                    file->usageList->value = line;
+                }
                 break;
             }
             // don't use the same index as the other external labels

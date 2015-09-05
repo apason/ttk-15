@@ -12,7 +12,7 @@ typedef struct USAGE_LIST{
     struct USAGE_LIST *next;
     char               label[32];
     int32_t            value;
-} usage_list;
+} USAGE_LIST;
     
 #endif
 

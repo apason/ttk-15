@@ -2,6 +2,7 @@
 #define COMPILER
 
 #include <stdint.h>
+#include <module.h>
 #include <ttk-15.h>
 
 #define MAX 128
@@ -23,6 +24,7 @@ typedef struct {
     int mode;
     char** array;
     struct label_list* symbolList;
+    struct USAGE_LIST* usageList;
     MYTYPE moduleSize;
     MYTYPE codeSize;
     MYTYPE exportSize;

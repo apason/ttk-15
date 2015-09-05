@@ -132,6 +132,8 @@ static int nextLine(FILE* fh) {
 int writeCodeFile(code_file* file) {
     int error = 0;
     FILE* fh = file->fh_out;
+    // the usage list starts out null
+    file->usageList = NULL;
     // skip header, we'll write it later
     fseek(fh, sizeof(MYTYPE) * 3, SEEK_CUR );
 
@@ -350,6 +352,11 @@ static void freeSymbols(code_file* file) {
         label_list* temp = file->symbolList;
         file->symbolList = file->symbolList->next;
         free(temp);
+    }
+    while (file->usageList != NULL) {
+        USAGE_LIST* next = file->usageList->next;
+        free(file->usageList);
+        file->usageList = next;
     }
 }
 
