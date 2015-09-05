@@ -8,11 +8,11 @@
 #define NO_LABEL 0
 #define EXPORT 3
 
-typedef struct USAGE_LIST{
-    struct USAGE_LIST *next;
+typedef struct usage_list{
+    struct usage_list *next;
     char               label[32];
     int32_t            value;
-} USAGE_LIST;
+} usage_list;
     
 #endif
 

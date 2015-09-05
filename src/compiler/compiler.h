@@ -24,10 +24,11 @@ typedef struct {
     int mode;
     char** array;
     struct label_list* symbolList;
-    struct USAGE_LIST* usageList;
+    struct usage_list* usageList;
     MYTYPE moduleSize;
     MYTYPE codeSize;
     MYTYPE exportSize;
+    MYTYPE importSize;
     FILE* fh_out;
     int* code_text;
 } code_file;

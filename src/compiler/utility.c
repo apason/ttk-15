@@ -238,13 +238,13 @@ int getAddress(char* argument, code_file* file, uint8_t *firstByte, int *isItFlo
                 else    *firstByte = temp->mode;
                 // add entry to the usage table
                 if (file->usageList != NULL) {
-                    USAGE_LIST* newFirst = (USAGE_LIST*)malloc(sizeof(USAGE_LIST));
+                    usage_list* newFirst = (usage_list*)malloc(sizeof(usage_list));
                     newFirst->next = file->usageList;
                     strncpy(newFirst->label, temp->label, 32);
                     newFirst->value = line;
                     file->usageList = newFirst;
                 } else {
-                    file->usageList = (USAGE_LIST*)malloc(sizeof(USAGE_LIST));
+                    file->usageList = (usage_list*)malloc(sizeof(usage_list));
                     file->usageList->next = NULL;
                     strncpy(file->usageList->label, temp->label, 32);
                     file->usageList->value = line;
@@ -269,6 +269,7 @@ int getAddress(char* argument, code_file* file, uint8_t *firstByte, int *isItFlo
             temp->address = (int16_t)index;
             temp->mode = *firstByte = IMPORT;
             addr = index;
+            
         }
     }
     return addr;
