@@ -11,13 +11,15 @@
 static int findMain(module **modules, int n);
 static int containsMain(module *mod);
 static void printModule(module *mod);
-static void printSymbols(llist *l);
+static void printSymbols(label_list *l);
 static int setMain(module **mods, options *opts);
+static void writeHeader(int count, module **modules, FILE *fp);
 
 int main(int argc, char **argv){
-    int      i        = 0;
-    module **modules  = NULL;
-    options *opts     = NULL;
+    int         i        = 0;
+    module    **modules  = NULL;
+    options    *opts     = NULL;
+    usage_list *list  = NULL;
 
     opts    = getOptions(argc, argv);
     modules = (module **) malloc(sizeof(module *) * (opts->count));
@@ -30,7 +32,7 @@ int main(int argc, char **argv){
     }
 
     //create module structs for each module
-    createModules(opts->count, argv +1, modules);
+    createModules(opts->count, argv +1, modules, opts->debug);
 
     //if there is only 1 object module to link, skip main finding
     if(opts->count > 1)
@@ -50,7 +52,16 @@ int main(int argc, char **argv){
     /* for(i=0;i<opts->count;i++) */
     /* 	printModule(modules[i]); */
 
+    //adjust label values in usage table
+    if(opts->debug)
+	for(i = 1; i < opts->count; i++){
+	    list = modules[i]->usages;
+	    for(; list; list = list->next)
+		list->value += modules[i]->address_constant;
+	}
 
+    writeHeader(opts->count, modules, opts->output);
+    
     //link main containing module first
     linkModule(opts->output, modules, 0, opts->count);
 
@@ -58,12 +69,38 @@ int main(int argc, char **argv){
     for(i = 1; i < opts->count; i++)
 	linkModule(opts->output, modules, i, opts->count);
 
+    if(opts->debug)
+	for(i = 0; i < opts->count; i++){
+	    list = modules[i]->usages;
+	    for(; list; list = list->next){
+		fwrite(&list->value, sizeof(MYTYPE), 1, opts->output);
+		fwrite(&list->label, LABELLENGTH, 1, opts->output);
+	    }
+	}
     
     freeModules(modules, opts->count);
     fclose(opts->output);
     free(opts);
 
     return 0;
+}
+
+static void writeHeader(int count, module **modules, FILE *fp){
+    MYTYPE header_size;
+    MYTYPE tmp;
+    int i;
+
+    header_size = 1 + 2 * count;
+
+    for(i = 0; i < count -1; i++){
+	tmp = modules[i]->address_constant +header_size;
+	fwrite(&tmp, sizeof(MYTYPE), 1, fp);
+	tmp = modules[i]->address_constant +modules[i]->data_start +header_size;
+	fwrite(&tmp, sizeof(MYTYPE), 1, fp);
+    }
+
+    tmp = modules[i -1]->address_constant +modules[i]->export_start +header_size;
+    fwrite(&tmp, sizeof(MYTYPE), 1, fp);
 }
 
 static int setMain(module **modules, options *opts){
@@ -113,7 +150,7 @@ static int findMain(module **modules, int n){
 
 //returns 1 if main label is found
 static int containsMain(module *mod){
-    llist *li;
+    label_list *li;
   
     for(li = mod->export; li != NULL; li = li->next)
 	if(!strncmp(li->label, "main", 32))
@@ -136,7 +173,7 @@ static void printModule(module *mod){
 
 }
 
-static void printSymbols(llist *l){
+static void printSymbols(label_list *l){
     for(;l;l = l->next)
 	printf("%s\t%d\n",l->label,l->value);
 }

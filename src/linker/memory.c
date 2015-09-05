@@ -2,7 +2,7 @@
 
 #include "linker.h"
 
-static void freeSymbolList(llist *l);
+static void freeSymbolList(label_list *l);
 static void freeModule(module *mod);
 
 //free redundant data of module (codes and data already linked)
@@ -30,9 +30,9 @@ static void freeModule(module *mod){
   free(mod);
 }
 
-static void freeSymbolList(llist *l){
-  llist *li   = NULL;
-  llist *prev = NULL;
+static void freeSymbolList(label_list *l){
+  label_list *li   = NULL;
+  label_list *prev = NULL;
 
   if(!l) return;
   

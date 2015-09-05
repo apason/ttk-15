@@ -8,8 +8,9 @@
   * import
 
 ##binary header##
-Header contains 3 integers 32 bit each. first integer defines starting point of data block. Second
+Header contains 4 integers 32 bit each. first integer defines starting point of data block. Second
 integer defines starting point of export table and third integer defines start of import table
+The last integer defines start of the label usage table
 
 ##code block##
 Code block locates right after header (8 bytes from beginning).
@@ -63,10 +64,10 @@ labels are valued from -1 to down.
 ##binary header##
 Length of the header is always present, but data block starts for modules is only present if the file is linked with the debug flag.
 
-                   |                  optional                       |
-+------------------+---------------+-------------+-----+-------------+
-| length of header | data[1] start | data[1] end | ... | data[n] end |
-+------------------+---------------+-------------+-----+-------------+
+                |                  optional                         |
++---------------+---------------+---------------+-----+-------------+
+| code[1] start | data[1] start | code[2] start | ... | usage start |
++---------------+---------------+---------------+-----+-------------+
 Every field in the header is one machine word (32bit integer)
 
 ##compiling in debug mode##
