@@ -22,8 +22,8 @@
 
 //used in options mode and debug flag
 #define UNDEFINED -1
-#define TTK15     15
-#define TTK91     91
+#define TTK15     1
+#define TTK91     0
 #define ON         1
 #define OFF        0
 

@@ -132,7 +132,7 @@ static int nextLine(FILE* fh) {
 int writeCodeFile(code_file* file) {
     int error = 0;
     FILE* fh = file->fh_out;
-    int debug = file->mode >> 2;
+    int debug = (file->mode >> 2);
     // the usage list starts out null
     file->usageList = NULL;
     // skip header, we'll write it later
