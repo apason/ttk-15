@@ -5,6 +5,7 @@
 #include <errno.h>
 
 //project headers
+#include <module.h>
 #include "linker.h"
 #include "error.h"
 
@@ -13,7 +14,7 @@ static int containsMain(module *mod);
 static void printModule(module *mod);
 static void printSymbols(label_list *l);
 static int setMain(module **mods, options *opts);
-static void writeHeader(int count, module **modules, FILE *fp);
+static void writeHeader(int count, module **modules, FILE *fp, int debug);
 
 int main(int argc, char **argv){
     int         i        = 0;
@@ -49,8 +50,9 @@ int main(int argc, char **argv){
 	modules[i]->address_constant = modules[i -1]->linked_size \
 	    +modules[i -1]->address_constant;
 
-    /* for(i=0;i<opts->count;i++) */
-    /* 	printModule(modules[i]); */
+    for(i=0;i<opts->count;i++)
+    	printModule(modules[i]);
+
 
     //adjust label values in usage table
     if(opts->debug)
@@ -60,8 +62,8 @@ int main(int argc, char **argv){
 		list->value += modules[i]->address_constant;
 	}
 
-    writeHeader(opts->count, modules, opts->output);
-    
+    writeHeader(opts->count, modules, opts->output, opts->debug);
+
     //link main containing module first
     linkModule(opts->output, modules, 0, opts->count);
 
@@ -85,21 +87,32 @@ int main(int argc, char **argv){
     return 0;
 }
 
-static void writeHeader(int count, module **modules, FILE *fp){
+static void writeHeader(int count, module **modules, FILE *fp, int debug){
     MYTYPE header_size;
+    MYTYPE codesize;
     MYTYPE tmp;
     int i;
 
-    header_size = 1 + 2 * count;
+    if(debug == 0){
+	tmp = 4;
+	fwrite(&tmp, sizeof(MYTYPE), 1, fp);
+	return;
+    }
 
-    for(i = 0; i < count -1; i++){
+    header_size = (1 + 2 * count) * sizeof(MYTYPE);
+
+    for(i = 0; i <= count -1; i++){
 	tmp = modules[i]->address_constant +header_size;
 	fwrite(&tmp, sizeof(MYTYPE), 1, fp);
-	tmp = modules[i]->address_constant +modules[i]->data_start +header_size;
+
+	codesize = (modules[i]->data_start - CODESTART) / CODESIZE;
+	
+	tmp = modules[i]->address_constant +codesize * sizeof(MYTYPE) +header_size;
 	fwrite(&tmp, sizeof(MYTYPE), 1, fp);
     }
 
-    tmp = modules[i -1]->address_constant +modules[i]->export_start +header_size;
+    //export start is offset in module! does not work
+    tmp = modules[i -1]->address_constant +modules[i -1]->linked_size +header_size;
     fwrite(&tmp, sizeof(MYTYPE), 1, fp);
 }
 
@@ -161,7 +174,9 @@ static int containsMain(module *mod){
 
 //atm print only export table
 static void printModule(module *mod){
-    printf("size: %d\tlinksize %d\tdstart: %d\tistart %d\nestart %d\tconstant %d\n", mod->size, mod->linked_size, mod->data_start, mod->import_start, mod->export_start, mod->address_constant);
+    usage_list *ul;
+    (void) ul;
+    printf("size: %d\tlinksize %d\tdstart: %d\testart %d\nistart %d\tconstant %d\t%d ustart\n", mod->size, mod->linked_size, mod->data_start, mod->export_start, mod->import_start, mod->address_constant, mod->label_usage_start);
     if(!mod->import)
 	printf("import list = NULL\n");
     else
@@ -170,6 +185,10 @@ static void printModule(module *mod){
 	printf("export list = NULL\n");
     else
 	printSymbols(mod->export);
+    if(!mod->usages)
+	printf("usage list = NULL\n");
+    for(ul = mod->usages;ul; ul = ul->next)
+    	printf("%s\t%d\n",ul->label,ul->value);
 
 }
 
