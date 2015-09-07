@@ -236,19 +236,6 @@ int getAddress(char* argument, code_file* file, uint8_t *firstByte, int *isItFlo
                 // make sure equ are not treated as labels
                 if (temp->size < 0) *firstByte = NO_LABEL;
                 else    *firstByte = temp->mode;
-                // add entry to the usage table
-                if (file->usageList != NULL) {
-                    usage_list* newFirst = (usage_list*)malloc(sizeof(usage_list));
-                    newFirst->next = file->usageList;
-                    strncpy(newFirst->label, temp->label, 32);
-                    newFirst->value = line;
-                    file->usageList = newFirst;
-                } else {
-                    file->usageList = (usage_list*)malloc(sizeof(usage_list));
-                    file->usageList->next = NULL;
-                    strncpy(file->usageList->label, temp->label, 32);
-                    file->usageList->value = line;
-                }
                 break;
             }
             // don't use the same index as the other external labels
@@ -270,6 +257,19 @@ int getAddress(char* argument, code_file* file, uint8_t *firstByte, int *isItFlo
             temp->mode = *firstByte = IMPORT;
             addr = index;
             
+        }
+        // add entry to the usage table
+        if (file->usageList != NULL) {
+            usage_list* newFirst = (usage_list*)malloc(sizeof(usage_list));
+            newFirst->next = file->usageList;
+            strncpy(newFirst->label, argument, 32);
+            newFirst->value = line;
+            file->usageList = newFirst;
+        } else {
+            file->usageList = (usage_list*)malloc(sizeof(usage_list));
+            file->usageList->next = NULL;
+            strncpy(file->usageList->label, argument, 32);
+            file->usageList->value = line;
         }
     }
     return addr;
