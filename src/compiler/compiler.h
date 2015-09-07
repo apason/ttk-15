@@ -23,8 +23,8 @@ typedef struct {
     int lines;
     int mode;
     char** array;
-    struct label_list* symbolList;
-    struct usage_list* usageList;
+    label_list* symbolList;
+    usage_list* usageList;
     MYTYPE moduleSize;
     MYTYPE codeSize;
     MYTYPE exportSize;
