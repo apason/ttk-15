@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+#include <ttk-15.h>
+
 #ifndef _module_h_
 #define _module_h_
 
@@ -8,10 +10,10 @@
 #define NO_LABEL 0
 #define EXPORT 3
 
-typedef struct usage_list{
-    struct usage_list *next;
+typedef struct USAGE_LIST{
+    struct USAGE_LIST *next;
     char               label[32];
-    int32_t            value;
+    MYTYPE             value;
 } usage_list;
     
 #endif

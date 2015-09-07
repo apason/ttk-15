@@ -69,7 +69,6 @@ void startMachine(machine *m){
     m->mmu->limit = m->memsize;
 
     if(m->cu->sr & TFLAG){
-	initScreen();
     execution_with_debug:
 	getInstruction(m);
 

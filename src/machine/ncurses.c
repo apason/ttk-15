@@ -84,6 +84,9 @@ static int current_memory_row;
 static int crt_notification;
 static int crt_offset;
 
+static position_list *pl;
+static usage_list *ul;
+
 /*
  * main function of ncurses gui. this is executed
  * between every instruction in debugging mode
@@ -577,7 +580,12 @@ static int len(MYTYPE x){
     return len;
 }
 
-void initScreen(void){
+void initScreen(position_list *posl, usage_list *usl){
+
+    //init position and usage list for disassembly
+    pl = posl;
+    ul = usl;
+    
     scr = CPU;
     initscr();
     start_color();
