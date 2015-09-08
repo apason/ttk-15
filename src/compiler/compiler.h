@@ -35,6 +35,7 @@ typedef struct OPTIONS {
     int    count;
     int    debug;
     FILE **outputs;
+    char *boutput;
     char **filenames;
 
 } options;

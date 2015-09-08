@@ -82,13 +82,18 @@ int main (int argc, char* argv[]) {
     
     // invoke linker now
     output_name_list = opts->filenames;
-    int currentsize = 40;
+    int currentsize = 60;
     char *linkercall = (char*)malloc(sizeof(char) * currentsize);
     strcpy(linkercall, "linker\0");
-    if (debug) {
+    // this branch's linker does not use -g
+    /*if (debug) {
         strncat(linkercall, " -g\0", 4);
+    }*/
+    if (opts->boutput != NULL) {
+        strcat(linkercall, " -o ");
+        strcat(linkercall, opts->boutput);
     }
-    int spaceleft = 40 - strlen(linkercall);
+    int spaceleft = currentsize - strlen(linkercall);
     for ( n = argc - opts->count; n < argc; ++n ) {
         char *currentobject = *output_name_list++;
         if (strlen(currentobject) + 1 > spaceleft) {
