@@ -85,6 +85,9 @@ int main (int argc, char* argv[]) {
     int currentsize = 40;
     char *linkercall = (char*)malloc(sizeof(char) * currentsize);
     strcpy(linkercall, "linker\0");
+    if (debug) {
+        strncat(linkercall, " -g\0", 4);
+    }
     int spaceleft = 40 - strlen(linkercall);
     for ( n = argc - opts->count; n < argc; ++n ) {
         char *currentobject = *output_name_list++;
