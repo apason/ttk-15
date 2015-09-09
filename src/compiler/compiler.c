@@ -81,36 +81,42 @@ int main (int argc, char* argv[]) {
     }
     
     // invoke linker now
-    output_name_list = opts->filenames;
-    int currentsize = 60;
-    char *linkercall = (char*)malloc(sizeof(char) * currentsize);
-    strcpy(linkercall, "linker\0");
-    // this branch's linker does not use -g
-    /*if (debug) {
-        strncat(linkercall, " -g\0", 4);
-    }*/
-    if (opts->boutput != NULL) {
-        strcat(linkercall, " -o ");
-        strcat(linkercall, opts->boutput);
-    }
-    int spaceleft = currentsize - strlen(linkercall);
-    for ( n = argc - opts->count; n < argc; ++n ) {
-        char *currentobject = *output_name_list++;
-        if (strlen(currentobject) + 1 > spaceleft) {
-            currentsize <<= 1;
-            char *temp = (char*)malloc(sizeof(char) * currentsize);
-            strcpy(temp, linkercall);
-            free(linkercall);
-            linkercall = temp;
+    if (!opts->nolink) {
+        output_name_list = opts->filenames;
+        int currentsize = 60;
+        char *linkercall = (char*)malloc(sizeof(char) * currentsize);
+        strcpy(linkercall, "linker\0");
+        // this branch's linker does not use -g that's why this line is commented
+        /*if (debug) {
+          strncat(linkercall, " -g\0", 4);
+          }*/
+        // -o means specified output binary
+        if (opts->boutput != NULL) {
+            strcat(linkercall, " -o ");
+            strcat(linkercall, opts->boutput);
         }
-        strcat(linkercall, " ");
-        strcat(linkercall, currentobject);
+        // calculate how much space is left in the linker call char array
+        int spaceleft = currentsize - strlen(linkercall);
+        for ( n = argc - opts->count; n < argc; ++n ) {
+            char *currentobject = *output_name_list++;
+            // double the size of the linker call array if the space is not enough
+            if (strlen(currentobject) + 1 > spaceleft) {
+                currentsize <<= 1;
+                char *temp = (char*)malloc(sizeof(char) * currentsize);
+                strcpy(temp, linkercall);
+                free(linkercall);
+                linkercall = temp;
+            }
+            strcat(linkercall, " ");
+            strcat(linkercall, currentobject);
+        }
+        system(linkercall);
+        free(linkercall);
+
+        // delete the object files
+        output_name_list = opts->filenames;
+        for ( n = argc - opts->count; n < argc; ++n ) unlink(*output_name_list++);
     }
-    system(linkercall);
-    free(linkercall);
-    
-    output_name_list = opts->filenames;
-    for ( n = argc - opts->count; n < argc; ++n ) unlink(*output_name_list++);
 
     // free the options struct
     freeOptions(opts);

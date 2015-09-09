@@ -3,7 +3,7 @@
 cd "$(dirname "$0")"
 
 target="../../target/"
-compiler=$target"ttc"
+compiler=$target"ttc -c"
 linker=$target"linker"
 machine=$target"ttk-15"
 converter="../target/converter"

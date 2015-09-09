@@ -13,7 +13,7 @@ static options *newOptions(void);
 options *getOptions(int argc, char *argv[]){
     int      i           = 0;
     int      optch       = 0;
-    char     optstring[] = "m:o:g";
+    char     optstring[] = "m:o:cg";
     options *opts        = newOptions();
 
     //suppose all arguments are source files
@@ -27,6 +27,13 @@ options *getOptions(int argc, char *argv[]){
                     opts->count -= 2;
                     opts->boutput = (char*)malloc(sizeof(char) * strlen(optarg) + 1);
                     strcpy(opts->boutput, optarg);
+                    break;
+                }
+            //just compile don't link the object modules
+            case 'c':
+                {
+                    opts->count--;
+                    opts->nolink = 1;
                     break;
                 }
 
@@ -77,6 +84,7 @@ static options *newOptions(void){
     opts->mode      = UNDEFINED;
     opts->count     = 0;
     opts->debug     = OFF;
+    opts->nolink    = 0;
     opts->filenames = NULL;
     opts->boutput   = NULL;
 
