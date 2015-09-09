@@ -12,6 +12,7 @@ int main(int argc,char *argv[]){
     options     *opts = getOptions(argc, argv);
     header_data *header;
     machine     *m;
+    int          limit;
 
     if(opts == NULL) return -1;
 
@@ -23,9 +24,13 @@ int main(int argc,char *argv[]){
 
     else if(opts->mode == TTK15){
 	header = readHeader(opts->file);
-	if(opts->memsize < header->usage_start -ftell(opts->file)) ;//error
 
-	m->regs[6] = (MYTYPE) loadFile(m->mem, opts->file, opts->memsize);
+	limit = (header->usage_start -ftell(opts->file)) / sizeof(MYTYPE);
+	if(opts->memsize < limit) ;//error
+
+	//if usage start is < 0, there is no usage table in binary
+	m->regs[6] = (MYTYPE)loadFile(m->mem, opts->file, header->usage_start > 0 ? \
+				      limit : opts->memsize);
 	
 	ul = readUsages(opts->file, header->usage_start);
 
@@ -41,6 +46,7 @@ int main(int argc,char *argv[]){
 	if(opts->debug){
 	    m->cu->sr |= TFLAG;
 	    initScreen(header->pl, ul);
+	    //initScreen(constructCodes(header->pl, ul), codeLength(header->pl));
 	}
 
 	//options are no longer needed

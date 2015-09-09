@@ -111,9 +111,8 @@ header_data *readHeader(FILE *fp){
     MYTYPE header_end, i;
     position_list *pl = NULL;
     header_data *header = (header_data *)malloc(sizeof(header_data));
-    
+
     fread(&header_end, sizeof(MYTYPE), 1, fp); //check return value for error!
-    fseek(fp, 0, SEEK_SET);
 
     //if there is no additional debug data ( -g not used)
     if((header_end / sizeof(MYTYPE) -1) / 2 <= 0){ //if header_end == 4
@@ -121,7 +120,9 @@ header_data *readHeader(FILE *fp){
 	header->usage_start = -1;
 	return header;
     }
-    
+
+    fseek(fp, 0, SEEK_SET);
+
     pl = (position_list *)malloc(sizeof(position_list));
     header->pl = pl;
     
