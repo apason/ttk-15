@@ -49,7 +49,7 @@ for fullpathtest in units/*; do
 		rm result.b15
 		continue
 	fi
-	why=$(cmp result.b15 a.out.b15)
+	why=$(cmp result.b15 a.out.b15 -i0:4)
 	if [ $(echo $why | wc -w) == "0" ]; then
 		echo -e TEST: $test ${green}PASSED!${NC}
 	else
