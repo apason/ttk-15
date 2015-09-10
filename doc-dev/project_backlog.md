@@ -5,7 +5,6 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
 
 ##v0.4 backlog##
  * breakpointit compileriin ja debuggeriin.
- * compiler toimimaan pelkän data-alueen sisältävillä moduuleilla
   * objekti- ja ajomoduuleille uusi rakenne.
     + neljäs sana objektimoduuliin
     + ajomoduuliin headeri
@@ -27,4 +26,4 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * Windows compatibility
 
 ##known issues##
-
+ * linkkeri ei toimi moduuleilla, joissa on pelkkä data-alue
