@@ -1,7 +1,7 @@
 ## makefile for testing ##
 
 .PHONY: alu general converter bitwise fpu
-all:	converter alu general bitwise fpu
+all:	alu general bitwise fpu
 
 alu:
 	bash alu/test.sh

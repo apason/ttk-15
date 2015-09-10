@@ -44,6 +44,7 @@ static void endCRT(void);
 static void printBin(WINDOW *w, MYTYPE a);
 static int listLength(const struct outputList *l);
 static int notCorrectInput(const char *buffer);
+static WINDOW *drawDAB(MYTYPE *memory, int x, int y);
 
 static char ra0[] = "R0:";
 static char ra1[] = "R1:";
@@ -262,6 +263,7 @@ static void nextMemoryPage(MYTYPE limit){
     if(current_memory_row >= limit -(slots_per_row * (y -5)))
 	current_memory_row = limit -(slots_per_row * (y -5));
 }
+
 static void prevMemoryPage(MYTYPE limit){
     int x, y, slots_per_row;
 
@@ -272,6 +274,7 @@ static void prevMemoryPage(MYTYPE limit){
 
     if(current_memory_row < 0) current_memory_row = 0;
 }
+
 static void drawSelected(const machine *m){
     switch (scr){
     case CPU:
@@ -388,7 +391,7 @@ static void drawCRT(void){
 
 static void drawCPU(const machine *m){
     int y, x, pos = 3;
-    static WINDOW *registers, *MMU, *CU, *ALU, *FPU;
+    static WINDOW *registers, *MMU, *CU, *ALU, *FPU, *DAB;
 
     wbkgd(stdscr, COLOR_PAIR(1));
 
@@ -399,6 +402,7 @@ static void drawCPU(const machine *m){
     delwin(CU);
     delwin(ALU);
     delwin(FPU);
+    delwin(DAB);
     
     //macro
     getmaxyx(stdscr, y, x);
@@ -431,6 +435,14 @@ static void drawCPU(const machine *m){
     getmaxyx(ALU, y, x);
     pos += y;
     mvwin(FPU, pos, 1);
+    getmaxyx(FPU, y, x);
+    pos += y;
+
+    
+    getmaxyx(stdscr, y, x);
+    //print DisAssembler and Breakpoints
+    DAB = drawDAB(m->mem, x -2, y -pos -1);
+    mvwin(DAB, pos, 1);
 
     box(stdscr, 0, 0);
     drawPanel();
@@ -442,7 +454,7 @@ static void drawCPU(const machine *m){
     wrefresh(CU);
     wrefresh(ALU);
     wrefresh(FPU);
-
+    wrefresh(DAB);
     
 }
 
@@ -513,6 +525,14 @@ static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, int x, char *arr[], int size)
     return w;
 }
 
+static WINDOW *drawDAB(MYTYPE *memory, int x, int y){
+    WINDOW *w;
+
+    w = newwin(y, x, 0, 0);
+    wprintw(w, "asdasd");
+    return w;
+}
+	
 //if current was global this function would fuck it up.
 static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, char *arr[], int size){
     WINDOW *w;

@@ -1,11 +1,26 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 //project headers
 #include <ttk-15.h>
 #include <instructions.h>
 #include <ncurses.h>
+#include <disasm.h>
 #include "machine.h"
+#include "bitwise.h"
+
+//max length of disassembled instruction
+#define MAXLEN 48
+
+static int isCodeArea(int i, position_list *pl);
+static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, int i, MYTYPE *mem);
+static char *getLabelPrefix(int16_t line, usage_list *ul, int addr, MYTYPE *mem);
+static char *getLabelSuffix(int16_t line, usage_list *ul);
+
+static char *reg_table[] = {"r1", "r2", "r3", "r4", "r5", "sp", "fp"};
+static char *mod_table[] = {"=", " ", "@"};
+static char *ind_table[] = {" ", "(r1)", "(r2)", "(r3)", "(r4)", "(r5)", "(sp)", "(fp)"};
 
 
 void initializeInstructionArray(instructionptr *instructions){
@@ -74,9 +89,13 @@ void initializeInstructionArray(instructionptr *instructions){
   instructions[FJNNEG] = fjnneg;
   instructions[FJNZER] = fjnzer;
   instructions[FJNPOS] = fjnpos;
-
   
 }
+
+void initializeDisAssemblyArray(void){
+    
+}
+
 
 //mainly for debugging. prints state of machine and first memoryslots
 void printState(machine *m){
@@ -180,4 +199,98 @@ usage_list *readUsages(FILE *fp, int usage_start){
     }
     
     return ul;
+}
+
+//returns the value of position list start - header end = length of all data + code
+int codeLength(header_data *header){
+    int i;
+    position_list *pl;
+    
+    if(header->pl == NULL) return -1;
+
+    for(pl = header->pl, i = 0; pl; pl = pl->next) i += 2;
+
+    //there is 2*n +1 fields in the header
+    return i +1;
+    
+}
+
+char **constructCodes(position_list *pl, usage_list *ul, int length, MYTYPE *mem){
+    int i;
+    char **code_table = (char **)malloc(length * sizeof(char*));
+
+    for(i = 0; i < length; i++)
+	if(isCodeArea(i, pl)){
+	   code_table[i] = (char *)malloc(MAXLEN * sizeof(char));
+	   disAssemble(mem, code_table[i], ul, i, mem);
+	}
+	else
+	    code_table[i] = NULL;
+
+    return code_table;
+}
+
+static int isCodeArea(int i, position_list *pl){
+
+    for(; pl; pl = pl->next)
+	if(i >= pl->code && i < pl->data)
+	    return 1;
+
+    return 0;
+}
+
+static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, int i, MYTYPE *mem){
+    char     *label = NULL;
+
+    uint8_t   opc   = 0;
+    int16_t   addr  = 0;
+    uint8_t   rj    = 0;
+    uint8_t   ri    = 0;
+    uint8_t   mode  = 0;
+
+    //extract all fields from instruction (macros)
+    extractOpcode(source[i], opc);
+    extractAddress(source[i], addr);
+    extractRj(source[i], rj);
+    extractRi(source[i], ri);
+    extractMode(source[i], mode);
+
+    label = getLabelPrefix(i, ul, addr, mem);
+    if(label)
+	strncpy(code_table, label, 33);
+    else
+	sprintf(code_table, "%d", addr);
+
+    strncpy(code_table, dis_asm[opc], 7);
+    strncat(code_table, reg_table[rj], 3);
+    strncat(code_table, mod_table[mode], 2);
+    label = getLabelSuffix(i, ul);
+    
+    if(label)
+	strncat(code_table, label, 33);
+    else
+	sprintf(code_table +strlen(code_table), "%d", addr);
+
+    strncat(code_table, ind_table[ri], 5);
+
+}
+
+static char *getLabelSuffix(int16_t line, usage_list *ul){
+    for(; ul; ul = ul->next)
+	if(ul->value == line)
+	    return ul->label;
+
+    return NULL;
+}
+
+//search ALL labels and check if addr is  line
+static char *getLabelPrefix(int16_t line, usage_list *ul, int addr, MYTYPE *mem){
+    MYTYPE tmp;
+
+    extractAddress(mem[line], tmp);
+    for(; ul; ul = ul->next)
+	if(tmp == line)
+	    return ul->label;
+	
+    return NULL;
 }

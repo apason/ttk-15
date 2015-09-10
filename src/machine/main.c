@@ -46,7 +46,7 @@ int main(int argc,char *argv[]){
 	if(opts->debug){
 	    m->cu->sr |= TFLAG;
 	    initScreen(header->pl, ul);
-	    //initScreen(constructCodes(header->pl, ul), codeLength(header->pl));
+	    //initScreen(constructCodes(header->pl, ul codeLength(header)), codeLength(header));
 	}
 
 	//options are no longer needed
