@@ -33,7 +33,7 @@ for fullpathtest in units/*; do
 	fi
 
 	ttksource=$(ls ${dir}/*.k* | awk '{print $1;}')
-	$compiler $ttksource -o a.out.o15 
+	$compiler $ttksource 
 	
 	if [ $? != 0 ]; then
 		echo compiling $ttksource in $test failed
@@ -41,11 +41,11 @@ for fullpathtest in units/*; do
 		continue
 	fi
 	
-	$linker a.out.o15 > /dev/null
+        $linker $(ls ${dir}/*.o15) > /dev/null
 	
 	if [ $? != 0 ]; then
 		echo linking in $test failed
-		rm a.out.o15
+                rm $(ls ${dir}/*.o15)
 		rm result.b15
 		continue
 	fi
@@ -56,7 +56,7 @@ for fullpathtest in units/*; do
 		echo -e TEST: $test ${red}FAILED!${NC} : $why
 		exit -1
 	fi
-	rm a.out.o15
+        rm $(ls ${dir}/*.o15)
 	rm result.b15
 	rm a.out.b15
 

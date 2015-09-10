@@ -1,7 +1,7 @@
 #!/bin/bash
 
 target="../../target/"
-compiler=$target"ttc"
+compiler=$target"ttc -c"
 linker=$target"linker"
 machine=$target"ttk-15"
 
