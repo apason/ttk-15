@@ -8,11 +8,11 @@
 #include "error.h"
 
 
-static char *getLabelName(llist *s, uint32_t instruction);
+static char *getLabelName(label_list *s, uint32_t instruction);
 static int16_t findLabelValue(char *label);
 static int findLabelAddressConstant(char *label);
 static int handleExternalLabel(uint32_t *buf,  char *label);
-static int16_t findLocalLabel(char *label, llist *list);
+static int16_t findLocalLabel(char *label, label_list *list);
 
 //used in every function. initialized in linkmodule
 static module **modules;
@@ -122,7 +122,7 @@ static int handleExternalLabel(uint32_t *buf, char *label){
 static int findLabelAddressConstant(char *label){
     int    i  = 0;
     int    ac = ELABEL_NOT_FOUND;
-    llist *s  = NULL;
+    label_list *s  = NULL;
   
     for(i = 0; i < n; i++)
 	for(s = modules[i]->export; s; s = s->next)
@@ -137,7 +137,7 @@ static int findLabelAddressConstant(char *label){
 }
 
 //gets label name from modules own table
-static char *getLabelName(llist *s, uint32_t instruction){
+static char *getLabelName(label_list *s, uint32_t instruction){
     int16_t label = 0;
 
     label = (int16_t) instruction;
@@ -150,7 +150,7 @@ static char *getLabelName(llist *s, uint32_t instruction){
 }
 
 //get label from list
-static int16_t findLocalLabel(char *label, llist *list){ 
+static int16_t findLocalLabel(char *label, label_list *list){ 
     for(; list; list = list->next)
 	if(!strncmp(list->label, label, LABELLENGTH))
 	   return list->value;

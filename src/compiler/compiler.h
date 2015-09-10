@@ -2,10 +2,11 @@
 #define COMPILER
 
 #include <stdint.h>
+#include <module.h>
 #include <ttk-15.h>
 
 #define MAX 128
-#define N_INSTR 53
+#define N_INSTR 52
 // single linked list for the symbol table
 typedef struct label_list {
     struct label_list* next;
@@ -22,10 +23,12 @@ typedef struct {
     int lines;
     int mode;
     char** array;
-    struct label_list* symbolList;
+    label_list* symbolList;
+    usage_list* usageList;
     MYTYPE moduleSize;
     MYTYPE codeSize;
     MYTYPE exportSize;
+    MYTYPE importSize;
     FILE* fh_out;
     int* code_text;
 } code_file;
@@ -59,5 +62,5 @@ extern int getOpCode(char* operation);
 extern int getRegister(char* argument, int errors);
 extern int getIndexingMode(char* argument);
 extern int getIndexRegister(char* argument);
-extern int getAddress(char* argument, label_list* symbols, uint8_t* firstByte, int* isItFloat);
+extern int getAddress(char* argument, code_file* file, uint8_t* firstByte, int* isItFloat, int line);
 #endif 

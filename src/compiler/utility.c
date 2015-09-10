@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <module.h>
 #include <ttk-15.h>
+#include <module.h>
 #include "compiler.h"
 #include "errorcodes.h"
 
@@ -202,8 +203,8 @@ int getIndexRegister(char* argument) {
     return 0;
 }
 
-int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, int *isItFloat) {
-    label_list* temp = symbols;
+int getAddress(char* argument, code_file* file, uint8_t *firstByte, int *isItFloat, int line) {
+    label_list* temp = file->symbolList;
     int addr;
     // is the address a number?
     if (isdigit(argument[0]) || (isdigit(argument[1]) && argument[0] == '-')) {
@@ -243,7 +244,7 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, int *isI
         }
         if (temp == NULL) {
             // Didn't find label so added to the list of external symbols
-            temp = symbols;
+            temp = file->symbolList;
             while (temp->next != NULL) temp = temp->next;
             temp->next = (label_list*)malloc(sizeof(label_list));
             temp = temp->next;
@@ -255,6 +256,20 @@ int getAddress(char* argument, label_list* symbols, uint8_t *firstByte, int *isI
             temp->address = (int16_t)index;
             temp->mode = *firstByte = IMPORT;
             addr = index;
+            
+        }
+        // add entry to the usage table
+        if (file->usageList != NULL) {
+            usage_list* newFirst = (usage_list*)malloc(sizeof(usage_list));
+            newFirst->next = file->usageList;
+            strncpy(newFirst->label, argument, 32);
+            newFirst->value = line;
+            file->usageList = newFirst;
+        } else {
+            file->usageList = (usage_list*)malloc(sizeof(usage_list));
+            file->usageList->next = NULL;
+            strncpy(file->usageList->label, argument, 32);
+            file->usageList->value = line;
         }
     }
     return addr;

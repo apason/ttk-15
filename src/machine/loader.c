@@ -12,12 +12,12 @@
 
 static int needFix(MYTYPE buf);
 
-int loadFile(MYTYPE *mem, FILE *file, MYTYPE memsize){
+int loadFile(MYTYPE *mem, FILE *file, MYTYPE limit){
     int   i  = 0;
 
     for(i = 0; !feof(file); i++){
 	//check for sufficient memory size
-	if(i >= memsize) return -1;
+	if(i >= limit) return i;
 	fread(mem +i, sizeof(MYTYPE), 1, file);
     }
 

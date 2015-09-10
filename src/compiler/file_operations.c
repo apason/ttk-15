@@ -12,7 +12,7 @@
 static int countLines(FILE*);
 static int nextLine(FILE*);
 static char** readCode(FILE*, int, int**, int);
-static int writeInstruction(char* instr,char* val,label_list* symbols, FILE*,int);
+static int writeInstruction(char* instr,char* val,code_file* file, int line);
 static void freeSymbols(code_file*);
 static void freeCodeArray(code_file*);
 static void print_error(int error, int line);
@@ -132,8 +132,11 @@ static int nextLine(FILE* fh) {
 int writeCodeFile(code_file* file) {
     int error = 0;
     FILE* fh = file->fh_out;
+    int debug = (file->mode >> 2);
+    // the usage list starts out null
+    file->usageList = NULL;
     // skip header, we'll write it later
-    fseek(fh, sizeof(MYTYPE) * 3, SEEK_CUR );
+    fseek(fh, sizeof(MYTYPE) * 4, SEEK_CUR );
 
     // start writing data
     int i, cInstructions = 0;
@@ -144,7 +147,7 @@ int writeCodeFile(code_file* file) {
 
         sscanf(file->array[i], "%s %s", word, val);
         if (isInstruction(word)) {
-            error = writeInstruction(word,val,file->symbolList, fh, file->mode);
+            error = writeInstruction(word,val,file, cInstructions);
             // print error if found
             if (error < 0) {
                 print_error(error, file->code_text[cInstructions]);
@@ -169,7 +172,7 @@ int writeCodeFile(code_file* file) {
             sscanf(file->array[i], "%s %s %s %s", trash, label, word, val);
 
         if (!isInstruction(label) && isInstruction(word)) {
-            error = writeInstruction(word,val,file->symbolList, fh, file->mode);
+            error = writeInstruction(word,val,file, cInstructions);
             // print error if found
             if (error < 0) {
                 print_error(error, file->code_text[cInstructions]);
@@ -202,10 +205,13 @@ int writeCodeFile(code_file* file) {
     
     // write the import and export tables
     file->exportSize = 0;
+    file->importSize = 0;
     symbols = file->symbolList;
     while (symbols != NULL) {
         if (symbols->mode == EXPORT)
             file->exportSize += 34;
+        if (symbols->mode == IMPORT)
+            file->importSize += 34;
         if (symbols->mode == EXPORT || symbols->mode == IMPORT) {
             if (strlen(symbols->label)>32)
                 fprintf(stderr, "Warning: symbol name more than 32 chars, will be cut: %s\n",symbols->label);
@@ -214,28 +220,41 @@ int writeCodeFile(code_file* file) {
         }
         symbols = symbols->next;
     }
+    usage_list *ulabels = file->usageList;
+    if (debug) {
+        while (ulabels != NULL) {
+            fwrite(&(ulabels->value),sizeof(ulabels->value),1,fh);
+            fwrite(ulabels->label, sizeof(char), 32, fh);
+            ulabels = ulabels->next;
+        }
+    }
+
     fseek(fh, 0, SEEK_SET);
 
     // write header to the object file
-    MYTYPE dataSegmentAddress = file->codeSize*5 + 12;
+    // 4 * 4 is the header size in bytes
+    MYTYPE dataSegmentAddress = file->codeSize*5 + 4 * 4;
     MYTYPE exportTableAddress = dataSegmentAddress + (file->moduleSize - file->codeSize)*4;
     MYTYPE importTableAddress = exportTableAddress + file->exportSize;
+    MYTYPE labelUsageAddress = importTableAddress + file->importSize;
 
     fwrite(&dataSegmentAddress, sizeof(MYTYPE),1,fh);
     fwrite(&exportTableAddress, sizeof(MYTYPE),1,fh);
     fwrite(&importTableAddress, sizeof(MYTYPE),1,fh);
+    fwrite(&labelUsageAddress, sizeof(MYTYPE),1,fh);
     fclose(fh);
     return 0;
 }
 
 
-static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, int ttk_mode) {
-
+static int writeInstruction(char* word,char* val,code_file* file, int line) {
+    FILE* fh = file->fh_out;
+    
     int warning = 0;
 
     uint8_t firstByte = NO_LABEL;
     uint32_t instruction = 0;
-    int ttk_15 = (ttk_mode == TTK15);
+    int ttk_15 = (file->mode & TTK15);
 
     int opCode = 0;
     int reg = 0;
@@ -308,7 +327,7 @@ static int writeInstruction(char* word,char* val,label_list* symbols, FILE* fh, 
         } else {
             // this variable also stores possible error in getAddress
             int isItFloat = 0;
-            addr = getAddress(argument, symbols, &firstByte, &isItFloat);
+            addr = getAddress(argument, file, &firstByte, &isItFloat, line);
             if (isItFloat < 0)
                 return isItFloat;
             // If the argument is a float we have to use fload instead of just load
@@ -349,6 +368,11 @@ static void freeSymbols(code_file* file) {
         label_list* temp = file->symbolList;
         file->symbolList = file->symbolList->next;
         free(temp);
+    }
+    while (file->usageList != NULL) {
+        usage_list* next = file->usageList->next;
+        free(file->usageList);
+        file->usageList = next;
     }
 }
 

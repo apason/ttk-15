@@ -31,7 +31,7 @@ int main (int argc, char* argv[]) {
         // and set the code_file struct to hold the filehandle and output name
         code_file codeFile;
         codeFile.name = argv[n];
-        codeFile.mode = TTK91;
+        codeFile.mode = TTK91 | (debug << 2);
         codeFile.fh_out = output++;
 
         // read the file into the struct
@@ -42,9 +42,9 @@ int main (int argc, char* argv[]) {
         char* suffix = strrchr(argv[n], '.');
         if (opts->mode == UNDEFINED && suffix != NULL) {
             if (!strncmp(suffix,".k15",5))
-            codeFile.mode = TTK15;
+            codeFile.mode = TTK15 | (debug << 2);
         } else
-            codeFile.mode = opts->mode;
+            codeFile.mode = opts->mode | (debug << 2);
 
 
         // calculate code size and create the symbol table
@@ -74,6 +74,12 @@ int main (int argc, char* argv[]) {
             while (temp != NULL) {
                 printf("%s : %0x : %d : %d : %s\n",temp->label, (uint16_t)temp->address, temp->size, temp->value, mode[temp->mode]);
                 temp = temp->next;
+            }
+            printf("Label locations:\n");
+            usage_list* utemp = codeFile.usageList;
+            while (utemp != NULL) {
+                printf("%0x : %s \n",utemp->value, utemp->label);
+                utemp = utemp->next;
             }
         }
         // free the space reserved for dynamic data in codeFile

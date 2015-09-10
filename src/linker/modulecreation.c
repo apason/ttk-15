@@ -12,11 +12,12 @@
 
 static void readCode(module *mod);
 static void readImportExport(module *mod);
-static llist *readSymbols(module *mod, int start, int end);
+static label_list *readSymbols(module *mod, int start, int end);
 static module *readModule(FILE *fp, char *filename);
+static void readLabelUsages(module *mod);
 
 //create all modules determined by argv
-void createModules(int n, char **argv, module **modules){
+void createModules(int n, char **argv, module **modules, int debug){
     FILE *fp = NULL;
     int   i  = 0;
   
@@ -40,16 +41,19 @@ void createModules(int n, char **argv, module **modules){
 
 	readCode(modules[i]);
 	readImportExport(modules[i]);
+
+	if(debug)
+	    readLabelUsages(modules[i]);
     
     }
 }
 
 //initializes one module. returns NULL if any block is wrong size
 static module *readModule(FILE *fp, char *filename){
-    int i               = 0;
-    uint32_t data_size  = -1;
-    uint32_t code_size  = -1;
-    module *mod         = (module *)malloc(sizeof(module));
+    int      i                 = 0;
+    uint32_t data_size         = -1;
+    uint32_t code_size         = -1;
+    module  *mod               = (module *)malloc(sizeof(module));
 
     mod->filename = filename;
 
@@ -60,10 +64,13 @@ static module *readModule(FILE *fp, char *filename){
     mod->data = (char *)malloc(mod->size);
     fseek(fp, 0, SEEK_SET);
 
+    //ERROR CHECKING ABOUT SMALL MODULE SHOULD BE HERE
+
     //read code and data starts
     fread(&mod->data_start, sizeof(MYTYPE), 1, fp);
     fread(&mod->export_start, sizeof(MYTYPE), 1, fp);
     fread(&mod->import_start, sizeof(MYTYPE), 1, fp);
+    fread(&mod->label_usage_start, sizeof(MYTYPE), 1, fp);
 
     /*
      * module should allways be at least 16 bytes.
@@ -78,9 +85,11 @@ static module *readModule(FILE *fp, char *filename){
         
     if((mod->data_start > mod->export_start)                           | \
        (mod->export_start > mod->import_start)                         | \
-       (mod->import_start > mod->size )                                | \
+       (mod->import_start > mod->label_usage_start )                   | \
+       (mod->label_usage_start > mod->size)                            | \
        ((mod->import_start -mod->export_start) % SYMBOLSIZE != 0)      | \
-       ((mod->size -mod->import_start) % SYMBOLSIZE != 0)              | \
+       ((mod->label_usage_start -mod->import_start) % SYMBOLSIZE != 0) | \
+       ((mod->size -mod->label_usage_start) % USAGESIZE != 0)          | \
        ((mod->data_start -CODESTART) % CODESIZE != 0)                  | \
        ((mod->export_start -mod->data_start) % sizeof(MYTYPE) != 0)){
 
@@ -128,12 +137,12 @@ static void readImportExport(module *mod){
 
 }
 
-static llist *readSymbols(module *mod, int start, int end){
+static label_list *readSymbols(module *mod, int start, int end){
     int size = (end -start) / SYMBOLSIZE;
     int i    = 0;
 
-    llist *list = (llist*) malloc(sizeof(llist));
-    llist *head = list;
+    label_list *list = (label_list*) malloc(sizeof(label_list));
+    label_list *head = list;
 
     //memset would be better?
     *(list->label +LABELLENGTH) = '\0';           //initialize
@@ -144,10 +153,10 @@ static llist *readSymbols(module *mod, int start, int end){
 	strncpy(list->label, (char *)mod->data \
 		+start +(i * SYMBOLSIZE), LABELLENGTH);
 	list->value = *((int16_t *)(mod->data +start \
-				      +(i * SYMBOLSIZE) +LABELLENGTH));
+	        +(i * SYMBOLSIZE) +LABELLENGTH));
 
 	if(i < size -1){
-	    list->next = (llist *)malloc(sizeof(llist));
+	    list->next = (label_list *)malloc(sizeof(label_list));
 	    list = list->next;
 	    list->next = NULL;
 	}    
@@ -159,4 +168,35 @@ static llist *readSymbols(module *mod, int start, int end){
     }
     
     return head;
+}
+
+static void readLabelUsages(module *mod){
+    int size = (mod->size -mod->label_usage_start) / USAGESIZE;
+    int i    = 0;
+
+    usage_list *list = (usage_list*) malloc(sizeof(usage_list));
+    usage_list *head = list;
+
+    *(list->label +LABELLENGTH) = '\0';
+    list->next = NULL;
+
+    for(i = 0; i < size; i++){
+	strncpy(list->label, (char *)mod->data +mod->label_usage_start \
+		+(i * USAGESIZE) +sizeof(MYTYPE), LABELLENGTH);
+	list->value = *((int32_t *)(mod->data +mod->label_usage_start \
+				    +(i * USAGESIZE)));
+
+	if(i < size -1){
+	    list->next = (usage_list *)malloc(sizeof(usage_list));
+	    list = list->next;
+	    list->next = NULL;
+	}
+    }
+
+    if(i == 0){
+	free(head);
+	mod->usages = NULL;
+    }
+    else
+	mod->usages = head;
 }

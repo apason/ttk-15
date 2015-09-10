@@ -106,3 +106,78 @@ float f16Decode(f16 f){
 
     return *(volatile float*) &ret;
 }
+
+header_data *readHeader(FILE *fp){
+    MYTYPE header_end, i;
+    position_list *pl = NULL;
+    header_data *header = (header_data *)malloc(sizeof(header_data));
+
+    fread(&header_end, sizeof(MYTYPE), 1, fp); //check return value for error!
+
+    //if there is no additional debug data ( -g not used)
+    if((header_end / sizeof(MYTYPE) -1) / 2 <= 0){ //if header_end == 4
+	header->pl = NULL;
+	header->usage_start = -1;
+	return header;
+    }
+
+    fseek(fp, 0, SEEK_SET);
+
+    pl = (position_list *)malloc(sizeof(position_list));
+    header->pl = pl;
+    
+    //read that many pairs of (code_start, data_start)
+    
+    for(i = 0; i < (header_end / sizeof(MYTYPE) -3) / 2; i++){
+	
+	fread(&pl->data, sizeof(MYTYPE), 1, fp);
+	fread(&pl->code, sizeof(MYTYPE), 1, fp);
+
+	pl->next = (position_list *)malloc(sizeof(position_list));
+	pl = pl->next;
+    }
+
+    pl->next = NULL;
+    
+    fread(&pl->data, sizeof(MYTYPE), 1, fp);
+    fread(&pl->code, sizeof(MYTYPE), 1, fp);
+
+    fread(&header->usage_start, sizeof(MYTYPE), 1, fp);
+
+    return header;
+}
+
+usage_list *readUsages(FILE *fp, int usage_start){
+    int i, d, tmp;
+    usage_list *ul = NULL;
+    
+    if(usage_start > 0)
+	return NULL;
+
+    fseek(fp, 0, SEEK_END);
+    tmp = ftell(fp);
+    fseek(fp, usage_start, SEEK_SET);
+    d = ftell(fp);
+    d = tmp -d;
+
+    if(d % (LABELLENGTH + sizeof(MYTYPE)) != 0){
+	printf("ERRORRR. incorrect usage table");
+	fflush(NULL);
+    }
+
+    ul = (usage_list *)malloc(sizeof(usage_list));
+    ul->next = NULL;
+    
+    for(i = 0; i < d; i++){
+	fread(&ul->value, sizeof(MYTYPE), 1, fp);
+	fread(&ul->label, LABELLENGTH, 1, fp);
+
+	if(i < d -1){
+	    ul->next = (usage_list *)malloc(sizeof(usage_list));
+	    ul = ul->next;
+	    ul->next = NULL;
+	}
+    }
+    
+    return ul;
+}

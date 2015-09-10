@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include <module.h>
+
 #define FUNCTION(function) void function(machine *m, uint8_t rj, uint8_t mod, uint8_t ri, uint16_t mem)
 
 typedef struct OPTIONS{
@@ -14,6 +16,18 @@ typedef struct OPTIONS{
 
 } options;
 
+typedef struct POSITION_LIST{
+    int code;
+    int data;
+    struct POSITION_LIST *next;
+}position_list;
+
+typedef struct HEADER{
+    position_list *pl;
+    int            usage_start;
+} header_data;
+
+    
 typedef enum { MYTYPE_PARAM, MYTYPEF_PARAM } type_param;
 
 //prototype for machine instruction
@@ -36,9 +50,12 @@ extern void mmuSetData(mm_unit *mmu, MYTYPE *mem, MYTYPE addr, MYTYPE data);
 extern void initializeInstructionArray(instructionptr *instructions);
 extern void printState(machine *m);
 extern void freeMachine(machine *m);
+extern header_data *readHeader(FILE *fp);
+extern usage_list *readUsages(FILE *fp, int usage_start);
+
 
 //ncurses.c
-extern void initScreen(void);
+extern void initScreen(position_list *pl, usage_list *ul);
 extern void drawScreen(machine *m);
 extern MYTYPE readInput(type_param tpar);
 extern void killScreen(void);
