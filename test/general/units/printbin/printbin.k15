@@ -1,6 +1,6 @@
 ; prints binary when given a decimal number
 ; input is given in r1
-export printbin push sp,r2
+printbin push sp,r2
 	push sp,r3
 	load r3,=32
 	loop sub r3,=1
@@ -9,7 +9,7 @@ export printbin push sp,r2
 		and r2,=1
 		out r2,=crt
 		comp r3,=0
-		jgre =loop
+		jgre loop
 	pop sp,r3
 	pop sp,r2
 	exit sp,=0

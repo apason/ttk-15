@@ -1,3 +1,3 @@
 main load r1,=-1
-call sp,=printbin
+call sp,printbin
 svc sp,=halt
