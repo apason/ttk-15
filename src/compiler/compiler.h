@@ -6,7 +6,7 @@
 #include <ttk-15.h>
 
 #define MAX 128
-#define N_INSTR 53
+#define N_INSTR 52
 // single linked list for the symbol table
 typedef struct label_list {
     struct label_list* next;
