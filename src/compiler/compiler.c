@@ -92,10 +92,9 @@ int main (int argc, char* argv[]) {
         int currentsize = 60;
         char *linkercall = (char*)malloc(sizeof(char) * currentsize);
         strcpy(linkercall, "linker\0");
-        // this branch's linker does not use -g that's why this line is commented
-        /*if (debug) {
+        if (debug) {
           strncat(linkercall, " -g\0", 4);
-          }*/
+          }
         // -o means specified output binary
         if (opts->boutput != NULL) {
             strcat(linkercall, " -o ");
