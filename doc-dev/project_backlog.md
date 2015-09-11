@@ -2,17 +2,16 @@
 ttk-15 on ttk-91 klooni pienillä muutoksilla
 
 ##v0.4 valmiina##
-
-##v0.4 backlog##
- * breakpointit compileriin ja debuggeriin.
   * objekti- ja ajomoduuleille uusi rakenne.
-    + neljäs sana objektimoduuliin
     + ajomoduuliin headeri
     + debug moodissa compileriin kaikkien labelien paikat
     + debug moodissa linkkeri lisää data alueiden alut ja loput ajomoduulin headeriin
     + linkkeri päivittää moduulivakiot usage tauluun
-    
+    + neljäs sana objektimoduulin headeriin
  * "wrapper" skripti tms joka kapseloi linkkerin ja kääntäjän (ehkä masiinan?)
+
+##v0.4 backlog##
+ * breakpointit compileriin ja debuggeriin.
  * GUI 
 
 ## backlog ##
