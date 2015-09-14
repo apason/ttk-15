@@ -23,6 +23,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * pienin osoitettava muistiyksikkö keskusmuistissa MYTYPE:stä yhteen tavuun
  * konekäskyt 16 ja 8 bitin käsittelyyn?
  * Windows compatibility
+ * PHP + cli web interface
 
 ##known issues##
  * linkkeri ei toimi moduuleilla, joissa on pelkkä data-alue
