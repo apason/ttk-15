@@ -91,7 +91,11 @@ int main (int argc, char* argv[]) {
         output_name_list = opts->filenames;
         int currentsize = 60;
         char *linkercall = (char*)malloc(sizeof(char) * currentsize);
-        strcpy(linkercall, "linker\0");
+        *linkercall = '\0';
+        if (strncmp(argv[0], "./", 2) == 0) {
+            strcpy(linkercall,"./");
+        }
+        strcat(linkercall, "linker\0");
         if (debug) {
           strncat(linkercall, " -g\0", 4);
           }
