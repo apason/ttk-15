@@ -11,14 +11,15 @@
 #include "bitwise.h"
 
 //max length of disassembled instruction
-#define MAXLEN 48
+#define MAXLEN 150
 
 static int isCodeArea(int i, position_list *pl);
 static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, int i, MYTYPE *mem);
 static char *getLabelPrefix(int16_t line, usage_list *ul, int addr, MYTYPE *mem);
 static char *getLabelSuffix(int16_t line, usage_list *ul);
+static void adjustPositionLists(position_list *pl);
 
-static char *reg_table[] = {"r1", "r2", "r3", "r4", "r5", "sp", "fp"};
+static char *reg_table[] = {"r0, ", "r1, ", "r2, ", "r3, ", "r4, ", "r5, ", "sp, ", "fp, "};
 static char *mod_table[] = {"=", " ", "@"};
 static char *ind_table[] = {" ", "(r1)", "(r2)", "(r3)", "(r4)", "(r5)", "(sp)", "(fp)"};
 
@@ -149,8 +150,11 @@ header_data *readHeader(FILE *fp){
     
     for(i = 0; i < (header_end / sizeof(MYTYPE) -3) / 2; i++){
 	
-	fread(&pl->data, sizeof(MYTYPE), 1, fp);
 	fread(&pl->code, sizeof(MYTYPE), 1, fp);
+	fread(&pl->data, sizeof(MYTYPE), 1, fp);
+
+	pl->code /= sizeof(MYTYPE);
+	pl->data /= sizeof(MYTYPE);
 
 	pl->next = (position_list *)malloc(sizeof(position_list));
 	pl = pl->next;
@@ -158,35 +162,44 @@ header_data *readHeader(FILE *fp){
 
     pl->next = NULL;
     
-    fread(&pl->data, sizeof(MYTYPE), 1, fp);
     fread(&pl->code, sizeof(MYTYPE), 1, fp);
+    fread(&pl->data, sizeof(MYTYPE), 1, fp);
+
+    pl->code /= sizeof(MYTYPE);
+    pl->data /= sizeof(MYTYPE);
 
     fread(&header->usage_start, sizeof(MYTYPE), 1, fp);
 
     return header;
 }
 
+//onko usage start byteinä vai sanonia=
 usage_list *readUsages(FILE *fp, int usage_start){
     int i, d, tmp;
     usage_list *ul = NULL;
+    usage_list *head = NULL;
     
-    if(usage_start > 0)
+    if(usage_start < 0)
 	return NULL;
 
     fseek(fp, 0, SEEK_END);
     tmp = ftell(fp);
     fseek(fp, usage_start, SEEK_SET);
     d = ftell(fp);
-    d = tmp -d;
+    d = (tmp -d);
 
     if(d % (LABELLENGTH + sizeof(MYTYPE)) != 0){
 	printf("ERRORRR. incorrect usage table");
 	fflush(NULL);
     }
+    else
+	d /= (LABELLENGTH + sizeof(MYTYPE));
 
     ul = (usage_list *)malloc(sizeof(usage_list));
     ul->next = NULL;
-    
+    head = ul;
+
+    //tavut vai sanat?
     for(i = 0; i < d; i++){
 	fread(&ul->value, sizeof(MYTYPE), 1, fp);
 	fread(&ul->label, LABELLENGTH, 1, fp);
@@ -198,10 +211,10 @@ usage_list *readUsages(FILE *fp, int usage_start){
 	}
     }
     
-    return ul;
+    return head;
 }
 
-//returns the value of position list start - header end = length of all data + code
+//returns the value of usage list start - header end = length of all data + code
 int codeLength(header_data *header){
     int i;
     position_list *pl;
@@ -211,13 +224,25 @@ int codeLength(header_data *header){
     for(pl = header->pl, i = 0; pl; pl = pl->next) i += 2;
 
     //there is 2*n +1 fields in the header
-    return i +1;
+    return header->usage_start -(i +1);
     
 }
 
+static void adjustPositionLists(position_list *pl){
+    int address_constant = pl->code;
+
+    for(; pl; pl = pl->next){
+	pl->code -= address_constant;
+	pl->data -= address_constant;
+    }
+}
+
+//problem. i is from 0 and position list indexes includes header.
 char **constructCodes(position_list *pl, usage_list *ul, int length, MYTYPE *mem){
     int i;
     char **code_table = (char **)malloc(length * sizeof(char*));
+
+    adjustPositionLists(pl);
 
     for(i = 0; i < length; i++)
 	if(isCodeArea(i, pl)){
@@ -259,9 +284,9 @@ static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, 
     if(label)
 	strncpy(code_table, label, 33);
     else
-	sprintf(code_table, "%d", addr);
+	sprintf(code_table, "%d ", i);
 
-    strncpy(code_table, dis_asm[opc], 7);
+    strncat(code_table, dis_asm[opc], 7);
     strncat(code_table, reg_table[rj], 3);
     strncat(code_table, mod_table[mode], 2);
     label = getLabelSuffix(i, ul);
@@ -275,6 +300,9 @@ static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, 
 
 }
 
+
+
+
 static char *getLabelSuffix(int16_t line, usage_list *ul){
     for(; ul; ul = ul->next)
 	if(ul->value == line)
@@ -287,10 +315,36 @@ static char *getLabelSuffix(int16_t line, usage_list *ul){
 static char *getLabelPrefix(int16_t line, usage_list *ul, int addr, MYTYPE *mem){
     MYTYPE tmp;
 
-    extractAddress(mem[line], tmp);
-    for(; ul; ul = ul->next)
+    for(; ul; ul = ul->next){
+	extractAddress(mem[ul->value], tmp);	
 	if(tmp == line)
 	    return ul->label;
+    }
 	
     return NULL;
+}
+
+void printHeader(header_data *header){
+    if(header == NULL){
+	printf("NULL\n");
+	return;
+    }
+    if(header->pl == NULL)
+	printf("position_list:\tNULL\n");
+    else
+	printPositionList(header->pl);
+
+    printf("usage_start:\t%d\n", header->usage_start);
+}
+
+void printPositionList(position_list *pl){
+    int i = 0;
+    for(; pl; pl = pl->next)
+	printf("module %d:\tcode: %d\tdata: %d\n", i++, pl->code, pl->data);
+}
+    
+void printUsageList(usage_list *ul){
+    int i = 0;
+    for(; ul; ul=ul->next)
+	printf("%d\t%d: %s\n", i++, ul->value, ul->label);
 }

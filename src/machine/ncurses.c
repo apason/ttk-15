@@ -85,8 +85,7 @@ static int current_memory_row;
 static int crt_notification;
 static int crt_offset;
 
-static position_list *pl;
-static usage_list *ul;
+static char **disassembled_codes;
 
 /*
  * main function of ncurses gui. this is executed
@@ -529,7 +528,7 @@ static WINDOW *drawDAB(MYTYPE *memory, int x, int y){
     WINDOW *w;
 
     w = newwin(y, x, 0, 0);
-    wprintw(w, "asdasd");
+    wprintw(w, "%s", disassembled_codes[0]);
     return w;
 }
 	
@@ -600,11 +599,9 @@ static int len(MYTYPE x){
     return len;
 }
 
-void initScreen(position_list *posl, usage_list *usl){
+void initScreen(char **disassembled, int length){
 
-    //init position and usage list for disassembly
-    pl = posl;
-    ul = usl;
+    disassembled_codes = disassembled;
     
     scr = CPU;
     initscr();

@@ -17,14 +17,14 @@ typedef struct OPTIONS{
 } options;
 
 typedef struct POSITION_LIST{
-    int code;
-    int data;
+    int code;                       //MYTYPES
+    int data;                       //MYTYPES
     struct POSITION_LIST *next;
 }position_list;
 
 typedef struct HEADER{
     position_list *pl;
-    int            usage_start;
+    int            usage_start; //in bytes?
 } header_data;
 
     
@@ -52,14 +52,19 @@ extern void printState(machine *m);
 extern void freeMachine(machine *m);
 extern header_data *readHeader(FILE *fp);
 extern usage_list *readUsages(FILE *fp, int usage_start);
-
+extern char **constructCodes(position_list *pl, usage_list *ul, int length, MYTYPE *mem);
+extern int codeLength(header_data *header);
+extern void printHeader(header_data *header);
+extern void printPositionList(position_list *pl);
+extern void printUsageList(usage_list *ul);
 
 //ncurses.c
-extern void initScreen(position_list *pl, usage_list *ul);
+extern void initScreen(char **disAssembled, int length);
 extern void drawScreen(machine *m);
 extern MYTYPE readInput(type_param tpar);
 extern void killScreen(void);
 extern void printOutput(MYTYPE out, type_param tpar);
+
 
 //instructions.c contains all machine instructions
 extern FUNCTION(nop);

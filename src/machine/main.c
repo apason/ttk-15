@@ -13,7 +13,7 @@ int main(int argc,char *argv[]){
     header_data *header;
     machine     *m;
     int          limit;
-
+    
     if(opts == NULL) return -1;
 
     m = newMachine(opts->memsize);
@@ -25,8 +25,10 @@ int main(int argc,char *argv[]){
     else if(opts->mode == TTK15){
 	header = readHeader(opts->file);
 
+	//	printHeader(header);
+
 	limit = (header->usage_start -ftell(opts->file)) / sizeof(MYTYPE);
-	if(opts->memsize < limit) ;//error
+	if(opts->memsize < limit) ;//ERROR!
 
 	//if usage start is < 0, there is no usage table in binary
 	m->regs[6] = (MYTYPE)loadFile(m->mem, opts->file, header->usage_start > 0 ? \
@@ -34,9 +36,9 @@ int main(int argc,char *argv[]){
 	
 	ul = readUsages(opts->file, header->usage_start);
 
-	//debug
-	/* printUsageList(ul); */
-	/* return 0; */
+	//debug prints addresses in bytes!
+	//	printUsageList(ul);
+
     }
 
     //otherwise error occured
@@ -44,13 +46,24 @@ int main(int argc,char *argv[]){
 	m->regs[7] = m->regs[6];
 
 	if(opts->debug){
+	    char **codes = constructCodes(header->pl, ul, codeLength(header), m->mem);
+	    int len = codeLength(header);
+	    int i;
+	    (void) i;
+	    (void) codes;
+	    (void) len;
+
+	    /* for(i = 0; i < len; i++) */
+	    /* 	printf("%s\n", codes[i]); */
+	    
 	    m->cu->sr |= TFLAG;
-	    initScreen(header->pl, ul);
-	    //initScreen(constructCodes(header->pl, ul codeLength(header)), codeLength(header));
+	    initScreen(codes, len);
 	}
 
 	//options are no longer needed
 	freeOptions(opts);
+
+	//m->cu->sr &= ~TFLAG;
 
 	startMachine(m);
     }
