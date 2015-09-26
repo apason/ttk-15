@@ -201,7 +201,7 @@ void drawScreen(machine *m){
 	    break;
 	case ' ':
 	    if(scr == CPU)
-		breakpoints[disassembled.offset] = 1;
+		breakpoints[disassembled.offset] ^= 1;
 	    break;
 	default:
 	    ;
