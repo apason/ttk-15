@@ -13,14 +13,14 @@
 //max length of disassembled instruction
 #define MAXLEN 150
 
-static int isCodeArea(int i, position_list *pl);
-static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, int i, MYTYPE *mem);
+static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, int i, MYTYPE *mem, int max_label_length);
 static char *getLabelPrefix(int16_t line, usage_list *ul, int addr, MYTYPE *mem);
 static char *getLabelSuffix(int16_t line, usage_list *ul);
 static void adjustPositionLists(position_list *pl);
+int maxLabelLength(usage_list *ul);
 
-static char *reg_table[] = {"r0, ", "r1, ", "r2, ", "r3, ", "r4, ", "r5, ", "sp, ", "fp, "};
-static char *mod_table[] = {"=", " ", "@"};
+static char *reg_table[] = {"r0,", "r1,", "r2,", "r3,", "r4,", "r5,", "sp,", "fp,"};
+static char *mod_table[] = {" =", " ", " @"};
 static char *ind_table[] = {" ", "(r1)", "(r2)", "(r3)", "(r4)", "(r5)", "(sp)", "(fp)"};
 
 
@@ -173,7 +173,6 @@ header_data *readHeader(FILE *fp){
     return header;
 }
 
-//onko usage start byteinä vai sanonia=
 usage_list *readUsages(FILE *fp, int usage_start){
     int i, d, tmp;
     usage_list *ul = NULL;
@@ -182,28 +181,38 @@ usage_list *readUsages(FILE *fp, int usage_start){
     if(usage_start < 0)
 	return NULL;
 
+    /*
+     * calculate the size of usage_list 
+     * and set stream position to the beginning
+     */
     fseek(fp, 0, SEEK_END);
     tmp = ftell(fp);
+    d = (tmp -usage_start);                          // size in BYTES
     fseek(fp, usage_start, SEEK_SET);
-    d = ftell(fp);
-    d = (tmp -d);
 
+    //error checking
     if(d % (LABELLENGTH + sizeof(MYTYPE)) != 0){
 	printf("ERRORRR. incorrect usage table");
 	fflush(NULL);
     }
     else
-	d /= (LABELLENGTH + sizeof(MYTYPE));
+	/*
+	 * size in 36? byte FIELDS
+	 * one field contains row number and the label
+	 */
+	d /= (LABELLENGTH + sizeof(MYTYPE));         // size in 
 
+    //reserve memory for the first unit
     ul = (usage_list *)malloc(sizeof(usage_list));
     ul->next = NULL;
-    head = ul;
+    head = ul;                                       // save list start
 
-    //tavut vai sanat?
+    //read all label usages
     for(i = 0; i < d; i++){
 	fread(&ul->value, sizeof(MYTYPE), 1, fp);
 	fread(&ul->label, LABELLENGTH, 1, fp);
 
+	//reserve memory for next field.
 	if(i < d -1){
 	    ul->next = (usage_list *)malloc(sizeof(usage_list));
 	    ul = ul->next;
@@ -214,7 +223,12 @@ usage_list *readUsages(FILE *fp, int usage_start){
     return head;
 }
 
-//returns the value of usage list start - header end = length of all data + code
+
+/*
+ * Retutns the value length of all code + data
+ * start of usage list - end of header
+ * in WORDS
+ */
 int codeLength(header_data *header){
     int i;
     position_list *pl;
@@ -224,7 +238,7 @@ int codeLength(header_data *header){
     for(pl = header->pl, i = 0; pl; pl = pl->next) i += 2;
 
     //there is 2*n +1 fields in the header
-    return header->usage_start -(i +1);
+    return (header->usage_start / sizeof(MYTYPE)) -(i +1);
     
 }
 
@@ -237,17 +251,19 @@ static void adjustPositionLists(position_list *pl){
     }
 }
 
-//problem. i is from 0 and position list indexes includes header.
 char **constructCodes(position_list *pl, usage_list *ul, int length, MYTYPE *mem){
-    int i;
+    int i, max_label_length;
     char **code_table = (char **)malloc(length * sizeof(char*));
 
     adjustPositionLists(pl);
+    printPositionList(pl); fflush(NULL);
+
+    max_label_length = maxLabelLength(ul);
 
     for(i = 0; i < length; i++)
 	if(isCodeArea(i, pl)){
-	   code_table[i] = (char *)malloc(MAXLEN * sizeof(char));
-	   disAssemble(mem, code_table[i], ul, i, mem);
+	    code_table[i] = (char *)malloc(MAXLEN * sizeof(char));
+	    disAssemble(mem, code_table[i], ul, i, mem, max_label_length);
 	}
 	else
 	    code_table[i] = NULL;
@@ -255,7 +271,7 @@ char **constructCodes(position_list *pl, usage_list *ul, int length, MYTYPE *mem
     return code_table;
 }
 
-static int isCodeArea(int i, position_list *pl){
+int isCodeArea(int i, position_list *pl){
 
     for(; pl; pl = pl->next)
 	if(i >= pl->code && i < pl->data)
@@ -264,7 +280,7 @@ static int isCodeArea(int i, position_list *pl){
     return 0;
 }
 
-static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, int i, MYTYPE *mem){
+static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, int i, MYTYPE *mem, int max_label_length){
     char     *label = NULL;
 
     uint8_t   opc   = 0;
@@ -282,11 +298,10 @@ static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, 
 
     label = getLabelPrefix(i, ul, addr, mem);
     if(label)
-	strncpy(code_table, label, 33);
+	sprintf(code_table, "%-*s ", max_label_length, label);
     else
-	sprintf(code_table, "%d ", i);
-
-    strncat(code_table, dis_asm[opc], 7);
+	sprintf(code_table, "%-*d ", max_label_length, i);
+    sprintf(code_table +LABELLENGTH, "%-7s", dis_asm[opc]);
     strncat(code_table, reg_table[rj], 3);
     strncat(code_table, mod_table[mode], 2);
     label = getLabelSuffix(i, ul);
@@ -347,4 +362,13 @@ void printUsageList(usage_list *ul){
     int i = 0;
     for(; ul; ul=ul->next)
 	printf("%d\t%d: %s\n", i++, ul->value, ul->label);
+}
+
+int maxLabelLength(usage_list *ul){
+    int max = 0;
+
+    for(; ul; ul = ul->next)
+	max = strlen(ul->label) > max ? strlen(ul->label) : max;
+
+    return max;
 }

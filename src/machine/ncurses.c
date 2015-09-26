@@ -5,11 +5,18 @@
 #include <ncurses.h>
 #include <ttk-15.h>
 #include "machine.h"
+#include "masks.h"
 
 struct outputList{
     MYTYPE output;
     type_param tpar;
     struct outputList *next;
+};
+
+struct disassembled_data{
+    char **codes;
+    int offset;
+    int max_value;
 };
 
 /* 
@@ -45,6 +52,8 @@ static void printBin(WINDOW *w, MYTYPE a);
 static int listLength(const struct outputList *l);
 static int notCorrectInput(const char *buffer);
 static WINDOW *drawDAB(MYTYPE *memory, int x, int y);
+static void prevDABLine(void);
+static void nextDABLine(void);
 
 static char ra0[] = "R0:";
 static char ra1[] = "R1:";
@@ -78,28 +87,48 @@ static char fa1[] = "in2:";
 static char fa2[] = "out:";
 static char *FPU_array[] = {fa0, fa1, fa2};
 
+static struct disassembled_data disassembled;
+static char *breakpoints;
+
 static enum type current;
 static struct outputList *first = NULL;
 static enum screentab scr;
+
+//data from initialization
 static int current_memory_row;
 static int crt_notification;
 static int crt_offset;
-
-static char **disassembled_codes;
-
+static position_list *pl;
+static const MYTYPE *pc;
+    
 /*
  * main function of ncurses gui. this is executed
  * between every instruction in debugging mode
  */
 void drawScreen(machine *m){
     int ch;
+    static int start = 1;
+    static int to_end = 0;
 
+    if(to_end)
+	return;
+    
+    //do not draw the screen!
+    if(!breakpoints[m->cu->pc]){
+	if(start == 0)
+	    return;
+	else
+	    start = 0;
+    }
 
+    disassembled.offset = *pc;
+    
     drawSelected(m);
     
     //return only if we are in CPU window and enter is pressed
     while((ch = getch()) != 10){
 	switch (ch){
+	    //tab selection
 	case KEY_F(1):
 	    scr = CPU;	    
 	    break;
@@ -109,6 +138,7 @@ void drawScreen(machine *m){
 	case KEY_F(3):
 	    scr = OUT;	    
 	    break;
+	    //output type selection
 	case 'x':
 	    current = HEX;
 	    break;
@@ -118,6 +148,7 @@ void drawScreen(machine *m){
 	case 'd':
 	    current = DEC;
 	    break;
+	    //navigation
 	case KEY_NPAGE:
 	    if(scr == MEM)
 		nextMemoryPage(m->mmu->limit);
@@ -135,12 +166,16 @@ void drawScreen(machine *m){
 		nextMemoryLine(m->mmu->limit);
 	    if(scr == OUT)
 		nextCRTLine();
+	    if(scr == CRT)
+		prevDABLine();
 	    break;
 	case KEY_UP:
 	    if(scr == MEM)
 		prevMemoryLine(m->mmu->limit);
 	    if(scr == OUT)
 		prevCRTLine();
+	    if(scr == CRT)
+		nextDABLine();
 	    break;
 	case KEY_HOME:
 	    if(scr == MEM)
@@ -154,11 +189,27 @@ void drawScreen(machine *m){
 	    if(scr == OUT)
 		endCRT();
 	    break;
+	    //breakpoint commands
+	case 'n':
+	    start = 0;
+	    return;
+	    break;
+	case 'e':
+	    m->cu->sr = ~TFLAG;
+	    to_end = 1;
+	    return;
+	    break;
+	case ' ':
+	    if(scr == CPU)
+		breakpoints[disassembled.offset] = 1;
+	    break;
 	default:
 	    ;
 	}
 	drawSelected(m);
     }
+    
+    start = 1;
 }
 
 static void endCRT(void){
@@ -186,6 +237,18 @@ static void nextCRTLine(void){
     crt_offset--;
     if(crt_offset < 0)
 	crt_offset = 0;
+}
+
+static void nextDABLine(void){
+    disassembled.offset--;
+    if(disassembled.offset < 0)
+	disassembled.offset = 0;
+}
+
+static void prevDABLine(void){
+    disassembled.offset++;
+    if(disassembled.offset > disassembled.max_value)
+	disassembled.offset = disassembled.max_value;
 }
 
 static int listLength(const struct outputList *l){
@@ -436,9 +499,9 @@ static void drawCPU(const machine *m){
     mvwin(FPU, pos, 1);
     getmaxyx(FPU, y, x);
     pos += y;
-
     
     getmaxyx(stdscr, y, x);
+    
     //print DisAssembler and Breakpoints
     DAB = drawDAB(m->mem, x -2, y -pos -1);
     mvwin(DAB, pos, 1);
@@ -526,9 +589,38 @@ static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, int x, char *arr[], int size)
 
 static WINDOW *drawDAB(MYTYPE *memory, int x, int y){
     WINDOW *w;
+    int i, j, current_y, current_x, in_data = 0;
+    static char *brprefix[2] = {"[ ] ", "[x] "};
+
+    (void) current_x;
 
     w = newwin(y, x, 0, 0);
-    wprintw(w, "%s", disassembled_codes[0]);
+    for(i = disassembled.offset, j = 0; j < y && i < disassembled.max_value; j++, i++){
+	if(isCodeArea(i, pl)){
+	    //set color
+	    if(i == *pc)
+		wattron(w, COLOR_PAIR(2));
+	    else if(i == disassembled.offset)
+		wattron(w, COLOR_PAIR(1));
+	    else
+		wattroff(w, COLOR_PAIR(1));
+	    
+	    wprintw(w, "%s %s", brprefix[(int) breakpoints[i]], disassembled.codes[i]);
+	    getyx(w, current_y, current_x);
+	    wmove(w, current_y +1, 0);
+	    in_data = 0;
+	}
+	else{
+	    if(in_data == 0){
+		wprintw(w, " ");
+		getyx(w, current_y, current_x);
+		wmove(w, current_y +1, 0);
+	    }
+	    else
+		j--;
+	    in_data++;
+	}
+    }
     return w;
 }
 	
@@ -599,9 +691,21 @@ static int len(MYTYPE x){
     return len;
 }
 
-void initScreen(char **disassembled, int length){
+void initScreen(char **disassembled_codes, int length, position_list *poslist, const MYTYPE *program_counter){
+    int i;
 
-    disassembled_codes = disassembled;
+    pl = poslist;
+
+    pc = program_counter;
+
+    disassembled.codes  = disassembled_codes;
+    disassembled.max_value  = length;
+    disassembled.offset = 0;
+
+    //no breakpoints after initialization
+    breakpoints = (char *)malloc(length * sizeof(char));
+    for(i = 0; i < length; i++)
+	breakpoints[i] = 0;
     
     scr = CPU;
     initscr();

@@ -59,7 +59,12 @@ int main(int argc, char **argv){
 	for(i = 1; i < opts->count; i++){
 	    list = modules[i]->usages;
 	    for(; list; list = list->next)
-		list->value += modules[i]->address_constant;
+		/*
+		 * Label usage structure uses WORDS in values
+		 * of addresses but module structure uses BYTES
+		 * so we need to convert the values here!
+		 */
+		list->value += modules[i]->address_constant / sizeof(MYTYPE);
 	}
 
     writeHeader(opts->count, modules, opts->output, opts->debug);

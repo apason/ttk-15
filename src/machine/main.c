@@ -25,7 +25,7 @@ int main(int argc,char *argv[]){
     else if(opts->mode == TTK15){
 	header = readHeader(opts->file);
 
-	//	printHeader(header);
+	printHeader(header);
 
 	limit = (header->usage_start -ftell(opts->file)) / sizeof(MYTYPE);
 	if(opts->memsize < limit) ;//ERROR!
@@ -37,7 +37,7 @@ int main(int argc,char *argv[]){
 	ul = readUsages(opts->file, header->usage_start);
 
 	//debug prints addresses in bytes!
-	//	printUsageList(ul);
+	printUsageList(ul);
 
     }
 
@@ -46,8 +46,10 @@ int main(int argc,char *argv[]){
 	m->regs[7] = m->regs[6];
 
 	if(opts->debug){
-	    char **codes = constructCodes(header->pl, ul, codeLength(header), m->mem);
 	    int len = codeLength(header);
+	    printf("construct condes\n"); fflush(NULL);
+	    char **codes = constructCodes(header->pl, ul, len, m->mem);
+	    printf("out\n"); fflush(NULL);
 	    int i;
 	    (void) i;
 	    (void) codes;
@@ -57,14 +59,14 @@ int main(int argc,char *argv[]){
 	    /* 	printf("%s\n", codes[i]); */
 	    
 	    m->cu->sr |= TFLAG;
-	    initScreen(codes, len);
+	    initScreen(codes, len, header->pl, &m->cu->pc);
 	}
 
 	//options are no longer needed
 	freeOptions(opts);
 
-	//m->cu->sr &= ~TFLAG;
-
+	//	m->cu->sr &= ~TFLAG;
+	printf("starting machine\n"); fflush(NULL);
 	startMachine(m);
     }
     

@@ -17,14 +17,14 @@ typedef struct OPTIONS{
 } options;
 
 typedef struct POSITION_LIST{
-    int code;                       //MYTYPES
-    int data;                       //MYTYPES
+    int code;                       //WORDS
+    int data;                       //WORDS
     struct POSITION_LIST *next;
 }position_list;
 
 typedef struct HEADER{
     position_list *pl;
-    int            usage_start; //in bytes?
+    int            usage_start;     //BYTES
 } header_data;
 
     
@@ -57,9 +57,11 @@ extern int codeLength(header_data *header);
 extern void printHeader(header_data *header);
 extern void printPositionList(position_list *pl);
 extern void printUsageList(usage_list *ul);
+extern int isCodeArea(int i, position_list *pl);
+
 
 //ncurses.c
-extern void initScreen(char **disAssembled, int length);
+extern void initScreen(char **disAssembled, int length, position_list *poslist, const MYTYPE *program_counter);
 extern void drawScreen(machine *m);
 extern MYTYPE readInput(type_param tpar);
 extern void killScreen(void);
