@@ -263,7 +263,7 @@ char **constructCodes(position_list *pl, usage_list *ul, int length, MYTYPE *mem
     for(i = 0; i < length; i++)
 	if(isCodeArea(i, pl)){
 	    code_table[i] = (char *)malloc(MAXLEN * sizeof(char));
-	    disAssemble(mem, code_table[i], ul, i, mem, max_label_length);
+	    disAssemble(mem, code_table[i], ul, i, mem, max_label_length +1);
 	}
 	else
 	    code_table[i] = NULL;
@@ -301,7 +301,7 @@ static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, 
 	sprintf(code_table, "%-*s ", max_label_length, label);
     else
 	sprintf(code_table, "%-*d ", max_label_length, i);
-    sprintf(code_table +LABELLENGTH, "%-7s", dis_asm[opc]);
+    sprintf(code_table +max_label_length, "%-7s", dis_asm[opc]);
     strncat(code_table, reg_table[rj], 3);
     strncat(code_table, mod_table[mode], 2);
     label = getLabelSuffix(i, ul);

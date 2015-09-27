@@ -17,6 +17,7 @@ struct disassembled_data{
     char **codes;
     int offset;
     int max_value;
+    int selected;
 };
 
 /* 
@@ -109,6 +110,7 @@ void drawScreen(machine *m){
     int ch;
     static int start = 1;
     static int to_end = 0;
+    static int bind = 1;
 
     if(to_end)
 	return;
@@ -121,8 +123,6 @@ void drawScreen(machine *m){
 	    start = 0;
     }
 
-    disassembled.offset = *pc;
-    
     drawSelected(m);
     
     //return only if we are in CPU window and enter is pressed
@@ -201,7 +201,7 @@ void drawScreen(machine *m){
 	    break;
 	case ' ':
 	    if(scr == CPU)
-		breakpoints[disassembled.offset] ^= 1;
+		breakpoints[disassembled.selected] ^= 1;
 	    break;
 	default:
 	    ;
@@ -240,15 +240,15 @@ static void nextCRTLine(void){
 }
 
 static void nextDABLine(void){
-    disassembled.offset--;
-    if(disassembled.offset < 0)
-	disassembled.offset = 0;
+    disassembled.selected--;
+    if(disassembled.selected < 0)
+	disassembled.selected = 0;
 }
 
 static void prevDABLine(void){
-    disassembled.offset++;
-    if(disassembled.offset > disassembled.max_value)
-	disassembled.offset = disassembled.max_value;
+    disassembled.selected++;
+    if(disassembled.selected > disassembled.max_value)
+	disassembled.selected = disassembled.max_value;
 }
 
 static int listLength(const struct outputList *l){
@@ -592,6 +592,11 @@ static WINDOW *drawDAB(MYTYPE *memory, int x, int y){
     int i, j, current_y, current_x, in_data = 0;
     static char *brprefix[2] = {"[ ] ", "[x] "};
 
+    if(disassembled.selected <= disassembled.offset)
+	disassembled.offset -= y;
+    if(disassembled.selected >= disassembled.offset +y)
+	disassembled.offset +=y;
+
     (void) current_x;
 
     w = newwin(y, x, 0, 0);
@@ -600,7 +605,7 @@ static WINDOW *drawDAB(MYTYPE *memory, int x, int y){
 	    //set color
 	    if(i == *pc)
 		wattron(w, COLOR_PAIR(2));
-	    else if(i == disassembled.offset)
+	    else if(i == disassembled.selected)
 		wattron(w, COLOR_PAIR(1));
 	    else
 		wattroff(w, COLOR_PAIR(1));
@@ -701,6 +706,7 @@ void initScreen(char **disassembled_codes, int length, position_list *poslist, c
     disassembled.codes  = disassembled_codes;
     disassembled.max_value  = length;
     disassembled.offset = 0;
+    disassembled.selected = 0;
 
     //no breakpoints after initialization
     breakpoints = (char *)malloc(length * sizeof(char));
@@ -710,8 +716,9 @@ void initScreen(char **disassembled_codes, int length, position_list *poslist, c
     scr = CPU;
     initscr();
     start_color();
-    init_pair(1, COLOR_WHITE, COLOR_BLUE);
-    init_pair(2, COLOR_BLUE, COLOR_WHITE);
+    init_pair(1, COLOR_WHITE, COLOR_BLUE);  //default hilight
+    init_pair(2, COLOR_BLUE, COLOR_WHITE);  //default color
+
     attron(COLOR_PAIR(1));
     current_memory_row = 0;
     crt_offset = 0;
