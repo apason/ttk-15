@@ -53,8 +53,8 @@ static void printBin(WINDOW *w, MYTYPE a);
 static int listLength(const struct outputList *l);
 static int notCorrectInput(const char *buffer);
 static WINDOW *drawDAB(MYTYPE *memory, int x, int y);
-static void prevDABLine(void);
-static void nextDABLine(void);
+static void prevDABLine(int *bind);
+static void nextDABLine(int *bind);
 
 static char ra0[] = "R0:";
 static char ra1[] = "R1:";
@@ -123,6 +123,13 @@ void drawScreen(machine *m){
 	    start = 0;
     }
 
+    //adjust selection line to pc
+    if(bind){
+	for(; disassembled.selected < *pc; prevDABLine(&bind));
+	for(; disassembled.selected > *pc; nextDABLine(&bind));
+    }
+    
+
     drawSelected(m);
     
     //return only if we are in CPU window and enter is pressed
@@ -167,7 +174,7 @@ void drawScreen(machine *m){
 	    if(scr == OUT)
 		nextCRTLine();
 	    if(scr == CRT)
-		prevDABLine();
+		prevDABLine(&bind);
 	    break;
 	case KEY_UP:
 	    if(scr == MEM)
@@ -175,7 +182,7 @@ void drawScreen(machine *m){
 	    if(scr == OUT)
 		prevCRTLine();
 	    if(scr == CRT)
-		nextDABLine();
+		nextDABLine(&bind);
 	    break;
 	case KEY_HOME:
 	    if(scr == MEM)
@@ -239,16 +246,24 @@ static void nextCRTLine(void){
 	crt_offset = 0;
 }
 
-static void nextDABLine(void){
+static void nextDABLine(int *bind){
     disassembled.selected--;
     if(disassembled.selected < 0)
 	disassembled.selected = 0;
+    if(disassembled.selected == *pc)
+	*bind = 1;
+    else
+	*bind = 0;
 }
 
-static void prevDABLine(void){
+static void prevDABLine(int *bind){
     disassembled.selected++;
     if(disassembled.selected > disassembled.max_value)
 	disassembled.selected = disassembled.max_value;
+    if(disassembled.selected == *pc)
+	*bind = 1;
+    else
+	*bind = 0;
 }
 
 static int listLength(const struct outputList *l){
@@ -604,9 +619,9 @@ static WINDOW *drawDAB(MYTYPE *memory, int x, int y){
 	if(isCodeArea(i, pl)){
 	    //set color
 	    if(i == *pc)
-		wattron(w, COLOR_PAIR(2));
+		wattron(w, COLOR_PAIR(3));
 	    else if(i == disassembled.selected)
-		wattron(w, COLOR_PAIR(1));
+		wattron(w, COLOR_PAIR(4));
 	    else
 		wattroff(w, COLOR_PAIR(1));
 	    
@@ -718,7 +733,8 @@ void initScreen(char **disassembled_codes, int length, position_list *poslist, c
     start_color();
     init_pair(1, COLOR_WHITE, COLOR_BLUE);  //default hilight
     init_pair(2, COLOR_BLUE, COLOR_WHITE);  //default color
-
+    init_pair(3, COLOR_BLACK, COLOR_RED);   //default pc
+    init_pair(4, COLOR_BLACK, COLOR_GREEN); //default selected
     attron(COLOR_PAIR(1));
     current_memory_row = 0;
     crt_offset = 0;
