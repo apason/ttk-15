@@ -17,6 +17,7 @@ static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, 
 static char *getLabelPrefix(int16_t line, usage_list *ul, int addr, MYTYPE *mem);
 static char *getLabelSuffix(int16_t line, usage_list *ul);
 static void adjustPositionLists(position_list *pl);
+static int isCodeArea(int i, position_list *pl);
 int maxLabelLength(usage_list *ul);
 
 static char *reg_table[] = {"r0,", "r1,", "r2,", "r3,", "r4,", "r5,", "sp,", "fp,"};
@@ -225,20 +226,24 @@ usage_list *readUsages(FILE *fp, int usage_start){
 
 
 /*
- * Retutns the value length of all code + data
+ * Retutns the value length of all code + data(excluding last module)
  * start of usage list - end of header
  * in WORDS
  */
 int codeLength(header_data *header){
-    int i;
+    int i, last_data;
     position_list *pl;
     
     if(header->pl == NULL) return -1;
 
-    for(pl = header->pl, i = 0; pl; pl = pl->next) i += 2;
+    for(pl = header->pl, i = 0; pl; pl = pl->next){
+	i += 2;
+	if(pl->next == NULL)
+	    last_data = header->usage_start / sizeof(MYTYPE) -pl->data;
+    }
 
     //there is 2*n +1 fields in the header
-    return (header->usage_start / sizeof(MYTYPE)) -(i +1);
+    return (header->usage_start / sizeof(MYTYPE)) -(i +1) -last_data;
     
 }
 
@@ -260,7 +265,7 @@ char **constructCodes(position_list *pl, usage_list *ul, int length, MYTYPE *mem
 
     max_label_length = maxLabelLength(ul);
 
-    for(i = 0; i < length; i++)
+    for(i = 0; i <= length; i++)
 	if(isCodeArea(i, pl)){
 	    code_table[i] = (char *)malloc(MAXLEN * sizeof(char));
 	    disAssemble(mem, code_table[i], ul, i, mem, max_label_length +1);
@@ -271,7 +276,7 @@ char **constructCodes(position_list *pl, usage_list *ul, int length, MYTYPE *mem
     return code_table;
 }
 
-int isCodeArea(int i, position_list *pl){
+static int isCodeArea(int i, position_list *pl){
 
     for(; pl; pl = pl->next)
 	if(i >= pl->code && i < pl->data)

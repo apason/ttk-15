@@ -57,8 +57,6 @@ extern int codeLength(header_data *header);
 extern void printHeader(header_data *header);
 extern void printPositionList(position_list *pl);
 extern void printUsageList(usage_list *ul);
-extern int isCodeArea(int i, position_list *pl);
-
 
 //ncurses.c
 extern void initScreen(char **disAssembled, int length, position_list *poslist, const MYTYPE *program_counter);

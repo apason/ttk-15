@@ -1,0 +1,22 @@
+navigation keys allways moves just selection
+	   selection is adjusted with pc
+	   	     selection is allways in code area assuming the program is written correctly
+
+offset is adjusted with selection
+       what if offset goes to data area? -it does not because of whiles in beginning of drawdab()
+
+system fucks up if pc goes to data area!
+       why?
+
+max_value is allways in code or data area. not in stack.
+	  allways in data area!
+
+system will crash if pc flows to data area in the last module?
+       it does not. codeLength() return value includes all code + data
+       	  so it only crashes when pc flows to stack area.
+       yes it does. len does no longer include the last data
+
+duplicate of isCodeArea? disassembled.codes == NULL if its in data. ???
+
+
+what if pc flows to stack. what happens to breakpoints array? probably segfault?

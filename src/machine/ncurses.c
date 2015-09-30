@@ -28,6 +28,7 @@ enum type { BIN = 32, HEX = 8, DEC = 11, EXP = 13 };
 //current screen tab to draw
 enum screentab { CPU, MEM, OUT };
 
+static int isCodeArea(int line);
 static void drawSelected(const machine *m);
 static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, int x, char **arr, int size);
 static WINDOW *drawMYTYPEF(MYTYPEF *addr, int elems, enum type current, int x, char **arr, int size);
@@ -250,6 +251,10 @@ static void nextDABLine(int *bind){
     disassembled.selected--;
     if(disassembled.selected < 0)
 	disassembled.selected = 0;
+    
+    //data addresses cannot be selected!
+    for(; isCodeArea(disassembled.selected) == 0; disassembled.selected--);
+    
     if(disassembled.selected == *pc)
 	*bind = 1;
     else
@@ -260,6 +265,10 @@ static void prevDABLine(int *bind){
     disassembled.selected++;
     if(disassembled.selected > disassembled.max_value)
 	disassembled.selected = disassembled.max_value;
+
+    //data address cannot be selected!
+    for(; isCodeArea(disassembled.selected) == 0; disassembled.selected++);
+
     if(disassembled.selected == *pc)
 	*bind = 1;
     else
@@ -601,22 +610,36 @@ static WINDOW *drawMYTYPE(MYTYPE *addr, int elems, int x, char *arr[], int size)
 
     return w;
 }
-
+//what if disassembled.offset happens to be in data area?
 static WINDOW *drawDAB(MYTYPE *memory, int x, int y){
     WINDOW *w;
     int i, j, current_y, current_x, in_data = 0;
     static char *brprefix[2] = {"[ ] ", "[x] "};
-
-    if(disassembled.selected <= disassembled.offset)
-	disassembled.offset -= y;
-    if(disassembled.selected >= disassembled.offset +y)
-	disassembled.offset +=y;
-
+    
     (void) current_x;
 
     w = newwin(y, x, 0, 0);
-    for(i = disassembled.offset, j = 0; j < y && i < disassembled.max_value; j++, i++){
-	if(isCodeArea(i, pl)){
+
+    /*
+     * adjust offset to corrsepond selection. 
+     * selection should allways been visible.
+     */
+    while(disassembled.selected < disassembled.offset){
+	disassembled.offset -=y;
+	if(disassembled.offset < 0)
+	    disassembled.offset = 0;
+	for(; isCodeArea(disassembled.offset) == 0; disassembled.offset--);
+    }
+    while(disassembled.selected > disassembled.offset +y){
+	disassembled.offset +=y;
+	if(disassembled.offset > disassembled.max_value -y)
+	    disassembled.offset = disassembled.max_value -y;
+	for(; isCodeArea(disassembled.offset) == 0; disassembled.offset++);
+    }    
+
+
+    for(i = disassembled.offset, j = 0; j < y && i <= disassembled.max_value; j++, i++){
+	if(isCodeArea(i)){
 	    //set color
 	    if(i == *pc)
 		wattron(w, COLOR_PAIR(3));
@@ -719,7 +742,7 @@ void initScreen(char **disassembled_codes, int length, position_list *poslist, c
     pc = program_counter;
 
     disassembled.codes  = disassembled_codes;
-    disassembled.max_value  = length;
+    disassembled.max_value  = length -1;
     disassembled.offset = 0;
     disassembled.selected = 0;
 
@@ -927,4 +950,12 @@ static int notCorrectInput(const char *buffer){
 	    return -1;
 
     return 0;
+}
+
+//error check for i is outside of bounds
+static int isCodeArea(int line){
+    if(disassembled.codes[line] == NULL)
+	return 0;
+    else
+	return 1;
 }
