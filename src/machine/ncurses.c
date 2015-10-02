@@ -655,6 +655,8 @@ static WINDOW *drawDAB(MYTYPE *memory, int x, int y){
 	}
 	else{
 	    if(in_data == 0){
+		wattroff(w, COLOR_PAIR(3));
+		wattroff(w, COLOR_PAIR(4));
 		wprintw(w, " ");
 		getyx(w, current_y, current_x);
 		wmove(w, current_y +1, 0);
