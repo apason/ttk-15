@@ -245,9 +245,13 @@ int getAddress(char* argument, code_file* file, uint8_t *firstByte, int *isItFlo
         if (temp == NULL) {
             // Didn't find label so added to the list of external symbols
             temp = file->symbolList;
-            while (temp->next != NULL) temp = temp->next;
-            temp->next = (label_list*)malloc(sizeof(label_list));
-            temp = temp->next;
+            if (temp != NULL) {
+                while (temp->next != NULL) temp = temp->next;
+                temp->next = (label_list*)malloc(sizeof(label_list));
+                temp = temp->next;
+            } else {
+                temp = (label_list*)malloc(sizeof(label_list));
+            }
             temp->next = NULL;
             // zero the label char array
             memset(temp->label,0,sizeof(temp->label));

@@ -19,6 +19,12 @@ static void print_error(int error, int line);
 
 // this is a function to be used outside this file
 int readCodeFile(code_file* file, int debug) {
+    if (file == NULL) {
+        fprintf(stderr, "Invalid filestruct \n");
+        return -1;
+    }
+    file->usageList = NULL;
+    file->symbolList = NULL;
     FILE* fh = fopen(file->name,"r");
     if (fh == NULL) {
         fprintf(stderr, "Error opening file: %s\n",file->name);
@@ -164,12 +170,15 @@ int writeCodeFile(code_file* file) {
 
         val[0] = '\0';
         char trash[MAX];
+        *word = *label = *val = '\0';
         if (sscanf(file->array[i], "%s %s %s", label, word, val) < 2) {
             fprintf(stderr,"Error reading line: %d\n",file->code_text[cInstructions]);//error
             fprintf(stderr,"\t\"%s\"\n",file->array[i]);
         }
-        if (!strncmp(label, "export", LABELLENGTH))
+        if (!strncmp(label, "export", LABELLENGTH)) {
+            *word = *label = *val = '\0';
             sscanf(file->array[i], "%s %s %s %s", trash, label, word, val);
+        }
 
         if (!isInstruction(label) && isInstruction(word)) {
             error = writeInstruction(word,val,file, cInstructions);
