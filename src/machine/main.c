@@ -25,7 +25,7 @@ int main(int argc,char *argv[]){
     else if(opts->mode == TTK15){
 	header = readHeader(opts->file);
 
-	printHeader(header);
+	//printHeader(header);
 
 	limit = (header->usage_start -ftell(opts->file)) / sizeof(MYTYPE);
 	if(opts->memsize < limit) ;//ERROR!
@@ -37,7 +37,7 @@ int main(int argc,char *argv[]){
 	ul = readUsages(opts->file, header->usage_start);
 
 	//debug prints addresses in bytes!
-	printUsageList(ul);
+	//printUsageList(ul);
 
     }
 
@@ -66,7 +66,6 @@ int main(int argc,char *argv[]){
 	freeOptions(opts);
 
 	//	m->cu->sr &= ~TFLAG;
-	printf("starting machine\n"); fflush(NULL);
 	startMachine(m);
     }
     

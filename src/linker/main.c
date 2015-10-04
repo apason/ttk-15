@@ -50,8 +50,8 @@ int main(int argc, char **argv){
 	modules[i]->address_constant = modules[i -1]->linked_size \
 	    +modules[i -1]->address_constant;
 
-    for(i=0;i<opts->count;i++)
-    	printModule(modules[i]);
+    /* for(i=0;i<opts->count;i++) */
+    /* 	printModule(modules[i]); */
 
 
     //adjust label values in usage table
