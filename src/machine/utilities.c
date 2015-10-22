@@ -133,22 +133,43 @@ header_data *readHeader(FILE *fp){
     position_list *pl = NULL;
     header_data *header = (header_data *)malloc(sizeof(header_data));
 
-    fread(&header_end, sizeof(MYTYPE), 1, fp); //check return value for error!
+    //Error. too small header. (less then one word)
+    if(fread(&header_end, sizeof(MYTYPE), 1, fp) != 1){
+	printf("1");
+	free(header);
+	return NULL;
+    }
+
+    //Error. incorrect binary file
+    //NOTE. header_end can be negative value!
+    if((header_end >= 0 ? header_end : -header_end) % sizeof(MYTYPE) != 0){
+	printf("end: %d\t", header_end);
+	free(header);
+	return NULL;
+    }
 
     //if there is no additional debug data ( -g not used)
-    if((header_end / sizeof(MYTYPE) -1) / 2 <= 0){ //if header_end == 4
+    if(header_end < 0){
 	header->pl = NULL;
 	header->usage_start = -1;
 	return header;
     }
 
+    //-g used. check header size. header_end can not be a negative number
+    fseek(fp, 0, SEEK_END);
+    if(ftell(fp) < header_end){
+	printf("3");
+	free(header);
+	return NULL;
+    }
+    
+    //start from beginning
     fseek(fp, 0, SEEK_SET);
 
     pl = (position_list *)malloc(sizeof(position_list));
     header->pl = pl;
     
-    //read that many pairs of (code_start, data_start)
-    
+    //read n -1 pairs of (code_start, data_start)
     for(i = 0; i < (header_end / sizeof(MYTYPE) -3) / 2; i++){
 	
 	fread(&pl->code, sizeof(MYTYPE), 1, fp);
@@ -162,7 +183,8 @@ header_data *readHeader(FILE *fp){
     }
 
     pl->next = NULL;
-    
+
+    //read the last modules code and data
     fread(&pl->code, sizeof(MYTYPE), 1, fp);
     fread(&pl->data, sizeof(MYTYPE), 1, fp);
 
@@ -230,11 +252,20 @@ usage_list *readUsages(FILE *fp, int usage_start){
  * start of usage list - end of header
  * in WORDS
  */
-int codeLength(header_data *header){
-    int i, last_data;
+int codeLength(header_data *header, FILE *fp){
+    int i, last_data, ret;
     position_list *pl;
-    
-    if(header->pl == NULL) return -1;
+
+    /*
+     * if modules were linked without debug flag
+     * there is counter value of the last code line
+     * address in the first word.
+     */
+    if(header->pl == NULL){
+	fseek(fp, 0, SEEK_SET);
+	fread(&ret, sizeof(MYTYPE), 1, fp);
+	return -ret;
+    }
 
     for(pl = header->pl, i = 0; pl; pl = pl->next){
 	i += 2;
@@ -248,6 +279,10 @@ int codeLength(header_data *header){
 }
 
 static void adjustPositionLists(position_list *pl){
+
+    //not linked with -g
+    if(!pl) return;
+    
     int address_constant = pl->code;
 
     for(; pl; pl = pl->next){
@@ -259,12 +294,13 @@ static void adjustPositionLists(position_list *pl){
 char **constructCodes(position_list *pl, usage_list *ul, int length, MYTYPE *mem){
     int i, max_label_length;
     char **code_table = (char **)malloc(length * sizeof(char*));
-
+        printf("asd"); fflush(NULL);
     adjustPositionLists(pl);
+        printf("asd"); fflush(NULL);
     printPositionList(pl); fflush(NULL);
-
+    printf("asd"); fflush(NULL);
     max_label_length = maxLabelLength(ul);
-
+    printf("asd"); fflush(NULL);
     for(i = 0; i <= length; i++)
 	if(isCodeArea(i, pl)){
 	    code_table[i] = (char *)malloc(MAXLEN * sizeof(char));
@@ -277,6 +313,10 @@ char **constructCodes(position_list *pl, usage_list *ul, int length, MYTYPE *mem
 }
 
 static int isCodeArea(int i, position_list *pl){
+
+    //if pl is null we dont know about code and data areas so disassemble all of them
+    if(pl == NULL)
+	return 1;
 
     for(; pl; pl = pl->next)
 	if(i >= pl->code && i < pl->data)
@@ -306,17 +346,25 @@ static void disAssemble(const MYTYPE *source, char *code_table, usage_list *ul, 
 	sprintf(code_table, "%-*s ", max_label_length, label);
     else
 	sprintf(code_table, "%-*d ", max_label_length, i);
-    sprintf(code_table +max_label_length, "%-7s", dis_asm[opc]);
+    printf("%d\n", opc); fflush(NULL);
+    opc = opc <= 166 ? opc : 10; // set to unknown
+    printf("%d", opc); fflush(NULL);
+    sprintf(code_table +max_label_length, "%-7s", dis_asm[opc] != NULL ? dis_asm[opc] : " ");
+
+    //ERROR. same problem here!!!
     strncat(code_table, reg_table[rj], 3);
-    strncat(code_table, mod_table[mode], 2);
-    label = getLabelSuffix(i, ul);
     
+    strncat(code_table, mod_table[mode], 2);
+
+    label = getLabelSuffix(i, ul);
+
     if(label)
 	strncat(code_table, label, 33);
     else
 	sprintf(code_table +strlen(code_table), "%d", addr);
 
     strncat(code_table, ind_table[ri], 5);
+
 
 }
 
@@ -376,4 +424,45 @@ int maxLabelLength(usage_list *ul){
 	max = strlen(ul->label) > max ? strlen(ul->label) : max;
 
     return max;
+}
+
+/*
+ * this function checks that values in header are in possible order.
+ * that means data block of a module is allways after the corresponding
+ * code block. Also values from first module should be before the values
+ * of the second module etc. Usage start should locate after all data
+ * and code blocks.
+ *
+ * Size of the binary should be bigger or equal to usage start
+ *
+ * returns 1 if above conditions are true, 0 otherwise.
+ *
+ */
+int checkHeaderIntegrityAndFileSize(header_data *header, FILE *fp){
+    MYTYPE last_data = 0;
+    position_list *pl = header->pl;
+    size_t tmp;
+
+    //linked without -g
+    if(header->usage_start == -1)
+	return 1;
+    
+    for(; pl; pl = pl->next){
+	if(pl->code < 0 || pl->data < 0 || \
+	   pl->code > pl->data || pl->code < last_data)
+	    return 0;
+
+	last_data = pl->data;
+    }
+
+    tmp = ftell(fp);
+    fseek(fp, 0, SEEK_END);
+
+    //this is ok because the binari is linked with -g. (usage start > 0)
+    if(ftell(fp) < header->usage_start)
+	return 0;
+
+    fseek(fp, tmp, SEEK_SET);
+
+    return 1;
 }

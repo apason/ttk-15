@@ -53,10 +53,11 @@ extern void freeMachine(machine *m);
 extern header_data *readHeader(FILE *fp);
 extern usage_list *readUsages(FILE *fp, int usage_start);
 extern char **constructCodes(position_list *pl, usage_list *ul, int length, MYTYPE *mem);
-extern int codeLength(header_data *header);
+extern int codeLength(header_data *header, FILE *fp);
 extern void printHeader(header_data *header);
 extern void printPositionList(position_list *pl);
 extern void printUsageList(usage_list *ul);
+extern int checkHeaderIntegrityAndFileSize(header_data *header, FILE *fp);
 
 //ncurses.c
 extern void initScreen(char **disAssembled, int length, position_list *poslist, const MYTYPE *program_counter);

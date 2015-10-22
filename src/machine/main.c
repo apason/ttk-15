@@ -23,9 +23,18 @@ int main(int argc,char *argv[]){
 	m->regs[6] = (MYTYPE) loadFile91(m->mem, opts->file, opts->memsize);
 
     else if(opts->mode == TTK15){
-	header = readHeader(opts->file);
+	//read header and check for errors
+	if((header = readHeader(opts->file)) == NULL)
+	    return -1;
 
-	//printHeader(header);
+	//check file size.
+	if(checkHeaderIntegrityAndFileSize(header, opts->file) == 0){
+	    //free memory!
+	    return -1;
+	}
+
+	printHeader(header);
+	fflush(NULL);
 
 	limit = (header->usage_start -ftell(opts->file)) / sizeof(MYTYPE);
 	if(opts->memsize < limit) ;//ERROR!
@@ -37,16 +46,21 @@ int main(int argc,char *argv[]){
 	ul = readUsages(opts->file, header->usage_start);
 
 	//debug prints addresses in bytes!
-	//printUsageList(ul);
+	printUsageList(ul);
 
     }
-
+    else                                                      //this should not happen
+	return -1;
+    
+    fflush(NULL);
     //otherwise error occured
     if(m->regs[6] > 0){
 	m->regs[7] = m->regs[6];
 
 	if(opts->debug){
-	    int len = codeLength(header);
+
+	    int len = codeLength(header, opts->file);
+	    
 	    printf("construct condes\n"); fflush(NULL);
 	    char **codes = constructCodes(header->pl, ul, len, m->mem);
 	    printf("out\n"); fflush(NULL);

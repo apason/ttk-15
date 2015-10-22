@@ -41,7 +41,7 @@ labels are valued from -1 to down.
 
 ##structure##
 
-                    | start of code |  data start   | import start  | label usage start
+                    | start of data |  import start | export start  | label usage start
                     +---------------+---------------+---------------+---------------+
 +--------------+    | 32bit integer | 32bit integer | 32bit integer | 32bit integer |
 | header       | -> +---------------+---------------+---------------+---------------+
@@ -62,12 +62,22 @@ labels are valued from -1 to down.
 #TODO binary file structure
 
 ##binary header##
-Length of the header is always present, but data block starts for modules is only present if the file is linked with the debug flag.
+If the object modules are linked without debug flag the binary header only contains one field. That field contains the counter value
+of the last code line address in memory. The address is converted to negative so that machine loader knows the size of the header is 1 word.
 
-                |                  optional                         |
++----------------------------------------+
+|-last code address when binary is loaded|
++----------------------------------------+
+
+if the object modules are linked with debug flag, then the binary header contains more information.
+There is 2 fields for each linked object module. Those fields contains values of code_start and
+data_start for each module. After code and data pointers there is one value more. It is the value
+of usage list start. So there is overall 2n +1 fields in header (n is the amount of linked modules)
+
 +---------------+---------------+---------------+-----+-------------+
 | code[1] start | data[1] start | code[2] start | ... | usage start |
 +---------------+---------------+---------------+-----+-------------+
+
 Every field in the header is one machine word (32bit integer)
 
 ##compiling in debug mode##
@@ -81,3 +91,12 @@ Every field in the header is one machine word (32bit integer)
 ##linking in debug mode##
     * the debug label tables in the object files are updated with module constants and placed all together in the end of the finished binary file
     * in debug mode starts and ends of the data area in modules are also placed in the header of the binary file
+
+##summary##
++----------------+
+|header          | -> Can be one filed "normal" header or longer -g header.
++----------------+
+|code and data   | -> code and data areas of each module. This part of binary file is loaded to machines memory
++----------------+
+|label usage list| -> only when linked with -g
++----------------+

@@ -92,6 +92,10 @@ int main(int argc, char **argv){
     return 0;
 }
 
+/*
+ * NOTE! We need to use bytes here because sizes in the module struct
+ * is also in bytes
+ */
 static void writeHeader(int count, module **modules, FILE *fp, int debug){
     MYTYPE header_size;
     MYTYPE codesize;
@@ -99,7 +103,13 @@ static void writeHeader(int count, module **modules, FILE *fp, int debug){
     int i;
 
     if(debug == 0){
-	tmp = 4;
+	module *tmpmod = modules[count -1];
+	//size of code area in WORDS
+	int code_size = (tmpmod->data_start -CODESTART) / 5;
+
+	//last code line in BYTES!
+	printf("%d", code_size * 4 + tmpmod->address_constant);
+	tmp = -(code_size * 4 + tmpmod->address_constant);
 	fwrite(&tmp, sizeof(MYTYPE), 1, fp);
 	return;
     }

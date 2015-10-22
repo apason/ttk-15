@@ -20,3 +20,7 @@ duplicate of isCodeArea? disassembled.codes == NULL if its in data. ???
 
 
 what if pc flows to stack. what happens to breakpoints array? probably segfault?
+
+infinite loop if pc flows to data area of from the last module
+
+linking without -g causes headers first word to be counter number of last code line!!!

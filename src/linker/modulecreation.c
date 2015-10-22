@@ -16,7 +16,12 @@ static label_list *readSymbols(module *mod, int start, int end);
 static module *readModule(FILE *fp, char *filename);
 static void readLabelUsages(module *mod);
 
-//create all modules determined by argv
+/*
+ * create all modules determined by argv
+ * after this function there is all fields filled in 
+ * module struct except for address_constant. This field
+ * could not be calculated before all modules are created
+ */
 void createModules(int n, char **argv, module **modules, int debug){
     FILE *fp = NULL;
     int   i  = 0;
