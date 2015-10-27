@@ -312,16 +312,16 @@ static int writeInstruction(char* word,char* val,code_file* file, int line) {
         // get index register
         if ((ireg = getIndexRegister(argument)) < 0)
             return INVALIDIREG;
+        // check if opcode is STORE and make it compatible if we use ttk-91
+        if (( opCode == STORE || (opCode >= JUMP && opCode <= CALL)) && !ttk_15) {
+            if (--mode < 0)
+                return INVALIDMODE;
+        }
         // if we have two arguments, first one has to be a register
         if (nargs == 2) {
             // Get first argument which is a register
             if ((reg = getRegister(val, 1)) < 0)
                 return INVALIDREG;
-            // check if opcode is STORE and make it compatible if we use ttk-91
-            if (( opCode == STORE || (opCode >= JUMP && opCode <= CALL)) && !ttk_15) {
-                if (--mode < 0)
-                    return INVALIDMODE;
-            }
         }
         // If the second argument is also a register it's used as an index register
         // otherwise it actually is the first argument
