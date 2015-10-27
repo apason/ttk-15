@@ -216,7 +216,7 @@ FUNCTION(jump){
 }
 
 FUNCTION(jneg){
-    if(m->regs[rj] > 0)
+    if(m->regs[rj] < 0)
 	m->cu->pc = m->cu->tr;
 }
 
