@@ -9,9 +9,9 @@ int main (int argc, char* argv[]) {
 
     options *opts = getOptions(argc,argv);
     int debug = (opts->debug == ON);
-    //options now includes information of mode int opts->mode
-    //outputfile in opts->output and number of files to compile
-    //opts->count. source files are in end of argv as 
+    //options now includes information of mode (int) in opts->mode
+    //outputfile in opts->output and number of files to compile in
+    //opts->count. source files are at the end of argv as 
     //note. output file is already open!
     //SO. source files are argv[argc -opts->count] to argv[argc -1]
 
@@ -23,7 +23,8 @@ int main (int argc, char* argv[]) {
 
 
         FILE* output = *output_list++;
-        // we need this to delete the output file if there is an error
+
+        // we need the name for the output file to delete it if there is an error
         char *output_name = *output_name_list++;
         strcpy(strrchr(output_name,'.'),".o15");
 
@@ -31,24 +32,29 @@ int main (int argc, char* argv[]) {
         // and set the code_file struct to hold the filehandle and output name
         code_file codeFile;
         codeFile.name = argv[n];
+        // the mode also tells whether we are in debug mode or not
         codeFile.mode = TTK91 | (debug << 2);
         codeFile.fh_out = output++;
 
-        // read the file into the struct
+        // read lines of the source file into the struct
         if (readCodeFile(&codeFile, debug) < 0) {
             unlink(output_name);
             continue;
         }
+        // change mode to ttk-15 if the source file ends in .k15
+        // and options didn't say otherwise
         char* suffix = strrchr(argv[n], '.');
         if (opts->mode == UNDEFINED && suffix != NULL) {
             if (!strncmp(suffix,".k15",5))
             codeFile.mode = TTK15 | (debug << 2);
-        } else
+        } else if (opts->mode != UNDEFINED) {
             codeFile.mode = opts->mode | (debug << 2);
+        }
 
 
         // calculate code size and create the symbol table
         if (buildModule(&codeFile) < 0) {
+            // failed to build module so skip this file
             freeCodeFile(&codeFile);
             unlink(output_name);
             continue;
@@ -65,6 +71,7 @@ int main (int argc, char* argv[]) {
         }
 
         if (debug) {
+            // these are just printouts for debug mode
             const char* mode[4] = {
                 "NO_LABEL", "LOCAL",
                 "IMPORT", "EXPORT" };
@@ -75,6 +82,7 @@ int main (int argc, char* argv[]) {
                 printf("%s : %0x : %d : %d : %s\n",temp->label, (uint16_t)temp->address, temp->size, temp->value, mode[temp->mode]);
                 temp = temp->next;
             }
+            // print label usage table
             printf("Label locations:\n");
             usage_list* utemp = codeFile.usageList;
             while (utemp != NULL) {
@@ -86,12 +94,16 @@ int main (int argc, char* argv[]) {
         freeCodeFile(&codeFile);
     }
     
-    // invoke linker now
+    // now all files should be compiled
+    // default behaviour is to compile and link
+    // it is time to link the files
     if (!opts->nolink) {
         output_name_list = opts->filenames;
         int currentsize = 60;
         char *linkercall = (char*)malloc(sizeof(char) * currentsize);
         *linkercall = '\0';
+        // if we have called compiler in the current directory
+        // we should call linker in the current directory too
         if (strncmp(argv[0], "./", 2) == 0) {
             strcpy(linkercall,"./");
         }
