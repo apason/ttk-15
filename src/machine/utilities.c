@@ -21,7 +21,7 @@ static int isCodeArea(int i, position_list *pl);
 int maxLabelLength(usage_list *ul);
 
 static char *reg_table[] = {"r0,", "r1,", "r2,", "r3,", "r4,", "r5,", "sp,", "fp,"};
-static char *mod_table[] = {" =", " ", " @"};
+static char *mod_table[] = {" =", " ", " @", " ?"};
 static char *ind_table[] = {" ", "(r1)", "(r2)", "(r3)", "(r4)", "(r5)", "(sp)", "(fp)"};
 
 
