@@ -27,3 +27,4 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
 
 ##known issues##
  * linkkeri ei toimi moduuleilla, joissa on pelkkä data-alue
+ * masiinan ncurses ei suljeta oikein virhetilanteissa => terminaali hyytyy
