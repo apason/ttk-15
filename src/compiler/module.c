@@ -20,6 +20,7 @@ int buildModule(code_file* file){
     label_node->size = 0;
     label_node->label[0] = '\0';
     label_node->next = NULL;
+    label_node->address = 0;
 
     for(i = 0; i < file->lines; i++){
         sscanf(code[i], "%s %s", word, val);

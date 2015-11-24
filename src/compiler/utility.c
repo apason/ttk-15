@@ -231,7 +231,7 @@ int getAddress(char* argument, code_file* file, uint8_t *firstByte, int *isItFlo
         int16_t index = -1;
         while(temp != NULL) {
             // when label is found it's address is replaced in the instruction
-            if (!strncmp(temp->label,argument,strlen(argument))) {
+            if (!strncmp(temp->label,argument,LABELLENGTH)) {
                 addr = temp->address;
                 // make sure equ are not treated as labels
                 if (temp->size < 0) *firstByte = NO_LABEL;
