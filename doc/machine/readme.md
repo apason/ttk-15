@@ -1,6 +1,6 @@
 #ttk-15#
 
-ttk-15 machine is for running ttk-15 or ttk-91(titokones format) binaries
+ttk-15 machine is for running ttk-15 or ttk-91(titokone's format) binaries
 
 ##usage##
 
@@ -113,7 +113,7 @@ NOTE! register r0 can not be used as index register! (when r0 is used as index
 register, it behaves like theres 0 in it. (r0 is not zeroed, it just behaves
 like that)
 
-NOTE! In low level calculation of second operand ALLWAYS works like this!
+NOTE! In low level calculation of second operand ALWAYS works like this!
 See notes in compilers readme!
 
 instructions are: (second column is value in hexadecimal)
@@ -161,7 +161,7 @@ jump and compare operations
 
 other operations
 
- * CALL      31	  call sub routine in addr.
+ * CALL      31	  call subroutine in addr.
  * EXIT      32	  exits from subroutine
  * PUSH      33	  push addr to stack pointed by ri
  * POP       34	  pop value from stack pointed by ri to rj

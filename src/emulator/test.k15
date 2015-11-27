@@ -1,0 +1,25 @@
+x dc 65
+load r1,=0
+loop load r2,r1
+    add r2,=48
+    store r2,=x
+    call sp,=print_number
+    add r1,=1
+    comp r1,=10
+    jles =loop
+svc sp,=halt
+
+print_number push r1
+        push r2
+        push r3
+        push r4
+        load r1,=4
+        load r2,=1
+        load r3,=x
+        load r4,=1
+        svc sp,=128
+        pop r4
+        pop r3
+        pop r2
+        pop r1
+        exit sp,=0
