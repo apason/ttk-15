@@ -1,0 +1,7 @@
+; int to float
+; parameter and result in r1
+inttofloat push sp,r2
+    ;; TODO
+
+    pop sp,r2
+    exit sp,=0
