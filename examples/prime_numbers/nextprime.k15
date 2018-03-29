@@ -1,7 +1,7 @@
 ; count next prime into stack
 ; takes argument in r1
 ; needs sqrt function!!
-nextprime push sp,r5
+export nextprime push sp,r5
 push sp,r4
 push sp,r3
 push sp,r2

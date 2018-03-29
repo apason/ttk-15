@@ -1,7 +1,7 @@
 ; squareroot with newtonian
 ; takes argument in r1
 ; stores result in r1
-sqrt push sp,r4
+export sqrt push sp,r4
 	push sp,r2
 	push sp,r0
 	load r2,=1
