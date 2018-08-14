@@ -35,7 +35,7 @@ be run in machine.
  * Speed. Because ttk-15 is written in C it is much faster than original titokone
  * text mode. It is possible to run ttk-15 without any graphical elements, so it
  can be used without X11. In that way computation is much faster.
- * ncurses debugger. As titokone includes spring? based user interface, the ttk-15
+ * ncurses debugger. As titokone includes swing? based user interface, the ttk-15
  has ncurses based debugger. It is easy and intuitive to use and it can show data
  in decimal, hexadecimal or binary format.
  * Few new flags to state register: halt flag (for power of the processor)
