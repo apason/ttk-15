@@ -1,7 +1,7 @@
-# ttk-15 #
+# ttk-15
 ttk-15 on ttk-91 klooni pienillä muutoksilla
 
-##v0.4 valmiina##
+## v0.4 valmiina
   * objekti- ja ajomoduuleille uusi rakenne.
     + ajomoduuliin headeri
     + debug moodissa compileriin kaikkien labelien paikat
@@ -10,11 +10,11 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
     + neljäs sana objektimoduulin headeriin
  * "wrapper" skripti tms joka kapseloi linkkerin ja kääntäjän (ehkä masiinan?)
 
-##v0.4 backlog##
+## v0.4 backlog
  * breakpointit compileriin ja debuggeriin.
  * GUI 
 
-## backlog ##
+## backlog
  * testaa titokoneessa nollalla jakaminen ym. keskeytykset
  * konekäskyt state registerin tutkimiseen
  * keskeytykset!
@@ -25,7 +25,7 @@ ttk-15 on ttk-91 klooni pienillä muutoksilla
  * Windows compatibility
  * PHP + cli web interface
 
-##known issues##
+## known issues
  * linkkeri ei toimi moduuleilla, joissa on pelkkä data-alue
  * masiinan ncurses ei suljeta oikein virhetilanteissa => terminaali hyytyy
  * masiina tarkistaa mul-käskyn overflowin jakolaskulla ja siitä johtuen jakaa nollalla, mikäli kertolaskun ensimmäinen operandi on 0

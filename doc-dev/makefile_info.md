@@ -1,4 +1,4 @@
-#root makefile#
+# root makefile
 
 The makefile in the project root works calling other makefiles. Machine, linker and compiler makefiles has
 common sections: normal compilation, clean and clobber.

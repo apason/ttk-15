@@ -1,4 +1,4 @@
-#ttk-15 project#
+# ttk-15 project 
 
 ttk-15 is general register machine, fully (backward) compatible with ttk-91.
 At this point, ttk-15 project consists of 3 parts.
@@ -7,24 +7,24 @@ At this point, ttk-15 project consists of 3 parts.
  * compiler
  * linker
 
-##machine##
+## machine
 
 machine is emulator of our 32 bit register machine written in C.
 It can run ttk-91 (titokones format) or ttk-15 binary files.
 
-##compiler##
+## compiler
 
 compiler is for compiling ttk-91 and ttk-15 source code to ttk-15 binary.
 That means object modules compiled with our compiler can not be run in other
 ttk-91 machines! (e.g. titokone) It creates .o15 object modules that contains
 compiled instructions, data area and symbol tables (import and export).
 
-##linker##
+## linker
 
 linker links one or more .o15 object modules to executable .b15 file which can
 be run in machine.
 
-##differencies between ttk-91 and titokone##
+## differencies between ttk-91 and titokone
  * Support of unlimited amount of object modules and linking. Object modules
  has import and export tables so this feature also enables global/local variables
  (labels) and makes programming easier.
@@ -47,7 +47,7 @@ be run in machine.
  * ttk-15 does not support READ, WRITE, TIME, and DATE svc:s yet. 
 
 
-##coming up##
+## coming up
 ttk-15 is still in under development. We are planned at least following things to next versions:
  * Graphical user interface and debugger (gtk, qt or both)
  * Implementation of breakpoints to debugger so debugging will be much easier.
@@ -69,7 +69,7 @@ For more information please read documentation in doc/ folder. We are willing to
 help if issues araise. You can contact us from issues section on github or
 directly to email. We are also grateful for any bug report or improvement idea.
 
-###authors###
+### authors
 
 Arttu Kilpinen - apason
 arttu.kilpinen@helsinki.fi
