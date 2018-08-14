@@ -1,8 +1,8 @@
-#ttk-15#
+# ttk-15
 
 ttk-15 machine is for running ttk-15 or ttk-91(titokone's format) binaries
 
-##usage##
+## usage
 
 To run .b15 or .b91 binary file start the machin from CLI with following syntax:
 
@@ -12,7 +12,7 @@ NOTE! File and options can be in any order!
 
 NOTE! All options are optional so ./ttk-15 tito.b91 works just fine
 
-###options###
+### options
 
 -m mode , where mode is either "b91" or "b15" specifies mode of binary.
 if there is no mode option, ttk-15 will define mode from file suffix.
@@ -30,7 +30,7 @@ for more information.
 -M memsize , where memsize is memory size reserved for machine. Size is
 declared in machine words (32bits) default value is 512
 
-###examples###
+### examples
 
 ./ttk-15 -m b91 foobar
 execute file "foobar" (treated as b91 file)
@@ -52,14 +52,14 @@ output to stdout and reads (instruction IN) from stdin.
 NOTE! When using -g with ncurses enabled, machine does print and read
 from that ncurses window and stdio and stdout is not used
 
-##specifications##
+## specifications
 ttk-15 is 32bit general register machine. File src/include/ttk-15.h gives
 good view about its structure. 
 
 It has 8 registers of which first 6 are general work registers, 7th is stack
 pointer and 8th is frame pointer.
 
-###state register###
+### state register
 
 State register is inside of machines control unit. It is also 32 bit register
 although only 11 most significant bits are used (at this point). Bits are from

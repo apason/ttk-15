@@ -1,8 +1,8 @@
-#linker#
+# linker
 
 linker is for linking ttk-15 object modules (.o15) to ttk-15 executable (.b15)
 
-##usage##
+## usage
 
 Just run linker with object modules as parameters:
 
@@ -16,7 +16,7 @@ Optionally one can use -o flag to determine output file:
 
 modules and output flag can be in any order
 
-##notes##
+## notes
 
  * One and only one of modules must contain label "main". That module will be
  linked first and program will start from code block (start of code block! not from main label!)

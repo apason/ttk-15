@@ -1,4 +1,4 @@
-#building#
+# building 
 There is makefile in the project root. To build just run that makefile with some gnu make compatible building software. (with gnu make just type "make" in the project root).
 When build is done, binaries can be found in target/ directory.
 
