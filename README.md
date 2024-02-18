@@ -3,9 +3,9 @@
 ttk-15 is general register machine, fully (backward) compatible with ttk-91.
 At this point, ttk-15 project consists of 3 parts.
 
- * machine
- * compiler
- * linker
+ * machine  (Arttu)
+ * compiler (Hiski)
+ * linker   (Arttu)
 
 ## machine
 
@@ -48,7 +48,8 @@ be run in machine.
 
 
 ## coming up
-ttk-15 is still in under development. We are planned at least following things to next versions:
+This project is discontinued.
+~~ ttk-15 is still in under development. We are planned at least following things to next versions:
  * Graphical user interface and debugger (gtk, qt or both)
  * Implementation of breakpoints to debugger so debugging will be much easier.
  * ttk-15 and ttk-91 has very inefficient state register. In any exception
@@ -61,7 +62,7 @@ ttk-15 is still in under development. We are planned at least following things t
  under cygwin or mingw. Actually there is very little OS dependent code so porting would
  be very simple and fast.
  * linux man pages
- * pdf formatted users guide
+ * pdf formatted users guide ~~
 
 
 
