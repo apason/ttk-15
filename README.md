@@ -49,21 +49,14 @@ be run in machine.
 
 ## coming up
 This project is discontinued.
-~~ ttk-15 is still in under development. We are planned at least following things to next versions:
- * Graphical user interface and debugger (gtk, qt or both)
- * Implementation of breakpoints to debugger so debugging will be much easier.
- * ttk-15 and ttk-91 has very inefficient state register. In any exception
- (owerflow, div of zero etc..) the corresponding bits in state register is modified.
- However since there is no instruction to investigate this register it is quite useless.
- In next versions there will be instruction for it so state register would have a real utility.
- * Implementation of hardware clock and real support for interrupts. This allows one to
- write strings or even operating system to ttk-15
- * Full windows support. We have not tested ttk-15 in windows but it might compile well
- under cygwin or mingw. Actually there is very little OS dependent code so porting would
- be very simple and fast.
- * linux man pages
- * pdf formatted users guide ~~
-
+~~ttk-15 is still in under development. We are planned at least following things to next versions:~~
+ - ~~Graphical user interface and debugger (gtk, qt or both)~~
+ - ~~Implementation of breakpoints to debugger so debugging will be much easier.~~
+ - ~~ttk-15 and ttk-91 has very inefficient state register. In any exception (owerflow, div of zero etc..) the corresponding bits in state register is modified. However, since there is no instruction to investigate this register it is quite useless. In next versions there will be instruction for it so state register would have a real utility.~~
+ - ~~Implementation of hardware clock and real support for interrupts. This allows one to write strings or even operating system to ttk-15~~
+ - ~~Full windows support. We have not tested ttk-15 in windows but it might compile well under cygwin or mingw. Actually, there is very little OS dependent code so porting would be very simple and fast.~~
+ - ~~linux man pages~~
+ - ~~pdf formatted users guide~~
 
 
 For more information please read documentation in doc/ folder. We are willing to
